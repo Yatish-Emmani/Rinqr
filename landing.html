@@ -4,540 +4,348 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Rinqr — Anonymous Vehicle Contact</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
   <style>
-    body { margin: 0; max-width: 100%; padding: 0; }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #06101e; color: #e8f0f7; font-family: 'DM Sans', sans-serif; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
 
+    /* ── NAV ── */
     .lnav {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 40px;
-      height: 60px;
-      border-bottom: 1px solid var(--border);
-      background: #fff;
-      position: sticky;
-      top: 0;
-      z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 48px; height: 68px;
+      background: rgba(6,16,30,0.85);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(0,212,200,0.12);
+      position: sticky; top: 0; z-index: 200;
     }
-    .lnav-links { display: flex; align-items: center; gap: 28px; }
+    .lnav-links { display: flex; align-items: center; gap: 32px; }
     .lnav-link {
-      font-family: var(--font-m);
-      font-size: 11px;
-      letter-spacing: 1px;
-      color: var(--muted);
-      text-decoration: none;
-      text-transform: uppercase;
-      transition: color .15s;
+      font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 1.5px;
+      color: rgba(200,220,235,0.55); text-decoration: none; text-transform: uppercase;
+      transition: color .2s;
     }
-    .lnav-link:hover { color: var(--text); }
+    .lnav-link:hover { color: #00d4c8; }
     .lnav-cta {
-      background: var(--accent);
-      color: #fff;
-      font-family: var(--font-d);
-      font-size: 15px;
-      letter-spacing: 1px;
-      padding: 8px 20px;
-      border-radius: 5px;
-      text-decoration: none;
-      transition: opacity .15s;
+      background: #00b4aa; color: #06101e;
+      font-family: 'Bebas Neue', sans-serif; font-size: 16px; letter-spacing: 1.5px;
+      padding: 9px 24px; border-radius: 6px; text-decoration: none;
+      transition: background .2s, transform .1s; font-weight: 400;
     }
-    .lnav-cta:hover { opacity: .88; }
+    .lnav-cta:hover { background: #00d4c8; transform: translateY(-1px); }
 
+    /* ── HERO ── */
     .hero {
-      min-height: 92vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-direction: column;
-      text-align: center;
-      padding: 60px 24px;
-      position: relative;
-      overflow: hidden;
-      background: #fff;
-    }
-    .hero-bg {
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(ellipse 60% 50% at 50% 40%, rgba(0, 180, 170, .06) 0%, transparent 70%);
-      pointer-events: none;
+      min-height: 96vh; display: flex; align-items: center; justify-content: center;
+      flex-direction: column; text-align: center; padding: 80px 24px 60px;
+      position: relative; overflow: hidden;
+      background: radial-gradient(ellipse 80% 60% at 50% 20%, rgba(0,180,170,0.12) 0%, transparent 65%),
+                  radial-gradient(ellipse 50% 40% at 80% 80%, rgba(10,22,40,0.8) 0%, transparent 70%),
+                  #06101e;
     }
     .hero-grid {
-      position: absolute;
-      inset: 0;
+      position: absolute; inset: 0; pointer-events: none;
       background-image:
-        linear-gradient(rgba(0,0,0,.04) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(0,0,0,.04) 1px, transparent 1px);
-      background-size: 48px 48px;
-      pointer-events: none;
+        linear-gradient(rgba(0,212,200,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,212,200,0.04) 1px, transparent 1px);
+      background-size: 56px 56px;
+    }
+    .hero-glow {
+      position: absolute; top: -120px; left: 50%; transform: translateX(-50%);
+      width: 600px; height: 600px; pointer-events: none;
+      background: radial-gradient(circle, rgba(0,180,170,0.15) 0%, transparent 65%);
     }
     .hero-eyebrow {
-      font-family: var(--font-m);
-      font-size: 10px;
-      letter-spacing: 3px;
-      text-transform: uppercase;
-      color: var(--accent);
-      margin-bottom: 20px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      position: relative;
+      font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 4px;
+      text-transform: uppercase; color: #00b4aa; margin-bottom: 24px;
+      display: flex; align-items: center; gap: 10px; position: relative;
     }
-    .hero-eyebrow::before,
-    .hero-eyebrow::after {
-      content: '';
-      width: 24px;
-      height: 1px;
-      background: var(--accent);
-      opacity: .5;
+    .hero-eyebrow::before, .hero-eyebrow::after {
+      content: ''; width: 32px; height: 1px; background: #00b4aa; opacity: .4;
     }
     .hero-title {
-      font-family: var(--font-d);
-      font-size: clamp(52px, 9vw, 100px);
-      letter-spacing: 3px;
-      line-height: .95;
-      margin-bottom: 24px;
-      position: relative;
-      color: #0f0f0f;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(64px, 10vw, 116px);
+      letter-spacing: 4px; line-height: .92;
+      margin-bottom: 28px; position: relative; color: #f0f6ff;
     }
-    .hero-title span { color: var(--accent); }
+    .hero-title span { color: #00d4c8; }
+    .hero-title .dim { color: rgba(240,246,255,0.45); }
     .hero-sub {
-      font-size: clamp(15px, 2vw, 18px);
-      color: var(--muted);
-      max-width: 520px;
-      line-height: 1.65;
-      margin-bottom: 36px;
-      position: relative;
+      font-size: clamp(15px, 2vw, 18px); color: rgba(200,220,235,0.65);
+      max-width: 520px; line-height: 1.7; margin-bottom: 40px; position: relative;
     }
-    .hero-sub strong { color: var(--text); font-weight: 500; }
+    .hero-sub strong { color: #e8f0f7; font-weight: 500; }
     .hero-btns {
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-      justify-content: center;
-      position: relative;
-      margin-bottom: 48px;
+      display: flex; gap: 14px; flex-wrap: wrap; justify-content: center;
+      position: relative; margin-bottom: 60px;
     }
-    .hero-btn-primary {
-      background: var(--accent);
-      color: #fff;
-      font-family: var(--font-d);
-      font-size: 18px;
-      letter-spacing: 1px;
-      padding: 14px 32px;
-      border-radius: 6px;
-      text-decoration: none;
-      transition: opacity .15s, transform .1s;
+    .btn-primary {
+      background: #00b4aa; color: #06101e;
+      font-family: 'Bebas Neue', sans-serif; font-size: 19px; letter-spacing: 1.5px;
+      padding: 15px 36px; border-radius: 7px; text-decoration: none;
+      transition: background .2s, transform .15s, box-shadow .2s;
+      box-shadow: 0 0 0 0 rgba(0,180,170,0);
     }
-    .hero-btn-primary:hover { opacity: .88; transform: translateY(-1px); }
-    .hero-btn-secondary {
-      background: transparent;
-      color: var(--text);
-      font-family: var(--font-d);
-      font-size: 18px;
-      letter-spacing: 1px;
-      padding: 14px 32px;
-      border-radius: 6px;
-      border: 1px solid var(--border2);
-      text-decoration: none;
-      transition: border-color .15s, transform .1s;
+    .btn-primary:hover { background: #00d4c8; transform: translateY(-2px); box-shadow: 0 8px 32px rgba(0,180,170,0.3); }
+    .btn-ghost {
+      background: transparent; color: rgba(200,220,235,0.8);
+      font-family: 'Bebas Neue', sans-serif; font-size: 19px; letter-spacing: 1.5px;
+      padding: 15px 36px; border-radius: 7px; text-decoration: none;
+      border: 1px solid rgba(0,212,200,0.25);
+      transition: border-color .2s, color .2s, transform .15s;
     }
-    .hero-btn-secondary:hover { border-color: var(--accent); color: var(--accent); transform: translateY(-1px); }
-
+    .btn-ghost:hover { border-color: #00b4aa; color: #00d4c8; transform: translateY(-2px); }
     .hero-stats {
-      display: flex;
-      gap: 32px;
-      flex-wrap: wrap;
-      justify-content: center;
-      position: relative;
+      display: flex; gap: 48px; flex-wrap: wrap; justify-content: center; position: relative;
+      padding-top: 40px; border-top: 1px solid rgba(0,212,200,0.12);
     }
     .hero-stat-val {
-      font-family: var(--font-d);
-      font-size: 28px;
-      color: var(--text);
-      letter-spacing: 1px;
+      font-family: 'Bebas Neue', sans-serif; font-size: 34px; color: #f0f6ff;
+      letter-spacing: 2px; line-height: 1;
     }
-    .hero-stat-val span { color: var(--accent); }
+    .hero-stat-val span { color: #00d4c8; }
     .hero-stat-label {
-      font-family: var(--font-m);
-      font-size: 10px;
-      letter-spacing: 1px;
-      color: var(--muted);
-      text-transform: uppercase;
-      margin-top: 2px;
+      font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 1.5px;
+      color: rgba(200,220,235,0.4); text-transform: uppercase; margin-top: 4px;
     }
 
-    .section {
-      padding: 80px 40px;
-      max-width: 1080px;
-      margin: 0 auto;
-    }
+    /* ── SECTION SHARED ── */
+    .section { padding: 96px 48px; max-width: 1100px; margin: 0 auto; }
     .section-eyebrow {
-      font-family: var(--font-m);
-      font-size: 10px;
-      letter-spacing: 3px;
-      text-transform: uppercase;
-      color: var(--accent);
-      margin-bottom: 12px;
+      font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 4px;
+      text-transform: uppercase; color: #00b4aa; margin-bottom: 14px;
     }
     .section-title {
-      font-family: var(--font-d);
-      font-size: clamp(32px, 5vw, 52px);
-      letter-spacing: 2px;
-      line-height: 1;
-      margin-bottom: 14px;
-      color: var(--text);
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(36px, 5vw, 58px);
+      letter-spacing: 2px; line-height: .95;
+      margin-bottom: 16px; color: #f0f6ff;
     }
-    .section-sub {
-      font-size: 15px;
-      color: var(--muted);
-      max-width: 480px;
-      line-height: 1.65;
-      margin-bottom: 48px;
-    }
+    .section-sub { font-size: 15px; color: rgba(200,220,235,0.55); max-width: 500px; line-height: 1.7; margin-bottom: 52px; }
 
-    .how-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 16px;
-    }
+    /* ── DIVIDER ── */
+    .full-divider { border: none; border-top: 1px solid rgba(0,212,200,0.08); }
+
+    /* ── HOW IT WORKS ── */
+    .how-section { background: #06101e; }
+    .how-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; }
     .how-card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 24px 20px;
-      position: relative;
-      overflow: hidden;
-      transition: border-color .2s, transform .2s;
+      background: rgba(255,255,255,0.03); border: 1px solid rgba(0,212,200,0.10);
+      border-radius: 12px; padding: 28px 22px; position: relative; overflow: hidden;
+      transition: border-color .25s, transform .25s, background .25s;
     }
-    .how-card:hover { border-color: var(--accent); transform: translateY(-3px); }
+    .how-card:hover {
+      border-color: rgba(0,212,200,0.35); transform: translateY(-4px);
+      background: rgba(0,180,170,0.05);
+    }
     .how-card::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 0; right: 0;
-      height: 3px;
-      background: var(--accent);
-      opacity: 0;
-      transition: opacity .2s;
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+      background: linear-gradient(90deg, #00b4aa, #00d4c8);
+      opacity: 0; transition: opacity .25s;
     }
     .how-card:hover::before { opacity: 1; }
     .how-num {
-      font-family: var(--font-d);
-      font-size: 48px;
-      color: rgba(0,0,0,.06);
-      line-height: 1;
-      margin-bottom: 14px;
+      font-family: 'Bebas Neue', sans-serif; font-size: 56px;
+      color: rgba(0,212,200,0.08); line-height: 1; margin-bottom: 16px; letter-spacing: 2px;
     }
-    .how-icon { font-size: 28px; margin-bottom: 12px; display: block; }
-    .how-title { font-size: 15px; font-weight: 500; margin-bottom: 6px; color: var(--text); }
-    .how-desc  { font-size: 13px; color: var(--muted); line-height: 1.6; }
+    .how-icon { font-size: 28px; margin-bottom: 14px; display: block; }
+    .how-title { font-size: 15px; font-weight: 500; margin-bottom: 8px; color: #e8f0f7; }
+    .how-desc { font-size: 13px; color: rgba(200,220,235,0.5); line-height: 1.65; }
 
-    .features-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 14px;
-    }
+    /* ── FEATURES ── */
+    .features-section { background: #06101e; }
+    .features-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
     .feature-card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 24px;
-      transition: border-color .2s;
+      background: rgba(255,255,255,0.03); border: 1px solid rgba(0,212,200,0.10);
+      border-radius: 12px; padding: 28px; transition: border-color .25s, background .25s;
     }
-    .feature-card:hover { border-color: var(--accent); }
+    .feature-card:hover { border-color: rgba(0,212,200,0.30); background: rgba(0,180,170,0.04); }
     .feature-card.featured {
-      border-color: rgba(0, 180, 170, .35);
-      background: rgba(0, 180, 170, .03);
+      border-color: rgba(0,212,200,0.22);
+      background: rgba(0,180,170,0.06);
       grid-column: span 2;
     }
-    .feature-icon  { font-size: 24px; margin-bottom: 12px; display: block; }
-    .feature-title { font-size: 16px; font-weight: 500; margin-bottom: 6px; color: var(--text); }
-    .feature-desc  { font-size: 13px; color: var(--muted); line-height: 1.65; }
+    .feature-icon { font-size: 26px; margin-bottom: 14px; display: block; }
+    .feature-title { font-size: 16px; font-weight: 500; margin-bottom: 8px; color: #e8f0f7; }
+    .feature-desc { font-size: 13px; color: rgba(200,220,235,0.52); line-height: 1.7; }
     .feature-tag {
-      display: inline-block;
-      font-family: var(--font-m);
-      font-size: 9px;
-      letter-spacing: 1px;
-      padding: 3px 8px;
-      border-radius: 4px;
-      margin-top: 10px;
-      background: rgba(0, 180, 170, .10);
-      color: var(--accent);
-      border: 1px solid rgba(0, 180, 170, .25);
+      display: inline-block; font-family: 'DM Mono', monospace; font-size: 9px;
+      letter-spacing: 1.5px; padding: 4px 10px; border-radius: 4px; margin-top: 12px;
+      background: rgba(0,180,170,0.12); color: #00d4c8;
+      border: 1px solid rgba(0,212,200,0.25); text-transform: uppercase;
     }
 
+    /* ── DEMO ── */
     .demo-strip {
-      background: var(--surface);
-      border-top: 1px solid var(--border);
-      border-bottom: 1px solid var(--border);
-      padding: 60px 40px;
+      background: rgba(0,180,170,0.04);
+      border-top: 1px solid rgba(0,212,200,0.08);
+      border-bottom: 1px solid rgba(0,212,200,0.08);
+      padding: 80px 48px;
     }
-    .demo-inner {
-      max-width: 1080px;
-      margin: 0 auto;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 48px;
-      align-items: center;
-    }
+    .demo-inner { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; }
     .demo-phone {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 20px;
-      max-width: 320px;
-      margin: 0 auto;
+      background: #0d1f38; border: 1px solid rgba(0,212,200,0.18);
+      border-radius: 20px; padding: 24px; max-width: 300px; margin: 0 auto;
+      box-shadow: 0 32px 64px rgba(0,0,0,0.4), 0 0 0 1px rgba(0,212,200,0.08);
     }
     .demo-phone-header {
-      font-family: var(--font-m);
-      font-size: 9px;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      color: var(--muted);
-      margin-bottom: 14px;
-      text-align: center;
+      font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 2px;
+      text-transform: uppercase; color: rgba(200,220,235,0.35);
+      margin-bottom: 16px; text-align: center;
     }
-    .demo-reason-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 6px;
-      margin-bottom: 12px;
-    }
+    .demo-reason-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; margin-bottom: 14px; }
     .demo-reason {
-      background: var(--card2);
-      border: 1px solid var(--border);
-      border-radius: 7px;
-      padding: 10px 8px;
-      font-size: 11px;
-      text-align: center;
-      color: var(--text);
+      background: rgba(255,255,255,0.04); border: 1px solid rgba(0,212,200,0.12);
+      border-radius: 8px; padding: 11px 8px; font-size: 11px; text-align: center;
+      color: rgba(200,220,235,0.6);
     }
     .demo-reason.sel {
-      border-color: var(--accent);
-      background: rgba(0, 180, 170, .08);
-      color: var(--accent);
+      border-color: #00b4aa; background: rgba(0,180,170,0.12); color: #00d4c8;
     }
+    .demo-input {
+      background: rgba(255,255,255,0.05); border: 1px solid rgba(0,212,200,0.15);
+      border-radius: 8px; padding: 11px 14px; margin-bottom: 12px;
+    }
+    .demo-input-label { font-family: 'DM Mono', monospace; font-size: 9px; color: rgba(200,220,235,0.35); margin-bottom: 5px; letter-spacing: 1px; text-transform: uppercase; }
+    .demo-input-val { font-family: 'DM Mono', monospace; font-size: 16px; letter-spacing: 2px; color: rgba(200,220,235,0.7); }
     .demo-btn {
-      width: 100%;
-      background: var(--accent);
-      color: #fff;
-      font-family: var(--font-d);
-      font-size: 15px;
-      letter-spacing: 1px;
-      padding: 11px;
-      border-radius: 6px;
-      text-align: center;
-      margin-bottom: 8px;
+      width: 100%; background: #00b4aa; color: #06101e;
+      font-family: 'Bebas Neue', sans-serif; font-size: 16px; letter-spacing: 1.5px;
+      padding: 12px; border-radius: 7px; text-align: center; margin-bottom: 10px;
     }
-    .demo-privacy {
-      text-align: center;
-      font-family: var(--font-m);
-      font-size: 10px;
-      color: var(--green);
-    }
+    .demo-privacy { text-align: center; font-family: 'DM Mono', monospace; font-size: 10px; color: rgba(0,212,200,0.5); }
 
-    .pricing-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 14px;
-    }
+    /* ── PRICING ── */
+    .pricing-section { background: #06101e; }
+    .pricing-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 14px; }
     .price-card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      overflow: hidden;
-      transition: border-color .2s, transform .2s;
-      display: flex;
-      flex-direction: column;
+      background: rgba(255,255,255,0.03); border: 1px solid rgba(0,212,200,0.10);
+      border-radius: 12px; overflow: hidden; display: flex; flex-direction: column;
+      transition: border-color .25s, transform .25s;
     }
-    .price-card:hover { transform: translateY(-4px); border-color: var(--border2); }
-    .price-card.featured {
-      border-color: var(--accent);
-      position: relative;
-    }
+    .price-card:hover { transform: translateY(-4px); border-color: rgba(0,212,200,0.25); }
+    .price-card.featured { border-color: #00b4aa; position: relative; }
     .price-card.featured::before {
-      content: 'MOST POPULAR';
-      position: absolute;
-      top: 0; left: 0; right: 0;
-      background: var(--accent);
-      font-family: var(--font-m);
-      font-size: 9px;
-      letter-spacing: 2px;
-      color: #fff;
-      text-align: center;
-      padding: 5px;
+      content: 'MOST POPULAR'; position: absolute; top: 0; left: 0; right: 0;
+      background: #00b4aa; font-family: 'DM Mono', monospace; font-size: 9px;
+      letter-spacing: 2px; color: #06101e; text-align: center; padding: 6px; font-weight: 500;
     }
     .price-head {
-      padding: 24px 20px 16px;
-      border-bottom: 1px solid var(--border);
-      background: var(--surface);
+      padding: 24px 20px 18px; border-bottom: 1px solid rgba(0,212,200,0.08);
+      background: rgba(255,255,255,0.02);
     }
-    .price-card.featured .price-head { padding-top: 36px; }
+    .price-card.featured .price-head { padding-top: 38px; }
     .price-name {
-      font-family: var(--font-m);
-      font-size: 10px;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      color: var(--muted);
-      margin-bottom: 10px;
+      font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 2px;
+      text-transform: uppercase; color: rgba(200,220,235,0.4); margin-bottom: 10px;
     }
-    .price-amount {
-      font-family: var(--font-d);
-      font-size: 38px;
-      letter-spacing: 1px;
-      line-height: 1;
-      color: var(--text);
-    }
-    .price-amount sup { font-size: 18px; vertical-align: top; margin-top: 5px; display: inline-block; }
-    .price-amount sub {
-      font-family: var(--font-b);
-      font-size: 12px;
-      color: var(--muted);
-      font-weight: 400;
-    }
-    .price-annual {
-      font-family: var(--font-m);
-      font-size: 10px;
-      color: var(--green);
-      margin-top: 4px;
-    }
-    .price-desc { font-size: 12px; color: var(--muted); margin-top: 6px; }
+    .price-amount { font-family: 'Bebas Neue', sans-serif; font-size: 42px; letter-spacing: 1px; line-height: 1; color: #f0f6ff; }
+    .price-amount sup { font-size: 20px; vertical-align: top; margin-top: 6px; display: inline-block; }
+    .price-amount sub { font-family: 'DM Sans', sans-serif; font-size: 12px; color: rgba(200,220,235,0.4); font-weight: 400; }
+    .price-annual { font-family: 'DM Mono', monospace; font-size: 10px; color: #1a9e7a; margin-top: 5px; }
+    .price-desc { font-size: 12px; color: rgba(200,220,235,0.4); margin-top: 7px; }
     .price-body { padding: 20px; flex: 1; display: flex; flex-direction: column; }
-    .price-features { list-style: none; display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; flex: 1; }
-    .price-features li {
-      display: flex;
-      gap: 8px;
-      align-items: flex-start;
-      font-size: 13px;
-      color: var(--text);
-    }
-    .pf-check { color: var(--green); flex-shrink: 0; }
-    .pf-x     { color: var(--muted2); flex-shrink: 0; }
+    .price-features { list-style: none; display: flex; flex-direction: column; gap: 9px; margin-bottom: 20px; flex: 1; }
+    .price-features li { display: flex; gap: 8px; align-items: flex-start; font-size: 13px; color: rgba(200,220,235,0.7); }
+    .pf-check { color: #00b4aa; flex-shrink: 0; }
+    .pf-x     { color: rgba(200,220,235,0.2); flex-shrink: 0; }
     .price-btn {
-      display: block;
-      width: 100%;
-      padding: 12px;
-      border-radius: 6px;
-      text-align: center;
-      font-family: var(--font-d);
-      font-size: 16px;
-      letter-spacing: 1px;
-      text-decoration: none;
-      transition: opacity .15s;
-      border: none;
-      cursor: pointer;
+      display: block; width: 100%; padding: 12px; border-radius: 7px;
+      text-align: center; font-family: 'Bebas Neue', sans-serif; font-size: 17px;
+      letter-spacing: 1px; text-decoration: none; transition: opacity .15s, transform .1s;
+      border: none; cursor: pointer;
     }
-    .price-btn.primary { background: var(--accent); color: #fff; }
-    .price-btn.secondary { background: var(--card2); color: var(--text); border: 1px solid var(--border2); }
-    .price-btn.dark { background: #1a1a1a; color: #fff; }
-    .price-btn:hover { opacity: .88; }
+    .price-btn:hover { opacity: .88; transform: translateY(-1px); }
+    .price-btn.primary { background: #00b4aa; color: #06101e; }
+    .price-btn.secondary { background: rgba(255,255,255,0.06); color: rgba(200,220,235,0.8); border: 1px solid rgba(0,212,200,0.2); }
+    .price-btn.dark { background: rgba(255,255,255,0.08); color: #e8f0f7; border: 1px solid rgba(255,255,255,0.12); }
 
+    /* ── B2B ── */
     .b2b-strip {
-      background: var(--surface);
-      border-top: 1px solid var(--border);
-      border-bottom: 1px solid var(--border);
-      padding: 60px 40px;
+      background: rgba(0,180,170,0.04);
+      border-top: 1px solid rgba(0,212,200,0.08);
+      border-bottom: 1px solid rgba(0,212,200,0.08);
+      padding: 80px 48px;
     }
-    .b2b-inner { max-width: 1080px; margin: 0 auto; }
-    .b2b-cards {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 14px;
-      margin-top: 40px;
-    }
+    .b2b-inner { max-width: 1100px; margin: 0 auto; }
+    .b2b-cards { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; margin-top: 44px; }
     .b2b-card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 22px;
-      transition: border-color .2s;
+      background: rgba(255,255,255,0.03); border: 1px solid rgba(0,212,200,0.10);
+      border-radius: 12px; padding: 26px; transition: border-color .25s, background .25s;
     }
-    .b2b-card:hover { border-color: var(--accent); }
-    .b2b-icon  { font-size: 28px; margin-bottom: 12px; display: block; }
-    .b2b-title { font-size: 15px; font-weight: 500; margin-bottom: 6px; color: var(--text); }
-    .b2b-desc  { font-size: 13px; color: var(--muted); line-height: 1.6; margin-bottom: 12px; }
+    .b2b-card:hover { border-color: rgba(0,212,200,0.28); background: rgba(0,180,170,0.05); }
+    .b2b-icon { font-size: 28px; margin-bottom: 14px; display: block; }
+    .b2b-title { font-size: 15px; font-weight: 500; margin-bottom: 7px; color: #e8f0f7; }
+    .b2b-desc { font-size: 13px; color: rgba(200,220,235,0.5); line-height: 1.65; margin-bottom: 14px; }
     .b2b-price {
-      font-family: var(--font-m);
-      font-size: 11px;
-      color: var(--accent);
-      background: rgba(0, 180, 170, .08);
-      border: 1px solid rgba(0, 180, 170, .25);
-      padding: 4px 10px;
-      border-radius: 4px;
-      display: inline-block;
+      font-family: 'DM Mono', monospace; font-size: 11px; color: #00d4c8;
+      background: rgba(0,180,170,0.10); border: 1px solid rgba(0,212,200,0.22);
+      padding: 5px 10px; border-radius: 5px; display: inline-block;
     }
 
-    .cta-section {
-      padding: 100px 40px;
+    /* ── CTA ── */
+    .cta-wrap {
+      background: radial-gradient(ellipse 60% 80% at 50% 50%, rgba(0,180,170,0.1) 0%, transparent 70%), #06101e;
+      border-top: 1px solid rgba(0,212,200,0.08);
+      padding: 110px 24px;
       text-align: center;
-      max-width: 600px;
-      margin: 0 auto;
     }
     .cta-title {
-      font-family: var(--font-d);
-      font-size: clamp(36px, 6vw, 64px);
-      letter-spacing: 2px;
-      line-height: 1;
-      margin-bottom: 16px;
-      color: var(--text);
+      font-family: 'Bebas Neue', sans-serif; font-size: clamp(40px, 7vw, 72px);
+      letter-spacing: 3px; line-height: .95; margin-bottom: 18px; color: #f0f6ff;
     }
-    .cta-title span { color: var(--accent); }
-    .cta-sub { font-size: 15px; color: var(--muted); margin-bottom: 32px; line-height: 1.65; }
-    .cta-btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+    .cta-title span { color: #00d4c8; }
+    .cta-sub { font-size: 15px; color: rgba(200,220,235,0.5); margin-bottom: 36px; line-height: 1.65; max-width: 440px; margin-left: auto; margin-right: auto; }
+    .cta-btns { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
 
+    /* ── FOOTER ── */
     .footer {
-      border-top: 1px solid var(--border);
-      padding: 32px 40px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 16px;
-      background: var(--surface);
+      border-top: 1px solid rgba(0,212,200,0.08); padding: 32px 48px;
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 16px; background: rgba(0,0,0,0.3);
     }
-    .footer-links { display: flex; gap: 20px; }
+    .footer-links { display: flex; gap: 24px; flex-wrap: wrap; }
     .footer-link {
-      font-family: var(--font-m);
-      font-size: 10px;
-      letter-spacing: 1px;
-      color: var(--muted2);
-      text-decoration: none;
-      text-transform: uppercase;
+      font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 1.5px;
+      color: rgba(200,220,235,0.3); text-decoration: none; text-transform: uppercase;
       transition: color .15s;
     }
-    .footer-link:hover { color: var(--accent); }
-    .footer-note { font-family: var(--font-m); font-size: 10px; color: var(--muted2); }
-    .full-divider { border: none; border-top: 1px solid var(--border); }
+    .footer-link:hover { color: #00b4aa; }
+    .footer-note { font-family: 'DM Mono', monospace; font-size: 10px; color: rgba(200,220,235,0.2); }
 
+    /* ── LOGO IN NAV ── */
+    .logo-img { height: 38px; width: auto; display: block; }
+
+    /* ── RESPONSIVE ── */
     @media (max-width: 900px) {
-      .pricing-grid { grid-template-columns: repeat(2, 1fr); }
-      .price-card { overflow: hidden; }
-      .price-card.featured::before { font-size: 8px; letter-spacing: 1px; }
+      .pricing-grid { grid-template-columns: repeat(2,1fr); }
+      .how-grid { grid-template-columns: 1fr 1fr; }
     }
-    @media (max-width: 800px) {
+    @media (max-width: 768px) {
       .lnav { padding: 0 20px; }
       .lnav-links { display: none; }
       .section { padding: 60px 20px; }
-      .how-grid { grid-template-columns: 1fr 1fr; }
+      .demo-strip, .b2b-strip { padding: 60px 20px; }
+      .demo-inner { grid-template-columns: 1fr; }
       .features-grid { grid-template-columns: 1fr; }
       .feature-card.featured { grid-column: span 1; }
-      .demo-inner { grid-template-columns: 1fr; }
       .b2b-cards { grid-template-columns: 1fr; }
       .footer { flex-direction: column; align-items: flex-start; padding: 24px 20px; }
-      .demo-strip { padding: 40px 20px; }
-      .b2b-strip  { padding: 40px 20px; }
+      .hero-stats { gap: 28px; }
     }
     @media (max-width: 500px) {
       .how-grid { grid-template-columns: 1fr; }
       .pricing-grid { grid-template-columns: 1fr; }
-      .hero-stats { gap: 20px; }
     }
   </style>
 </head>
 <body>
 
 <nav class="lnav">
-  <a href="landing.html" class="logo-mark">
+  <a href="landing.html" style="text-decoration:none; display:flex; align-items:center;">
     <img src="Rinqr_logo.png" alt="Rinqr" class="logo-img">
   </a>
   <div class="lnav-links">
@@ -551,11 +359,11 @@
 </nav>
 
 <section class="hero">
-  <div class="hero-bg"></div>
   <div class="hero-grid"></div>
+  <div class="hero-glow"></div>
   <div class="hero-eyebrow">Privacy-first vehicle contact</div>
   <h1 class="hero-title">
-    SOMEONE<br>NEEDS TO<br>REACH <span>YOUR CAR</span>
+    SOMEONE<br><span class="dim">NEEDS TO</span><br>REACH <span>YOUR CAR</span>
   </h1>
   <p class="hero-sub">
     Rinqr lets anyone contact you when your car needs attention —
@@ -563,8 +371,8 @@
     One scan. Instant masked connection.
   </p>
   <div class="hero-btns">
-    <a href="activate.html" class="hero-btn-primary">Get your tag — $9.99</a>
-    <a href="index.html" class="hero-btn-secondary">See scanner demo</a>
+    <a href="activate.html" class="btn-primary">Get your tag — $9.99</a>
+    <a href="index.html" class="btn-ghost">See scanner demo</a>
   </div>
   <div class="hero-stats">
     <div class="hero-stat">
@@ -588,7 +396,7 @@
 
 <hr class="full-divider">
 
-<section class="section" id="how">
+<section class="section how-section" id="how">
   <div class="section-eyebrow">How it works</div>
   <h2 class="section-title">FOUR STEPS.<br>ZERO AWKWARD.</h2>
   <p class="section-sub">From sticker to solved in under 60 seconds. No apps. No accounts for the scanner.</p>
@@ -622,7 +430,7 @@
 
 <hr class="full-divider">
 
-<section class="section" id="features">
+<section class="section features-section" id="features">
   <div class="section-eyebrow">Features</div>
   <h2 class="section-title">BUILT FOR THE<br>REAL WORLD.</h2>
   <p class="section-sub">Every feature designed around one principle: protect your privacy while staying reachable.</p>
@@ -666,30 +474,30 @@
 <div class="demo-strip">
   <div class="demo-inner">
     <div class="demo-left">
-      <div class="section-eyebrow" style="margin-bottom:12px">Live demo</div>
-      <h2 class="section-title" style="font-size:clamp(28px,4vw,44px);margin-bottom:14px">SEE EXACTLY<br>WHAT SCANNERS SEE</h2>
-      <p style="font-size:14px;color:var(--muted);line-height:1.65;margin-bottom:24px">
+      <div class="section-eyebrow" style="margin-bottom:14px">Live demo</div>
+      <h2 class="section-title" style="font-size:clamp(30px,4vw,48px);margin-bottom:16px">SEE EXACTLY<br>WHAT SCANNERS SEE</h2>
+      <p style="font-size:14px;color:rgba(200,220,235,0.55);line-height:1.7;margin-bottom:28px">
         The scanner page is a simple mobile web page. No login. No download.
         They pick a reason, enter their number, and your Twilio relay does the rest.
         Their number stays hidden from you. Yours stays hidden from them.
       </p>
-      <a href="index.html" class="hero-btn-primary" style="display:inline-block;text-decoration:none">
+      <a href="index.html" class="btn-primary" style="display:inline-block;text-decoration:none;">
         Try the scanner demo →
       </a>
     </div>
     <div>
       <div class="demo-phone">
         <div class="demo-phone-header">Scanner's view — no app needed</div>
-        <div style="font-family:var(--font-m);font-size:9px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:8px">Why are you reaching out?</div>
+        <div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:2px;color:rgba(200,220,235,0.35);text-transform:uppercase;margin-bottom:10px">Why are you reaching out?</div>
         <div class="demo-reason-grid">
           <div class="demo-reason sel">🚗 Blocking<br>driveway</div>
           <div class="demo-reason">💡 Left<br>lights on</div>
           <div class="demo-reason">⚠️ Minor<br>accident</div>
           <div class="demo-reason">💬 Other<br>message</div>
         </div>
-        <div style="background:var(--card2);border:1px solid var(--border);border-radius:6px;padding:10px 12px;margin-bottom:10px">
-          <div style="font-family:var(--font-m);font-size:9px;color:var(--muted);margin-bottom:5px;letter-spacing:1px">YOUR PHONE NUMBER</div>
-          <div style="font-family:var(--font-m);font-size:16px;letter-spacing:2px;color:var(--text)">(555) 000-0000</div>
+        <div class="demo-input">
+          <div class="demo-input-label">Your phone number</div>
+          <div class="demo-input-val">(555) 000-0000</div>
         </div>
         <div class="demo-btn">Connect anonymously →</div>
         <div class="demo-privacy">🔒 Your number is never shared</div>
@@ -698,7 +506,7 @@
   </div>
 </div>
 
-<section class="section" id="pricing">
+<section class="section pricing-section" id="pricing">
   <div class="section-eyebrow">Pricing</div>
   <h2 class="section-title">SIMPLE.<br>NO SURPRISES.</h2>
   <p class="section-sub">Start free. Upgrade when you need more. No hidden fees, ever.</p>
@@ -708,7 +516,7 @@
       <div class="price-head">
         <div class="price-name">Starter</div>
         <div class="price-amount"><sup>$</sup>0</div>
-        <div class="price-annual" style="color:var(--muted)">+ $9.99 one-time for physical tag</div>
+        <div class="price-annual" style="color:rgba(200,220,235,0.35)">+ $9.99 one-time for physical tag</div>
         <div class="price-desc">For drivers who just want to be reachable.</div>
       </div>
       <div class="price-body">
@@ -718,8 +526,8 @@
           <li><span class="pf-check">✓</span>SMS alerts</li>
           <li><span class="pf-check">✓</span>Unlimited scans</li>
           <li><span class="pf-check">✓</span>Last 5 scans visible</li>
-          <li><span class="pf-x">–</span><span style="color:var(--muted2)">Full scan history</span></li>
-          <li><span class="pf-x">–</span><span style="color:var(--muted2)">Emergency contact</span></li>
+          <li><span class="pf-x">–</span><span style="color:rgba(200,220,235,0.25)">Full scan history</span></li>
+          <li><span class="pf-x">–</span><span style="color:rgba(200,220,235,0.25)">Emergency contact</span></li>
         </ul>
         <a href="activate.html" class="price-btn secondary">Get started →</a>
       </div>
@@ -796,8 +604,8 @@
 <div class="b2b-strip" id="business">
   <div class="b2b-inner">
     <div class="section-eyebrow">For business</div>
-    <h2 class="section-title" style="font-size:clamp(28px,4vw,48px);margin-bottom:12px">YOUR PARKING<br>PROBLEMS. SOLVED.</h2>
-    <p style="font-size:14px;color:var(--muted);max-width:480px;line-height:1.65;margin-bottom:0">
+    <h2 class="section-title" style="font-size:clamp(30px,4vw,52px);margin-bottom:14px">YOUR PARKING<br>PROBLEMS. SOLVED.</h2>
+    <p style="font-size:14px;color:rgba(200,220,235,0.5);max-width:480px;line-height:1.7">
       From office parks to dealership fleets — Rinqr scales to any size property.
     </p>
     <div class="b2b-cards">
@@ -820,29 +628,25 @@
         <span class="b2b-price">From $299 / property / yr</span>
       </div>
     </div>
-    <div style="margin-top:20px">
-      <a href="property.html" class="hero-btn-primary" style="display:inline-block;text-decoration:none">
+    <div style="margin-top:28px">
+      <a href="property.html" class="btn-primary" style="display:inline-block;text-decoration:none;">
         See property manager portal →
       </a>
     </div>
   </div>
 </div>
 
-<hr class="full-divider">
-
-<div style="background:var(--surface);border-top:1px solid var(--border)">
-  <div class="cta-section">
-    <h2 class="cta-title">READY TO<br>PROTECT YOUR <span>NUMBER?</span></h2>
-    <p class="cta-sub">Join drivers staying reachable without sacrificing their privacy. Setup takes 60 seconds.</p>
-    <div class="cta-btns">
-      <a href="activate.html" class="hero-btn-primary">Get your tag — $9.99</a>
-      <a href="index.html" class="hero-btn-secondary">See how it works</a>
-    </div>
+<div class="cta-wrap">
+  <h2 class="cta-title">READY TO<br>PROTECT YOUR <span>NUMBER?</span></h2>
+  <p class="cta-sub">Join drivers staying reachable without sacrificing their privacy. Setup takes 60 seconds.</p>
+  <div class="cta-btns">
+    <a href="activate.html" class="btn-primary">Get your tag — $9.99</a>
+    <a href="index.html" class="btn-ghost">See how it works</a>
   </div>
 </div>
 
 <footer class="footer">
-  <a href="landing.html" class="logo-mark">
+  <a href="landing.html" style="text-decoration:none; display:flex; align-items:center;">
     <img src="Rinqr_logo.png" alt="Rinqr" class="logo-img">
   </a>
   <div class="footer-links">
