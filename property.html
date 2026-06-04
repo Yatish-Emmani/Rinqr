@@ -541,21 +541,169 @@ function closeModal(e) {
   document.getElementById('modalOverlay').classList.remove('open');
 }
 
-function submitForm() {
-  const email = document.getElementById('cf-email').value.trim();
-  const first = document.getElementById('cf-first').value.trim();
+async function submitForm() {
+  const first    = document.getElementById('cf-first').value.trim();
+  const last     = document.getElementById('cf-last').value.trim();
+  const email    = document.getElementById('cf-email').value.trim();
   const property = document.getElementById('cf-property').value.trim();
+  const city     = document.getElementById('cf-city').value.trim();
+  const units    = document.getElementById('cf-units').value.trim();
+  const pain     = document.getElementById('cf-pain').value.trim();
+
   if (!first || !email || !property) {
     showToast('Please fill in your name, email, and property name');
     return;
   }
-  document.getElementById('confirmedEmail').textContent = email;
-  document.getElementById('contactForm').style.display = 'none';
-  document.getElementById('successMsg').classList.add('show');
+
+  const btn = document.querySelector('.submit-btn');
+  btn.textContent = 'Sending…';
+  btn.disabled = true;
+
+  try {
+    const res = await fetch('/api/pilot-request', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ first, last, email, property, city, units, pain }),
+    });
+
+    const data = await res.json();
+
+    if (!res.ok || data.error) {
+      showToast(data.message || 'Something went wrong — email yatish@getrinqr.com directly');
+      btn.textContent = 'Request my free pilot →';
+      btn.disabled = false;
+      return;
+    }
+
+    // Show success state
+    document.getElementById('confirmedEmail').textContent = email;
+    document.getElementById('contactForm').style.display = 'none';
+    document.getElementById('successMsg').classList.add('show');
+
+  } catch (err) {
+    console.error('submitForm error:', err);
+    showToast('Network error — check your connection and try again');
+    btn.textContent = 'Request my free pilot →';
+    btn.disabled = false;
+  }
 }
 
-renderFeed();
-renderChart();
+// ── Real data loader ─────────────────────────────────────────
+// If URL has ?id=PROPERTY_UUID, load live data from D1.
+// Otherwise show the demo/marketing view with fake data.
+const urlParams  = new URLSearchParams(location.search);
+const propertyId = urlParams.get('id');
+
+async function loadDashboard() {
+  if (!propertyId) {
+    // No ID — show demo view for marketing purposes
+    renderFeed();
+    renderChart();
+    return;
+  }
+
+  try {
+    const res  = await fetch(`/api/property/${propertyId}/stats`);
+    if (!res.ok) throw new Error('Failed to load');
+    const data = await res.json();
+
+    // Update stat cards with real numbers
+    document.getElementById('pStatScans').textContent = data.stats.totalScansThisMonth;
+    document.getElementById('pStatTows').textContent  = '—'; // calculated separately
+
+    // Update property header
+    const nameEl = document.querySelector('.prop-name');
+    const addrEl = document.querySelector('.prop-addr');
+    if (nameEl) nameEl.textContent = data.property.name;
+    if (addrEl) addrEl.textContent = data.property.address || '';
+
+    // Render real incidents
+    const feed = document.getElementById('incidentFeed');
+    if (!data.incidents || data.incidents.length === 0) {
+      feed.innerHTML = `
+        <div style="padding:24px;text-align:center;color:var(--muted);font-size:13px">
+          No incidents yet — tags are active and monitoring.
+        </div>`;
+    } else {
+      const iconMap = {
+        'Blocking driveway':  { icon: '🚗', cls: 'red'   },
+        'Left lights on':     { icon: '💡', cls: 'blue'  },
+        'Minor accident':     { icon: '⚠️', cls: 'amber' },
+        'Alarm going off':    { icon: '🔔', cls: 'amber' },
+        'Wrong parking spot': { icon: '🅿️', cls: 'red'   },
+        'Other message':      { icon: '💬', cls: 'green' },
+      };
+      feed.innerHTML = data.incidents.map(inc => {
+        const m   = iconMap[inc.reason] || { icon: '📋', cls: 'blue' };
+        const ago = timeAgo(inc.created_at);
+        return `
+          <div class="incident-item">
+            <div class="inc-icon ${m.cls}">${m.icon}</div>
+            <div class="inc-body">
+              <div class="inc-title">${inc.reason}${inc.unit_number ? ' — Unit ' + inc.unit_number : ''}</div>
+              <div class="inc-meta">${ago} · ${inc.tag_id}${inc.owner_name ? ' · ' + inc.owner_name : ''}</div>
+            </div>
+            <span class="badge ${inc.resolved ? 'badge-green' : 'badge-blue'}">${inc.resolved ? 'resolved' : 'logged'}</span>
+          </div>`;
+      }).join('');
+    }
+
+    // Render chart with real data
+    renderChartFromData(data.chartData);
+
+  } catch (err) {
+    console.error('Dashboard load error:', err);
+    // Fall back to demo data
+    renderFeed();
+    renderChart();
+  }
+}
+
+function timeAgo(dateStr) {
+  const diff = Math.floor((Date.now() - new Date(dateStr)) / 1000);
+  if (diff < 60)   return 'Just now';
+  if (diff < 3600) return Math.floor(diff / 60) + ' min ago';
+  if (diff < 86400) return Math.floor(diff / 3600) + ' hr ago';
+  return Math.floor(diff / 86400) + 'd ago';
+}
+
+function renderChartFromData(chartData) {
+  const el = document.getElementById('propChart');
+  if (!el) return;
+
+  // Build last 7 days labels
+  const days = [];
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date();
+    d.setDate(d.getDate() - i);
+    days.push({
+      label: ['S','M','T','W','T','F','S'][d.getDay()],
+      date:  d.toISOString().slice(0, 10),
+      count: 0,
+    });
+  }
+
+  // Fill in real counts
+  if (chartData) {
+    chartData.forEach(row => {
+      const day = days.find(d => d.date === row.day);
+      if (day) day.count = row.count;
+    });
+  }
+
+  const max = Math.max(...days.map(d => d.count), 1);
+  el.innerHTML = '';
+  days.forEach((d, i) => {
+    const pct = Math.round((d.count / max) * 100);
+    el.innerHTML += `
+      <div class="bar-col">
+        <div class="bar" style="height:${Math.max(pct, 4)}%;background:${i === 6 ? 'var(--accent)' : 'var(--border2)'}" title="${d.count} scans"></div>
+        <div class="bar-lbl">${d.label}</div>
+      </div>`;
+  });
+}
+
+loadDashboard();
 </script>
 </body>
 </html>

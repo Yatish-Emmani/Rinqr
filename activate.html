@@ -287,13 +287,17 @@
       </div>
 
       <div class="field">
-        <label for="propertyName">Apartment / property name <span style="color:var(--muted2)">(optional)</span></label>
+        <label for="propertyCode">Property code <span style="color:var(--muted2)">(optional — given by your manager)</span></label>
         <input
           type="text"
-          id="propertyName"
-          placeholder="Maple Grove Apartments"
-          autocomplete="organization"
+          id="propertyCode"
+          placeholder="e.g. OAKRID26"
+          maxlength="10"
+          oninput="lookupPropertyCode(this)"
+          autocomplete="off"
+          style="text-transform:uppercase;letter-spacing:2px;font-family:var(--font-m)"
         >
+        <div id="propertyCodeResult" style="font-size:12px;min-height:16px;font-family:var(--font-m)"></div>
       </div>
 
       <div class="field">
@@ -379,6 +383,48 @@
   let selectedVehicle = '';
   let activateStep    = 1;
 
+  // ── Property code lookup ──────────────────────────────────
+  let propertyLookupTimer  = null;
+  let resolvedPropertyId   = '';
+  let resolvedPropertyName = '';
+
+  function lookupPropertyCode(input) {
+    input.value = input.value.toUpperCase();
+    const code     = input.value.trim();
+    const resultEl = document.getElementById('propertyCodeResult');
+
+    clearTimeout(propertyLookupTimer);
+    resolvedPropertyId   = '';
+    resolvedPropertyName = '';
+
+    if (code.length < 4) {
+      resultEl.textContent = '';
+      return;
+    }
+
+    resultEl.style.color = 'var(--muted)';
+    resultEl.textContent = 'Looking up…';
+
+    propertyLookupTimer = setTimeout(async () => {
+      try {
+        const res  = await fetch(`/api/property-lookup?code=${encodeURIComponent(code)}`);
+        const data = await res.json();
+
+        if (data.found) {
+          resultEl.style.color = 'var(--green)';
+          resultEl.textContent = `✓ ${data.name}`;
+          resolvedPropertyId   = data.id;
+          resolvedPropertyName = data.name;
+        } else {
+          resultEl.style.color = 'var(--accent)';
+          resultEl.textContent = 'Code not found — leave blank if unsure';
+        }
+      } catch (e) {
+        resultEl.textContent = '';
+      }
+    }, 500);
+  }
+
   function formatTagId(input) {
     let v = input.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
     if (v.length > 8) v = v.slice(0, 8);
@@ -435,7 +481,8 @@
     const phone        = document.getElementById('ownerPhone').value.trim();
     const tag          = document.getElementById('tagId').value.trim();
     const vehicleDesc  = document.getElementById('vehicleDesc').value.trim();
-    const propertyName = document.getElementById('propertyName')?.value.trim() || '';
+    const propertyCode = document.getElementById('propertyCode')?.value.trim()  || '';
+    const propertyName = resolvedPropertyName;
     const unitNumber   = document.getElementById('unitNumber')?.value.trim()   || '';
 
     // Show loading state
@@ -456,6 +503,8 @@
           ownerPhone:   phone,
           vehicleType:  selectedVehicle,
           vehicleDesc,
+          propertyCode,
+          propertyId:   resolvedPropertyId,
           propertyName,
           unitNumber
         })
@@ -504,10 +553,14 @@
     document.getElementById('ownerName').value   = '';
     document.getElementById('ownerPhone').value  = '';
     document.getElementById('vehicleDesc').value = '';
-    const pn = document.getElementById('propertyName');
+    const pc = document.getElementById('propertyCode');
     const un = document.getElementById('unitNumber');
-    if (pn) pn.value = '';
-    if (un) un.value = '';
+    if (pc) { pc.value = ''; }
+    if (un) { un.value = ''; }
+    const resultEl = document.getElementById('propertyCodeResult');
+    if (resultEl) resultEl.textContent = '';
+    resolvedPropertyId   = '';
+    resolvedPropertyName = '';
     document.querySelectorAll('.vehicle-btn').forEach(b => b.classList.remove('selected'));
     selectedVehicle = '';
     document.getElementById('step1Btn').disabled     = true;
