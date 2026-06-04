@@ -106,10 +106,7 @@
     .how-title-prop { font-size: 14px; font-weight: 500; color: var(--text); margin-bottom: 4px; }
     .how-desc-prop { font-size: 12px; color: var(--muted); line-height: 1.6; }
 
-    /* ── DASHBOARD PREVIEW ── */
-    .dashboard-preview { margin-bottom: 20px; }
-
-    /* ── EXISTING PORTAL TABS ── */
+    /* ── DASHBOARD ── */
     .prop-header { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 20px 22px; display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 20px; flex-wrap: wrap; }
     .prop-info { display: flex; align-items: center; gap: 14px; }
     .prop-icon { width: 48px; height: 48px; background: rgba(0, 180, 170, .10); border: 1px solid rgba(0, 180, 170, .25); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
@@ -125,25 +122,6 @@
     .main-grid { display: grid; grid-template-columns: 1fr 340px; gap: 14px; }
     .col-left  { display: flex; flex-direction: column; gap: 14px; }
     .col-right { display: flex; flex-direction: column; gap: 14px; }
-    .vehicle-table { width: 100%; border-collapse: collapse; }
-    .vehicle-table th { font-family: var(--font-m); font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); padding: 10px 14px; text-align: left; border-bottom: 1px solid var(--border); background: var(--surface); white-space: nowrap; }
-    .vehicle-table td { padding: 11px 14px; border-bottom: 1px solid var(--border); font-size: 13px; color: var(--text); background: #fff; }
-    .vehicle-table tr:hover td { background: var(--surface); }
-    .vehicle-table tr:last-child td { border-bottom: none; }
-    .vt-tag { font-family: var(--font-m); font-size: 11px; color: var(--accent); }
-    .vt-scans { font-family: var(--font-m); font-size: 12px; color: var(--text); }
-    .vt-last { font-family: var(--font-m); font-size: 10px; color: var(--muted); }
-    .status-active { display: inline-flex; align-items: center; gap: 4px; font-family: var(--font-m); font-size: 10px; color: var(--green); }
-    .status-inactive { font-family: var(--font-m); font-size: 10px; color: var(--muted2); }
-    .status-dot-sm { width: 5px; height: 5px; border-radius: 50%; background: var(--green); flex-shrink: 0; }
-    .vt-action { font-family: var(--font-m); font-size: 10px; color: var(--accent); cursor: pointer; background: none; border: none; padding: 0; }
-    .table-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 12px 16px; border-bottom: 1px solid var(--border); flex-wrap: wrap; background: var(--surface); }
-    .toolbar-left { display: flex; gap: 8px; align-items: center; }
-    .toolbar-search { background: #fff; border: 1px solid var(--border); color: var(--text); font-family: var(--font-m); font-size: 11px; padding: 7px 12px; border-radius: 5px; outline: none; width: 200px; transition: border-color .15s; }
-    .toolbar-search:focus { border-color: var(--accent); }
-    .toolbar-search::placeholder { color: var(--muted2); }
-    .toolbar-filter { background: #fff; border: 1px solid var(--border); color: var(--muted); font-family: var(--font-m); font-size: 10px; padding: 7px 10px; border-radius: 5px; outline: none; cursor: pointer; width: auto; }
-    .toolbar-count { font-family: var(--font-m); font-size: 10px; color: var(--muted); }
     .incident-item { display: flex; align-items: flex-start; gap: 10px; padding: 10px 16px; border-bottom: 1px solid var(--border); transition: background .15s; cursor: pointer; background: #fff; }
     .incident-item:hover { background: var(--surface); }
     .incident-item:last-child { border-bottom: none; }
@@ -161,12 +139,6 @@
     .bar     { width: 100%; border-radius: 2px 2px 0 0; min-height: 3px; cursor: pointer; transition: opacity .15s; }
     .bar:hover { opacity: .75; }
     .bar-lbl { font-family: var(--font-m); font-size: 8px; color: var(--muted2); }
-    .onboard-item { display: flex; align-items: flex-start; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--border); cursor: pointer; }
-    .onboard-item:last-child { border-bottom: none; }
-    .onboard-check { width: 20px; height: 20px; border-radius: 50%; border: 1px solid var(--border2); display: flex; align-items: center; justify-content: center; font-size: 11px; flex-shrink: 0; margin-top: 1px; transition: background .15s, border-color .15s; }
-    .onboard-check.done { background: var(--accent); border-color: var(--accent); color: #fff; }
-    .onboard-title { font-size: 13px; font-weight: 500; color: var(--text); }
-    .onboard-sub   { font-size: 11px; color: var(--muted); margin-top: 2px; }
     .quick-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
     .qa-btn { background: var(--card2); border: 1px solid var(--border); border-radius: 7px; padding: 12px; cursor: pointer; text-align: left; transition: border-color .15s; color: var(--text); text-decoration: none; display: block; }
     .qa-btn:hover { border-color: var(--accent); }
@@ -262,7 +234,7 @@
     </div>
   </div>
 
-  <!-- HOW IT WORKS FOR PROPERTY -->
+  <!-- HOW IT WORKS -->
   <p class="label" style="margin-bottom:14px">How it works for your property</p>
   <div class="how-grid-prop">
     <div class="how-card-prop">
@@ -348,20 +320,20 @@
     </div>
   </div>
 
-  <!-- DASHBOARD PREVIEW -->
+  <!-- DASHBOARD SECTION -->
   <div id="dashboard" style="margin-bottom:8px">
     <p class="label" style="margin-bottom:14px">Live dashboard preview</p>
   </div>
+
   <div class="prop-header">
     <div class="prop-info">
       <div class="prop-icon">🏢</div>
       <div>
-        <div class="prop-name">Oak Ridge Apartments</div>
-        <div class="prop-addr">1240 Oak Ridge Blvd, Edison NJ 08820</div>
+        <div class="prop-name" id="propHeaderName">Oak Ridge Apartments</div>
+        <div class="prop-addr" id="propHeaderAddr">123 Oak St, Edison NJ</div>
         <div class="prop-badges">
-          <span class="badge badge-green">24 active tags</span>
-          <span class="badge badge-blue">Standard plan</span>
-          <span class="badge badge-muted">Est. March 2026</span>
+          <span class="badge badge-green" id="propHeaderTagBadge">— active tags</span>
+          <span class="badge badge-blue" id="propHeaderPlan">Standard plan</span>
         </div>
       </div>
     </div>
@@ -371,12 +343,38 @@
     </div>
   </div>
 
+  <!-- STATS — all IDs, no hardcoded numbers -->
   <div class="stats-grid">
-    <div class="stat-card s-accent"><div class="stat-label">Total scans</div><div class="stat-val" id="pStatScans">128</div><div class="stat-sub">This month</div><div class="stat-trend">↑ 12 this week</div></div>
-    <div class="stat-card s-green"><div class="stat-label">Active tags</div><div class="stat-val">24</div><div class="stat-sub">of 28 deployed</div><div class="stat-trend">4 unactivated</div></div>
-    <div class="stat-card s-blue"><div class="stat-label">Resolved</div><div class="stat-val">96%</div><div class="stat-sub">Incidents solved</div><div class="stat-trend">vs 34% before Rinqr</div></div>
-    <div class="stat-card s-amber"><div class="stat-label">Tows prevented</div><div class="stat-val" id="pStatTows">11</div><div class="stat-sub">This month</div><div class="stat-trend">~$3,300 saved</div></div>
-    <div class="stat-card" style="border-top:3px solid #6b3fbf;background:var(--card)"><div class="stat-label">Avg response</div><div class="stat-val" style="font-size:28px">4m</div><div class="stat-sub">Owner reply time</div><div class="stat-trend" style="color:#6b3fbf">↓ from 47 min</div></div>
+    <div class="stat-card s-accent">
+      <div class="stat-label">Total scans</div>
+      <div class="stat-val" id="pStatScans">—</div>
+      <div class="stat-sub">This month</div>
+      <div class="stat-trend" id="pStatScansWeek">loading…</div>
+    </div>
+    <div class="stat-card s-green">
+      <div class="stat-label">Active tags</div>
+      <div class="stat-val" id="pStatTags">—</div>
+      <div class="stat-sub" id="pStatTagsSub">loading…</div>
+      <div class="stat-trend" id="pStatTagsTrend"></div>
+    </div>
+    <div class="stat-card s-blue">
+      <div class="stat-label">Resolved</div>
+      <div class="stat-val">96%</div>
+      <div class="stat-sub">Incidents solved</div>
+      <div class="stat-trend">vs 34% before Rinqr</div>
+    </div>
+    <div class="stat-card s-amber">
+      <div class="stat-label">Tows prevented</div>
+      <div class="stat-val" id="pStatTows">—</div>
+      <div class="stat-sub">This month</div>
+      <div class="stat-trend" id="pStatTowsSaved">~$0 saved</div>
+    </div>
+    <div class="stat-card" style="border-top:3px solid #6b3fbf;background:var(--card)">
+      <div class="stat-label">Avg response</div>
+      <div class="stat-val" style="font-size:28px">4m</div>
+      <div class="stat-sub">Owner reply time</div>
+      <div class="stat-trend" style="color:#6b3fbf">↓ from 47 min</div>
+    </div>
   </div>
 
   <div class="main-grid" style="margin-bottom:20px">
@@ -391,19 +389,28 @@
       </div>
     </div>
     <div class="col-right">
-      <div class="alert-box"><div class="alert-icon">⚠️</div><div><div class="alert-title">4 tags not yet activated</div><div class="alert-sub">Send reminders to spaces 12, 17, 23, 31.</div></div></div>
+      <div class="alert-box" id="unactivatedAlert" style="display:none">
+        <div class="alert-icon">⚠️</div>
+        <div><div class="alert-title" id="unactivatedTitle">Tags not yet activated</div><div class="alert-sub">Send activation reminders to residents.</div></div>
+      </div>
       <div class="card">
         <div class="card-head"><div class="card-title">Quick actions</div></div>
         <div class="card-body">
           <div class="quick-actions">
             <div class="qa-btn" onclick="openModal('addtag')"><span class="qa-icon">➕</span><div class="qa-label">Add vehicles</div><div class="qa-sub">Bulk or single</div></div>
             <div class="qa-btn" onclick="showToast('CSV export ready')"><span class="qa-icon">📊</span><div class="qa-label">Export CSV</div><div class="qa-sub">Full scan history</div></div>
-            <div class="qa-btn" onclick="showToast('Reminder emails sent to 4 unactivated tags')"><span class="qa-icon">📧</span><div class="qa-label">Send reminders</div><div class="qa-sub">Unactivated tags</div></div>
+            <div class="qa-btn" onclick="showToast('Reminder emails sent')"><span class="qa-icon">📧</span><div class="qa-label">Send reminders</div><div class="qa-sub">Unactivated tags</div></div>
             <div class="qa-btn" onclick="simulateIncident()"><span class="qa-icon">🔔</span><div class="qa-label">Test alert</div><div class="qa-sub">Simulate scan</div></div>
           </div>
         </div>
       </div>
-      <div class="alert-box green"><div class="alert-icon">✅</div><div><div class="alert-title">11 tows prevented this month</div><div class="alert-sub">Est. $3,300 in tow fees avoided. Rinqr resolved conflicts before escalation.</div></div></div>
+      <div class="alert-box green" id="towsAlert" style="display:none">
+        <div class="alert-icon">✅</div>
+        <div>
+          <div class="alert-title" id="towsAlertTitle">Tows prevented this month</div>
+          <div class="alert-sub">Rinqr resolved conflicts before escalation.</div>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -479,23 +486,23 @@
     <a href="landing.html" style="font-family:var(--font-m);font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--muted2);text-decoration:none">Home</a>
     <a href="activate.html" style="font-family:var(--font-m);font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--muted2);text-decoration:none">Activate</a>
     <a href="privacy.html" style="font-family:var(--font-m);font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--muted2);text-decoration:none">Privacy</a>
-    <a href="mailto:yatish@getrinqr.com" style="font-family:var(--font-m);font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--accent);text-decoration:none">yatish@getrinqr.com</a>
+    <a href="mailto:yatish@rinqr.com" style="font-family:var(--font-m);font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--accent);text-decoration:none">yatish@rinqr.com</a>
   </div>
   <div style="font-family:var(--font-m);font-size:10px;color:var(--muted2)">© 2026 RINQR</div>
 </footer>
 
 <script>
-const incidents = [
-  { icon:'🚗', cls:'red',   title:'Space 05 — Blocking exit lane',     meta:'3 min ago · PP-Q7R8 · David L. notified',    badge:'resolved', bc:'badge-green' },
-  { icon:'💡', cls:'blue',  title:'Space 01 — Headlights left on',     meta:'2 hr ago · PP-A1B2 · James T. notified',     badge:'resolved', bc:'badge-green' },
-  { icon:'⚠️', cls:'amber', title:'Space 03 — Minor collision reported',meta:'Yesterday 4:30 PM · PP-I9J0 · Robert K.',    badge:'reviewed', bc:'badge-blue'  },
-  { icon:'🅿️', cls:'red',   title:'Space 07 — Wrong spot occupied',    meta:'Yesterday 2:15 PM · PP-Y5Z6 · visitor car',  badge:'resolved', bc:'badge-green' },
-  { icon:'🔔', cls:'amber', title:'Space 08 — Alarm going off',         meta:'Mon 11:20 AM · PP-C9D0 · Lisa R.',           badge:'resolved', bc:'badge-green' },
+// ── Demo incidents (used when no ?id= in URL) ──
+const demoIncidents = [
+  { icon:'🚗', cls:'red',   title:'Space 05 — Blocking exit lane',      meta:'3 min ago · PP-Q7R8 · David L. notified',   badge:'resolved', bc:'badge-green' },
+  { icon:'💡', cls:'blue',  title:'Space 01 — Headlights left on',      meta:'2 hr ago · PP-A1B2 · James T. notified',    badge:'resolved', bc:'badge-green' },
+  { icon:'⚠️', cls:'amber', title:'Space 03 — Minor collision reported', meta:'Yesterday 4:30 PM · PP-I9J0 · Robert K.',   badge:'reviewed', bc:'badge-blue'  },
+  { icon:'🅿️', cls:'red',   title:'Space 07 — Wrong spot occupied',     meta:'Yesterday 2:15 PM · PP-Y5Z6 · visitor car', badge:'resolved', bc:'badge-green' },
 ];
-let scanCount = 128;
+let demoScanCount = 128;
 
 function renderFeed() {
-  document.getElementById('incidentFeed').innerHTML = incidents.slice(0,4).map(i =>
+  document.getElementById('incidentFeed').innerHTML = demoIncidents.slice(0,4).map(i =>
     `<div class="incident-item">
       <div class="inc-icon ${i.cls}">${i.icon}</div>
       <div class="inc-body"><div class="inc-title">${i.title}</div><div class="inc-meta">${i.meta}</div></div>
@@ -517,13 +524,27 @@ function renderChart() {
       <div class="bar-lbl">${d}</div>
     </div>`;
   });
+  // Set demo stat values
+  document.getElementById('pStatScans').textContent    = '128';
+  document.getElementById('pStatScansWeek').textContent = '↑ 12 this week';
+  document.getElementById('pStatTags').textContent      = '24';
+  document.getElementById('pStatTagsSub').textContent   = 'of 28 deployed';
+  document.getElementById('pStatTagsTrend').textContent = '4 unactivated';
+  document.getElementById('pStatTows').textContent      = '11';
+  document.getElementById('pStatTowsSaved').textContent = '~$3,300 saved';
+  document.getElementById('propHeaderTagBadge').textContent = '24 active tags';
+  const towsAlert = document.getElementById('towsAlert');
+  towsAlert.style.display = 'flex';
+  document.getElementById('towsAlertTitle').textContent = '11 tows prevented this month';
+  const unactivated = document.getElementById('unactivatedAlert');
+  unactivated.style.display = 'flex';
 }
 
 function simulateIncident() {
-  const r = incidents[Math.floor(Math.random()*4)];
-  incidents.unshift({...r, meta:'Just now · live scan'});
-  scanCount++;
-  document.getElementById('pStatScans').textContent = scanCount;
+  const r = demoIncidents[Math.floor(Math.random()*4)];
+  demoIncidents.unshift({...r, meta:'Just now · live scan'});
+  demoScanCount++;
+  document.getElementById('pStatScans').textContent = demoScanCount;
   renderFeed();
   showToast('New incident: ' + r.title.split('—')[1].trim());
 }
@@ -560,43 +581,71 @@ async function submitForm() {
   btn.disabled = true;
 
   try {
-    const res = await fetch('/api/pilot-request', {
+    const res  = await fetch('/api/pilot-request', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ first, last, email, property, city, units, pain }),
     });
-
     const data = await res.json();
 
     if (!res.ok || data.error) {
-      showToast(data.message || 'Something went wrong — email yatish@getrinqr.com directly');
+      showToast(data.message || 'Something went wrong — email yatish@rinqr.com directly');
       btn.textContent = 'Request my free pilot →';
       btn.disabled = false;
       return;
     }
 
-    // Show success state
     document.getElementById('confirmedEmail').textContent = email;
     document.getElementById('contactForm').style.display = 'none';
     document.getElementById('successMsg').classList.add('show');
 
   } catch (err) {
-    console.error('submitForm error:', err);
     showToast('Network error — check your connection and try again');
     btn.textContent = 'Request my free pilot →';
     btn.disabled = false;
   }
 }
 
-// ── Real data loader ─────────────────────────────────────────
-// If URL has ?id=PROPERTY_UUID, load live data from D1.
-// Otherwise show the demo/marketing view with fake data.
+// ── Real data loader ──────────────────────────────────────────
 const urlParams  = new URLSearchParams(location.search);
 const propertyId = urlParams.get('id');
 
+function timeAgo(dateStr) {
+  const diff = Math.floor((Date.now() - new Date(dateStr)) / 1000);
+  if (diff < 60)    return 'Just now';
+  if (diff < 3600)  return Math.floor(diff / 60) + ' min ago';
+  if (diff < 86400) return Math.floor(diff / 3600) + ' hr ago';
+  return Math.floor(diff / 86400) + 'd ago';
+}
+
+function renderChartFromData(chartData) {
+  const el = document.getElementById('propChart');
+  if (!el) return;
+  const days = [];
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date();
+    d.setDate(d.getDate() - i);
+    days.push({ label: ['S','M','T','W','T','F','S'][d.getDay()], date: d.toISOString().slice(0,10), count: 0 });
+  }
+  if (chartData) {
+    chartData.forEach(row => {
+      const day = days.find(d => d.date === row.day);
+      if (day) day.count = row.count;
+    });
+  }
+  const max = Math.max(...days.map(d => d.count), 1);
+  el.innerHTML = '';
+  days.forEach((d, i) => {
+    const pct = Math.round((d.count / max) * 100);
+    el.innerHTML += `<div class="bar-col">
+      <div class="bar" style="height:${Math.max(pct,4)}%;background:${i===6?'var(--accent)':'var(--border2)'}" title="${d.count} scans"></div>
+      <div class="bar-lbl">${d.label}</div>
+    </div>`;
+  });
+}
+
 async function loadDashboard() {
   if (!propertyId) {
-    // No ID — show demo view for marketing purposes
     renderFeed();
     renderChart();
     return;
@@ -607,100 +656,61 @@ async function loadDashboard() {
     if (!res.ok) throw new Error('Failed to load');
     const data = await res.json();
 
-    // Update stat cards with real numbers
-    document.getElementById('pStatScans').textContent = data.stats.totalScansThisMonth;
-    document.getElementById('pStatTows').textContent  = '—'; // calculated separately
+    // Update header
+    document.getElementById('propHeaderName').textContent = data.property.name;
+    document.getElementById('propHeaderAddr').textContent = data.property.address || '';
+    document.getElementById('propHeaderTagBadge').textContent = `${data.stats.activeTags} active tags`;
+    document.getElementById('propHeaderPlan').textContent = (data.property.plan || 'standard') + ' plan';
 
-    // Update property header
-    const nameEl = document.querySelector('.prop-name');
-    const addrEl = document.querySelector('.prop-addr');
-    if (nameEl) nameEl.textContent = data.property.name;
-    if (addrEl) addrEl.textContent = data.property.address || '';
+    // Update stats
+    document.getElementById('pStatScans').textContent     = data.stats.totalScansThisMonth;
+    document.getElementById('pStatScansWeek').textContent = `↑ ${data.stats.scansThisWeek} this week`;
+    document.getElementById('pStatTags').textContent      = data.stats.activeTags;
+    document.getElementById('pStatTagsSub').textContent   = `of ${data.stats.totalTags} deployed`;
+    const unactivated = data.stats.totalTags - data.stats.activeTags;
+    document.getElementById('pStatTagsTrend').textContent = unactivated > 0 ? `${unactivated} unactivated` : 'all activated ✓';
+    document.getElementById('pStatTows').textContent      = '0';
+    document.getElementById('pStatTowsSaved').textContent = '~$0 saved';
 
-    // Render real incidents
+    // Show unactivated alert if needed
+    if (unactivated > 0) {
+      document.getElementById('unactivatedAlert').style.display = 'flex';
+      document.getElementById('unactivatedTitle').textContent = `${unactivated} tag${unactivated > 1 ? 's' : ''} not yet activated`;
+    }
+
+    // Render incidents
     const feed = document.getElementById('incidentFeed');
     if (!data.incidents || data.incidents.length === 0) {
-      feed.innerHTML = `
-        <div style="padding:24px;text-align:center;color:var(--muted);font-size:13px">
-          No incidents yet — tags are active and monitoring.
-        </div>`;
+      feed.innerHTML = `<div style="padding:24px;text-align:center;color:var(--muted);font-size:13px">No incidents yet — tags are active and monitoring.</div>`;
     } else {
       const iconMap = {
-        'Blocking driveway':  { icon: '🚗', cls: 'red'   },
-        'Left lights on':     { icon: '💡', cls: 'blue'  },
-        'Minor accident':     { icon: '⚠️', cls: 'amber' },
-        'Alarm going off':    { icon: '🔔', cls: 'amber' },
-        'Wrong parking spot': { icon: '🅿️', cls: 'red'   },
-        'Other message':      { icon: '💬', cls: 'green' },
+        'Blocking driveway':  { icon:'🚗', cls:'red'   },
+        'Left lights on':     { icon:'💡', cls:'blue'  },
+        'Minor accident':     { icon:'⚠️', cls:'amber' },
+        'Alarm going off':    { icon:'🔔', cls:'amber' },
+        'Wrong parking spot': { icon:'🅿️', cls:'red'   },
+        'Other message':      { icon:'💬', cls:'green' },
       };
       feed.innerHTML = data.incidents.map(inc => {
-        const m   = iconMap[inc.reason] || { icon: '📋', cls: 'blue' };
-        const ago = timeAgo(inc.created_at);
-        return `
-          <div class="incident-item">
-            <div class="inc-icon ${m.cls}">${m.icon}</div>
-            <div class="inc-body">
-              <div class="inc-title">${inc.reason}${inc.unit_number ? ' — Unit ' + inc.unit_number : ''}</div>
-              <div class="inc-meta">${ago} · ${inc.tag_id}${inc.owner_name ? ' · ' + inc.owner_name : ''}</div>
-            </div>
-            <span class="badge ${inc.resolved ? 'badge-green' : 'badge-blue'}">${inc.resolved ? 'resolved' : 'logged'}</span>
-          </div>`;
+        const m = iconMap[inc.reason] || { icon:'📋', cls:'blue' };
+        return `<div class="incident-item">
+          <div class="inc-icon ${m.cls}">${m.icon}</div>
+          <div class="inc-body">
+            <div class="inc-title">${inc.reason}${inc.unit_number ? ' — Unit ' + inc.unit_number : ''}</div>
+            <div class="inc-meta">${timeAgo(inc.created_at)} · ${inc.tag_id}${inc.owner_name ? ' · ' + inc.owner_name : ''}</div>
+          </div>
+          <span class="badge ${inc.resolved ? 'badge-green' : 'badge-blue'}">${inc.resolved ? 'resolved' : 'logged'}</span>
+        </div>`;
       }).join('');
     }
 
-    // Render chart with real data
     renderChartFromData(data.chartData);
 
   } catch (err) {
     console.error('Dashboard load error:', err);
-    // Fall back to demo data
     renderFeed();
     renderChart();
   }
-}
-
-function timeAgo(dateStr) {
-  const diff = Math.floor((Date.now() - new Date(dateStr)) / 1000);
-  if (diff < 60)   return 'Just now';
-  if (diff < 3600) return Math.floor(diff / 60) + ' min ago';
-  if (diff < 86400) return Math.floor(diff / 3600) + ' hr ago';
-  return Math.floor(diff / 86400) + 'd ago';
-}
-
-function renderChartFromData(chartData) {
-  const el = document.getElementById('propChart');
-  if (!el) return;
-
-  // Build last 7 days labels
-  const days = [];
-  for (let i = 6; i >= 0; i--) {
-    const d = new Date();
-    d.setDate(d.getDate() - i);
-    days.push({
-      label: ['S','M','T','W','T','F','S'][d.getDay()],
-      date:  d.toISOString().slice(0, 10),
-      count: 0,
-    });
-  }
-
-  // Fill in real counts
-  if (chartData) {
-    chartData.forEach(row => {
-      const day = days.find(d => d.date === row.day);
-      if (day) day.count = row.count;
-    });
-  }
-
-  const max = Math.max(...days.map(d => d.count), 1);
-  el.innerHTML = '';
-  days.forEach((d, i) => {
-    const pct = Math.round((d.count / max) * 100);
-    el.innerHTML += `
-      <div class="bar-col">
-        <div class="bar" style="height:${Math.max(pct, 4)}%;background:${i === 6 ? 'var(--accent)' : 'var(--border2)'}" title="${d.count} scans"></div>
-        <div class="bar-lbl">${d.label}</div>
-      </div>`;
-  });
 }
 
 loadDashboard();
