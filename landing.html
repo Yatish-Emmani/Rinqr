@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rinqr — Anonymous Vehicle Contact</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    body { margin: 0; max-width: 100%; padding: 0; }
+
+    .lnav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 40px;
+      height: 60px;
+      border-bottom: 1px solid var(--border);
+      background: #fff;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .lnav-links { display: flex; align-items: center; gap: 28px; }
+    .lnav-link {
+      font-family: var(--font-m);
+      font-size: 11px;
+      letter-spacing: 1px;
+      color: var(--muted);
+      text-decoration: none;
+      text-transform: uppercase;
+      transition: color .15s;
+    }
+    .lnav-link:hover { color: var(--text); }
+    .lnav-cta {
+      background: var(--accent);
+      color: #fff;
+      font-family: var(--font-d);
+      font-size: 15px;
+      letter-spacing: 1px;
+      padding: 8px 20px;
+      border-radius: 5px;
+      text-decoration: none;
+      transition: opacity .15s;
+    }
+    .lnav-cta:hover { opacity: .88; }
+
+    .hero {
+      min-height: 92vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      text-align: center;
+      padding: 60px 24px;
+      position: relative;
+      overflow: hidden;
+      background: #fff;
+    }
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 60% 50% at 50% 40%, rgba(0, 180, 170, .06) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero-grid {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(0,0,0,.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,0,0,.04) 1px, transparent 1px);
+      background-size: 48px 48px;
+      pointer-events: none;
+    }
+    .hero-eyebrow {
+      font-family: var(--font-m);
+      font-size: 10px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      position: relative;
+    }
+    .hero-eyebrow::before,
+    .hero-eyebrow::after {
+      content: '';
+      width: 24px;
+      height: 1px;
+      background: var(--accent);
+      opacity: .5;
+    }
+    .hero-title {
+      font-family: var(--font-d);
+      font-size: clamp(52px, 9vw, 100px);
+      letter-spacing: 3px;
+      line-height: .95;
+      margin-bottom: 24px;
+      position: relative;
+      color: #0f0f0f;
+    }
+    .hero-title span { color: var(--accent); }
+    .hero-sub {
+      font-size: clamp(15px, 2vw, 18px);
+      color: var(--muted);
+      max-width: 520px;
+      line-height: 1.65;
+      margin-bottom: 36px;
+      position: relative;
+    }
+    .hero-sub strong { color: var(--text); font-weight: 500; }
+    .hero-btns {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      justify-content: center;
+      position: relative;
+      margin-bottom: 48px;
+    }
+    .hero-btn-primary {
+      background: var(--accent);
+      color: #fff;
+      font-family: var(--font-d);
+      font-size: 18px;
+      letter-spacing: 1px;
+      padding: 14px 32px;
+      border-radius: 6px;
+      text-decoration: none;
+      transition: opacity .15s, transform .1s;
+    }
+    .hero-btn-primary:hover { opacity: .88; transform: translateY(-1px); }
+    .hero-btn-secondary {
+      background: transparent;
+      color: var(--text);
+      font-family: var(--font-d);
+      font-size: 18px;
+      letter-spacing: 1px;
+      padding: 14px 32px;
+      border-radius: 6px;
+      border: 1px solid var(--border2);
+      text-decoration: none;
+      transition: border-color .15s, transform .1s;
+    }
+    .hero-btn-secondary:hover { border-color: var(--accent); color: var(--accent); transform: translateY(-1px); }
+
+    .hero-stats {
+      display: flex;
+      gap: 32px;
+      flex-wrap: wrap;
+      justify-content: center;
+      position: relative;
+    }
+    .hero-stat-val {
+      font-family: var(--font-d);
+      font-size: 28px;
+      color: var(--text);
+      letter-spacing: 1px;
+    }
+    .hero-stat-val span { color: var(--accent); }
+    .hero-stat-label {
+      font-family: var(--font-m);
+      font-size: 10px;
+      letter-spacing: 1px;
+      color: var(--muted);
+      text-transform: uppercase;
+      margin-top: 2px;
+    }
+
+    .section {
+      padding: 80px 40px;
+      max-width: 1080px;
+      margin: 0 auto;
+    }
+    .section-eyebrow {
+      font-family: var(--font-m);
+      font-size: 10px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 12px;
+    }
+    .section-title {
+      font-family: var(--font-d);
+      font-size: clamp(32px, 5vw, 52px);
+      letter-spacing: 2px;
+      line-height: 1;
+      margin-bottom: 14px;
+      color: var(--text);
+    }
+    .section-sub {
+      font-size: 15px;
+      color: var(--muted);
+      max-width: 480px;
+      line-height: 1.65;
+      margin-bottom: 48px;
+    }
+
+    .how-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+    }
+    .how-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 24px 20px;
+      position: relative;
+      overflow: hidden;
+      transition: border-color .2s, transform .2s;
+    }
+    .how-card:hover { border-color: var(--accent); transform: translateY(-3px); }
+    .how-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: var(--accent);
+      opacity: 0;
+      transition: opacity .2s;
+    }
+    .how-card:hover::before { opacity: 1; }
+    .how-num {
+      font-family: var(--font-d);
+      font-size: 48px;
+      color: rgba(0,0,0,.06);
+      line-height: 1;
+      margin-bottom: 14px;
+    }
+    .how-icon { font-size: 28px; margin-bottom: 12px; display: block; }
+    .how-title { font-size: 15px; font-weight: 500; margin-bottom: 6px; color: var(--text); }
+    .how-desc  { font-size: 13px; color: var(--muted); line-height: 1.6; }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+    .feature-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 24px;
+      transition: border-color .2s;
+    }
+    .feature-card:hover { border-color: var(--accent); }
+    .feature-card.featured {
+      border-color: rgba(0, 180, 170, .35);
+      background: rgba(0, 180, 170, .03);
+      grid-column: span 2;
+    }
+    .feature-icon  { font-size: 24px; margin-bottom: 12px; display: block; }
+    .feature-title { font-size: 16px; font-weight: 500; margin-bottom: 6px; color: var(--text); }
+    .feature-desc  { font-size: 13px; color: var(--muted); line-height: 1.65; }
+    .feature-tag {
+      display: inline-block;
+      font-family: var(--font-m);
+      font-size: 9px;
+      letter-spacing: 1px;
+      padding: 3px 8px;
+      border-radius: 4px;
+      margin-top: 10px;
+      background: rgba(0, 180, 170, .10);
+      color: var(--accent);
+      border: 1px solid rgba(0, 180, 170, .25);
+    }
+
+    .demo-strip {
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      padding: 60px 40px;
+    }
+    .demo-inner {
+      max-width: 1080px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 48px;
+      align-items: center;
+    }
+    .demo-phone {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px;
+      max-width: 320px;
+      margin: 0 auto;
+    }
+    .demo-phone-header {
+      font-family: var(--font-m);
+      font-size: 9px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 14px;
+      text-align: center;
+    }
+    .demo-reason-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+      margin-bottom: 12px;
+    }
+    .demo-reason {
+      background: var(--card2);
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      padding: 10px 8px;
+      font-size: 11px;
+      text-align: center;
+      color: var(--text);
+    }
+    .demo-reason.sel {
+      border-color: var(--accent);
+      background: rgba(0, 180, 170, .08);
+      color: var(--accent);
+    }
+    .demo-btn {
+      width: 100%;
+      background: var(--accent);
+      color: #fff;
+      font-family: var(--font-d);
+      font-size: 15px;
+      letter-spacing: 1px;
+      padding: 11px;
+      border-radius: 6px;
+      text-align: center;
+      margin-bottom: 8px;
+    }
+    .demo-privacy {
+      text-align: center;
+      font-family: var(--font-m);
+      font-size: 10px;
+      color: var(--green);
+    }
+
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+    }
+    .price-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+      transition: border-color .2s, transform .2s;
+      display: flex;
+      flex-direction: column;
+    }
+    .price-card:hover { transform: translateY(-4px); border-color: var(--border2); }
+    .price-card.featured {
+      border-color: var(--accent);
+      position: relative;
+    }
+    .price-card.featured::before {
+      content: 'MOST POPULAR';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      background: var(--accent);
+      font-family: var(--font-m);
+      font-size: 9px;
+      letter-spacing: 2px;
+      color: #fff;
+      text-align: center;
+      padding: 5px;
+    }
+    .price-head {
+      padding: 24px 20px 16px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+    }
+    .price-card.featured .price-head { padding-top: 36px; }
+    .price-name {
+      font-family: var(--font-m);
+      font-size: 10px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+    .price-amount {
+      font-family: var(--font-d);
+      font-size: 38px;
+      letter-spacing: 1px;
+      line-height: 1;
+      color: var(--text);
+    }
+    .price-amount sup { font-size: 18px; vertical-align: top; margin-top: 5px; display: inline-block; }
+    .price-amount sub {
+      font-family: var(--font-b);
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 400;
+    }
+    .price-annual {
+      font-family: var(--font-m);
+      font-size: 10px;
+      color: var(--green);
+      margin-top: 4px;
+    }
+    .price-desc { font-size: 12px; color: var(--muted); margin-top: 6px; }
+    .price-body { padding: 20px; flex: 1; display: flex; flex-direction: column; }
+    .price-features { list-style: none; display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; flex: 1; }
+    .price-features li {
+      display: flex;
+      gap: 8px;
+      align-items: flex-start;
+      font-size: 13px;
+      color: var(--text);
+    }
+    .pf-check { color: var(--green); flex-shrink: 0; }
+    .pf-x     { color: var(--muted2); flex-shrink: 0; }
+    .price-btn {
+      display: block;
+      width: 100%;
+      padding: 12px;
+      border-radius: 6px;
+      text-align: center;
+      font-family: var(--font-d);
+      font-size: 16px;
+      letter-spacing: 1px;
+      text-decoration: none;
+      transition: opacity .15s;
+      border: none;
+      cursor: pointer;
+    }
+    .price-btn.primary { background: var(--accent); color: #fff; }
+    .price-btn.secondary { background: var(--card2); color: var(--text); border: 1px solid var(--border2); }
+    .price-btn.dark { background: #1a1a1a; color: #fff; }
+    .price-btn:hover { opacity: .88; }
+
+    .b2b-strip {
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      padding: 60px 40px;
+    }
+    .b2b-inner { max-width: 1080px; margin: 0 auto; }
+    .b2b-cards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin-top: 40px;
+    }
+    .b2b-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 22px;
+      transition: border-color .2s;
+    }
+    .b2b-card:hover { border-color: var(--accent); }
+    .b2b-icon  { font-size: 28px; margin-bottom: 12px; display: block; }
+    .b2b-title { font-size: 15px; font-weight: 500; margin-bottom: 6px; color: var(--text); }
+    .b2b-desc  { font-size: 13px; color: var(--muted); line-height: 1.6; margin-bottom: 12px; }
+    .b2b-price {
+      font-family: var(--font-m);
+      font-size: 11px;
+      color: var(--accent);
+      background: rgba(0, 180, 170, .08);
+      border: 1px solid rgba(0, 180, 170, .25);
+      padding: 4px 10px;
+      border-radius: 4px;
+      display: inline-block;
+    }
+
+    .cta-section {
+      padding: 100px 40px;
+      text-align: center;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    .cta-title {
+      font-family: var(--font-d);
+      font-size: clamp(36px, 6vw, 64px);
+      letter-spacing: 2px;
+      line-height: 1;
+      margin-bottom: 16px;
+      color: var(--text);
+    }
+    .cta-title span { color: var(--accent); }
+    .cta-sub { font-size: 15px; color: var(--muted); margin-bottom: 32px; line-height: 1.65; }
+    .cta-btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+
+    .footer {
+      border-top: 1px solid var(--border);
+      padding: 32px 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+      background: var(--surface);
+    }
+    .footer-links { display: flex; gap: 20px; }
+    .footer-link {
+      font-family: var(--font-m);
+      font-size: 10px;
+      letter-spacing: 1px;
+      color: var(--muted2);
+      text-decoration: none;
+      text-transform: uppercase;
+      transition: color .15s;
+    }
+    .footer-link:hover { color: var(--accent); }
+    .footer-note { font-family: var(--font-m); font-size: 10px; color: var(--muted2); }
+    .full-divider { border: none; border-top: 1px solid var(--border); }
+
+    @media (max-width: 900px) {
+      .pricing-grid { grid-template-columns: repeat(2, 1fr); }
+      .price-card { overflow: hidden; }
+      .price-card.featured::before { font-size: 8px; letter-spacing: 1px; }
+    }
+    @media (max-width: 800px) {
+      .lnav { padding: 0 20px; }
+      .lnav-links { display: none; }
+      .section { padding: 60px 20px; }
+      .how-grid { grid-template-columns: 1fr 1fr; }
+      .features-grid { grid-template-columns: 1fr; }
+      .feature-card.featured { grid-column: span 1; }
+      .demo-inner { grid-template-columns: 1fr; }
+      .b2b-cards { grid-template-columns: 1fr; }
+      .footer { flex-direction: column; align-items: flex-start; padding: 24px 20px; }
+      .demo-strip { padding: 40px 20px; }
+      .b2b-strip  { padding: 40px 20px; }
+    }
+    @media (max-width: 500px) {
+      .how-grid { grid-template-columns: 1fr; }
+      .pricing-grid { grid-template-columns: 1fr; }
+      .hero-stats { gap: 20px; }
+    }
+  </style>
+</head>
+<body>
+
+<nav class="lnav">
+  <a href="landing.html" class="logo-mark">
+    <img src="Rinqr_logo.png" alt="Rinqr" class="logo-img">
+  </a>
+  <div class="lnav-links">
+    <a href="#how" class="lnav-link">How it works</a>
+    <a href="#features" class="lnav-link">Features</a>
+    <a href="#pricing" class="lnav-link">Pricing</a>
+    <a href="#business" class="lnav-link">For Business</a>
+    <a href="signin.html" class="lnav-link">Sign in</a>
+  </div>
+  <a href="activate.html" class="lnav-cta">Get your tag →</a>
+</nav>
+
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-grid"></div>
+  <div class="hero-eyebrow">Privacy-first vehicle contact</div>
+  <h1 class="hero-title">
+    SOMEONE<br>NEEDS TO<br>REACH <span>YOUR CAR</span>
+  </h1>
+  <p class="hero-sub">
+    Rinqr lets anyone contact you when your car needs attention —
+    <strong>without ever seeing your phone number.</strong>
+    One scan. Instant masked connection.
+  </p>
+  <div class="hero-btns">
+    <a href="activate.html" class="hero-btn-primary">Get your tag — $9.99</a>
+    <a href="index.html" class="hero-btn-secondary">See scanner demo</a>
+  </div>
+  <div class="hero-stats">
+    <div class="hero-stat">
+      <div class="hero-stat-val">100<span>%</span></div>
+      <div class="hero-stat-label">Privacy guaranteed</div>
+    </div>
+    <div class="hero-stat">
+      <div class="hero-stat-val">0</div>
+      <div class="hero-stat-label">Apps to install</div>
+    </div>
+    <div class="hero-stat">
+      <div class="hero-stat-val">60<span>sec</span></div>
+      <div class="hero-stat-label">To activate</div>
+    </div>
+    <div class="hero-stat">
+      <div class="hero-stat-val"><span>∞</span></div>
+      <div class="hero-stat-label">Scans included</div>
+    </div>
+  </div>
+</section>
+
+<hr class="full-divider">
+
+<section class="section" id="how">
+  <div class="section-eyebrow">How it works</div>
+  <h2 class="section-title">FOUR STEPS.<br>ZERO AWKWARD.</h2>
+  <p class="section-sub">From sticker to solved in under 60 seconds. No apps. No accounts for the scanner.</p>
+  <div class="how-grid">
+    <div class="how-card">
+      <div class="how-num">01</div>
+      <span class="how-icon">📦</span>
+      <div class="how-title">Buy &amp; activate your tag</div>
+      <p class="how-desc">Order online, scan the activation QR on the packaging, enter your phone. Done in 60 seconds.</p>
+    </div>
+    <div class="how-card">
+      <div class="how-num">02</div>
+      <span class="how-icon">🚗</span>
+      <div class="how-title">Stick it on your car</div>
+      <p class="how-desc">Weatherproof vinyl sticker. Windshield, bumper, rear window. Car-wash safe. Built to last.</p>
+    </div>
+    <div class="how-card">
+      <div class="how-num">03</div>
+      <span class="how-icon">📱</span>
+      <div class="how-title">Someone scans your tag</div>
+      <p class="how-desc">No app needed. Any smartphone camera works. They pick a reason and enter their number.</p>
+    </div>
+    <div class="how-card">
+      <div class="how-num">04</div>
+      <span class="how-icon">🔒</span>
+      <div class="how-title">You connect anonymously</div>
+      <p class="how-desc">Twilio relay bridges the call. You get an SMS alert. Neither side ever sees the other's real number.</p>
+    </div>
+  </div>
+</section>
+
+<hr class="full-divider">
+
+<section class="section" id="features">
+  <div class="section-eyebrow">Features</div>
+  <h2 class="section-title">BUILT FOR THE<br>REAL WORLD.</h2>
+  <p class="section-sub">Every feature designed around one principle: protect your privacy while staying reachable.</p>
+  <div class="features-grid">
+    <div class="feature-card featured">
+      <span class="feature-icon">🔒</span>
+      <div class="feature-title">Complete number masking — both ways</div>
+      <p class="feature-desc">Your real number is AES-256 encrypted and never revealed to anyone who scans your tag. The scanner's number is equally hidden from you. Both parties communicate through a Twilio relay number. Neither party can identify the other from the call alone.</p>
+      <span class="feature-tag">Core technology</span>
+    </div>
+    <div class="feature-card">
+      <span class="feature-icon">📱</span>
+      <div class="feature-title">No app for scanners</div>
+      <p class="feature-desc">The person who scans your tag needs zero app install. It opens in their browser. Instant. No friction means more people actually use it when you need them to.</p>
+    </div>
+    <div class="feature-card">
+      <span class="feature-icon">💬</span>
+      <div class="feature-title">Instant SMS alerts</div>
+      <p class="feature-desc">The moment someone scans your tag you get a text with the reason they're reaching out. You decide if and when to call back.</p>
+    </div>
+    <div class="feature-card">
+      <span class="feature-icon">🆘</span>
+      <div class="feature-title">Emergency escalation</div>
+      <p class="feature-desc">Set an emergency contact. If you miss two consecutive calls from the same scan event, your contact is automatically notified.</p>
+    </div>
+    <div class="feature-card">
+      <span class="feature-icon">🌧️</span>
+      <div class="feature-title">Built to survive anything</div>
+      <p class="feature-desc">BOPP vinyl with gloss laminate. UV-resistant, waterproof, car-wash safe. QR error correction level H means it still scans even if 30% of it is damaged.</p>
+    </div>
+    <div class="feature-card">
+      <span class="feature-icon">📊</span>
+      <div class="feature-title">Full scan history</div>
+      <p class="feature-desc">Every scan logged with timestamp, reason, and approximate location. See patterns, export your data, and manage multiple tags from one dashboard.</p>
+    </div>
+  </div>
+</section>
+
+<hr class="full-divider">
+
+<div class="demo-strip">
+  <div class="demo-inner">
+    <div class="demo-left">
+      <div class="section-eyebrow" style="margin-bottom:12px">Live demo</div>
+      <h2 class="section-title" style="font-size:clamp(28px,4vw,44px);margin-bottom:14px">SEE EXACTLY<br>WHAT SCANNERS SEE</h2>
+      <p style="font-size:14px;color:var(--muted);line-height:1.65;margin-bottom:24px">
+        The scanner page is a simple mobile web page. No login. No download.
+        They pick a reason, enter their number, and your Twilio relay does the rest.
+        Their number stays hidden from you. Yours stays hidden from them.
+      </p>
+      <a href="index.html" class="hero-btn-primary" style="display:inline-block;text-decoration:none">
+        Try the scanner demo →
+      </a>
+    </div>
+    <div>
+      <div class="demo-phone">
+        <div class="demo-phone-header">Scanner's view — no app needed</div>
+        <div style="font-family:var(--font-m);font-size:9px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:8px">Why are you reaching out?</div>
+        <div class="demo-reason-grid">
+          <div class="demo-reason sel">🚗 Blocking<br>driveway</div>
+          <div class="demo-reason">💡 Left<br>lights on</div>
+          <div class="demo-reason">⚠️ Minor<br>accident</div>
+          <div class="demo-reason">💬 Other<br>message</div>
+        </div>
+        <div style="background:var(--card2);border:1px solid var(--border);border-radius:6px;padding:10px 12px;margin-bottom:10px">
+          <div style="font-family:var(--font-m);font-size:9px;color:var(--muted);margin-bottom:5px;letter-spacing:1px">YOUR PHONE NUMBER</div>
+          <div style="font-family:var(--font-m);font-size:16px;letter-spacing:2px;color:var(--text)">(555) 000-0000</div>
+        </div>
+        <div class="demo-btn">Connect anonymously →</div>
+        <div class="demo-privacy">🔒 Your number is never shared</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<section class="section" id="pricing">
+  <div class="section-eyebrow">Pricing</div>
+  <h2 class="section-title">SIMPLE.<br>NO SURPRISES.</h2>
+  <p class="section-sub">Start free. Upgrade when you need more. No hidden fees, ever.</p>
+  <div class="pricing-grid">
+
+    <div class="price-card">
+      <div class="price-head">
+        <div class="price-name">Starter</div>
+        <div class="price-amount"><sup>$</sup>0</div>
+        <div class="price-annual" style="color:var(--muted)">+ $9.99 one-time for physical tag</div>
+        <div class="price-desc">For drivers who just want to be reachable.</div>
+      </div>
+      <div class="price-body">
+        <ul class="price-features">
+          <li><span class="pf-check">✓</span>1 Rinqr tag</li>
+          <li><span class="pf-check">✓</span>Masked call relay</li>
+          <li><span class="pf-check">✓</span>SMS alerts</li>
+          <li><span class="pf-check">✓</span>Unlimited scans</li>
+          <li><span class="pf-check">✓</span>Last 5 scans visible</li>
+          <li><span class="pf-x">–</span><span style="color:var(--muted2)">Full scan history</span></li>
+          <li><span class="pf-x">–</span><span style="color:var(--muted2)">Emergency contact</span></li>
+        </ul>
+        <a href="activate.html" class="price-btn secondary">Get started →</a>
+      </div>
+    </div>
+
+    <div class="price-card featured">
+      <div class="price-head">
+        <div class="price-name">Driver</div>
+        <div class="price-amount"><sup>$</sup>4<sub>.99/mo</sub></div>
+        <div class="price-annual">or $39/yr — save 35%</div>
+        <div class="price-desc">For drivers who want full control.</div>
+      </div>
+      <div class="price-body">
+        <ul class="price-features">
+          <li><span class="pf-check">✓</span>Up to 3 tags</li>
+          <li><span class="pf-check">✓</span>Masked call relay</li>
+          <li><span class="pf-check">✓</span>SMS alerts</li>
+          <li><span class="pf-check">✓</span>Unlimited scans</li>
+          <li><span class="pf-check">✓</span>Full scan history + export</li>
+          <li><span class="pf-check">✓</span>Emergency contact</li>
+          <li><span class="pf-check">✓</span>Scan location logging</li>
+        </ul>
+        <a href="activate.html" class="price-btn primary">Get Driver →</a>
+      </div>
+    </div>
+
+    <div class="price-card">
+      <div class="price-head">
+        <div class="price-name">Fleet</div>
+        <div class="price-amount"><sup>$</sup>19<sub>.99/mo</sub></div>
+        <div class="price-annual">or $179/yr — save 25%</div>
+        <div class="price-desc">For families, small businesses &amp; enthusiasts.</div>
+      </div>
+      <div class="price-body">
+        <ul class="price-features">
+          <li><span class="pf-check">✓</span>Up to 10 tags</li>
+          <li><span class="pf-check">✓</span>Everything in Driver</li>
+          <li><span class="pf-check">✓</span>Shared team dashboard</li>
+          <li><span class="pf-check">✓</span>Bulk tag management</li>
+          <li><span class="pf-check">✓</span>Custom alert messages</li>
+          <li><span class="pf-check">✓</span>CSV data export</li>
+          <li><span class="pf-check">✓</span>Priority SMS delivery</li>
+        </ul>
+        <a href="property.html#contact" class="price-btn secondary">Get Fleet →</a>
+      </div>
+    </div>
+
+    <div class="price-card">
+      <div class="price-head">
+        <div class="price-name">Property</div>
+        <div class="price-amount"><sup>$</sup>299<sub>/yr</sub></div>
+        <div class="price-annual">per property · billed annually</div>
+        <div class="price-desc">For apartment complexes, offices &amp; fleets.</div>
+      </div>
+      <div class="price-body">
+        <ul class="price-features">
+          <li><span class="pf-check">✓</span>Unlimited tags</li>
+          <li><span class="pf-check">✓</span>Property manager portal</li>
+          <li><span class="pf-check">✓</span>Resident self-activation</li>
+          <li><span class="pf-check">✓</span>Analytics dashboard</li>
+          <li><span class="pf-check">✓</span>Tow-prevention reports</li>
+          <li><span class="pf-check">✓</span>Dedicated onboarding</li>
+          <li><span class="pf-check">✓</span>White-label option</li>
+        </ul>
+        <a href="property.html#contact" class="price-btn dark">Request pilot →</a>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<hr class="full-divider">
+
+<div class="b2b-strip" id="business">
+  <div class="b2b-inner">
+    <div class="section-eyebrow">For business</div>
+    <h2 class="section-title" style="font-size:clamp(28px,4vw,48px);margin-bottom:12px">YOUR PARKING<br>PROBLEMS. SOLVED.</h2>
+    <p style="font-size:14px;color:var(--muted);max-width:480px;line-height:1.65;margin-bottom:0">
+      From office parks to dealership fleets — Rinqr scales to any size property.
+    </p>
+    <div class="b2b-cards">
+      <div class="b2b-card">
+        <span class="b2b-icon">🏢</span>
+        <div class="b2b-title">Office Parks</div>
+        <p class="b2b-desc">Eliminate parking complaints. Let employees resolve blocked spots instantly without calling the front desk.</p>
+        <span class="b2b-price">From $299 / property / yr</span>
+      </div>
+      <div class="b2b-card">
+        <span class="b2b-icon">🚘</span>
+        <div class="b2b-title">Auto Dealerships</div>
+        <p class="b2b-desc">Tag every loaner, demo, and service vehicle. Know exactly who to call when a car needs to move.</p>
+        <span class="b2b-price">From $299 / fleet / yr</span>
+      </div>
+      <div class="b2b-card">
+        <span class="b2b-icon">🏘️</span>
+        <div class="b2b-title">Residential Properties</div>
+        <p class="b2b-desc">Perfect for visitor lots and large complexes. Reduce towing incidents and midnight calls to management.</p>
+        <span class="b2b-price">From $299 / property / yr</span>
+      </div>
+    </div>
+    <div style="margin-top:20px">
+      <a href="property.html" class="hero-btn-primary" style="display:inline-block;text-decoration:none">
+        See property manager portal →
+      </a>
+    </div>
+  </div>
+</div>
+
+<hr class="full-divider">
+
+<div style="background:var(--surface);border-top:1px solid var(--border)">
+  <div class="cta-section">
+    <h2 class="cta-title">READY TO<br>PROTECT YOUR <span>NUMBER?</span></h2>
+    <p class="cta-sub">Join drivers staying reachable without sacrificing their privacy. Setup takes 60 seconds.</p>
+    <div class="cta-btns">
+      <a href="activate.html" class="hero-btn-primary">Get your tag — $9.99</a>
+      <a href="index.html" class="hero-btn-secondary">See how it works</a>
+    </div>
+  </div>
+</div>
+
+<footer class="footer">
+  <a href="landing.html" class="logo-mark">
+    <img src="Rinqr_logo.png" alt="Rinqr" class="logo-img">
+  </a>
+  <div class="footer-links">
+    <a href="landing.html" class="footer-link">Home</a>
+    <a href="activate.html" class="footer-link">Activate</a>
+    <a href="signin.html" class="footer-link">Sign in</a>
+    <a href="property.html" class="footer-link">Business</a>
+    <a href="privacy.html" class="footer-link">Privacy</a>
+    <a href="terms.html" class="footer-link">Terms</a>
+  </div>
+  <div class="footer-note">© 2026 Rinqr · Privacy-first vehicle contact</div>
+</footer>
+
+</body>
+</html>

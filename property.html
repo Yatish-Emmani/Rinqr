@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rinqr — Property Manager Portal</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    body { min-height: 100vh; background: var(--surface); }
+    .main { max-width: 1100px; margin: 0 auto; padding: 24px 20px 60px; }
+
+    /* ── HERO BANNER ── */
+    .prop-hero {
+      background: #0f0f0f;
+      border-radius: var(--radius);
+      padding: 48px 40px;
+      margin-bottom: 20px;
+      position: relative;
+      overflow: hidden;
+    }
+    .prop-hero-bg {
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse 70% 60% at 20% 50%, rgba(0, 180, 170, .20) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .prop-hero-grid {
+      position: absolute; inset: 0;
+      background-image: linear-gradient(rgba(255,255,255,.04) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.04) 1px, transparent 1px);
+      background-size: 48px 48px; pointer-events: none;
+    }
+    .prop-hero-content { position: relative; z-index: 1; max-width: 600px; }
+    .prop-hero-eyebrow { font-family: var(--font-m); font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: rgba(255,255,255,.5); margin-bottom: 12px; }
+    .prop-hero-title { font-family: var(--font-d); font-size: clamp(32px, 5vw, 56px); letter-spacing: 2px; line-height: 1; color: #fff; margin-bottom: 14px; }
+    .prop-hero-title span { color: var(--accent); }
+    .prop-hero-sub { font-size: 14px; color: rgba(255,255,255,.55); line-height: 1.65; margin-bottom: 28px; max-width: 440px; }
+    .prop-hero-stats { display: flex; gap: 32px; flex-wrap: wrap; margin-bottom: 28px; }
+    .phs-val { font-family: var(--font-d); font-size: 26px; color: #fff; letter-spacing: 1px; }
+    .phs-val span { color: var(--accent); }
+    .phs-label { font-family: var(--font-m); font-size: 9px; letter-spacing: 1px; color: rgba(255,255,255,.4); text-transform: uppercase; margin-top: 1px; }
+    .prop-hero-btns { display: flex; gap: 10px; flex-wrap: wrap; }
+    .phb-primary { background: var(--accent); color: #fff; font-family: var(--font-d); font-size: 16px; letter-spacing: 1px; padding: 12px 24px; border-radius: 5px; text-decoration: none; border: none; cursor: pointer; transition: opacity .15s; }
+    .phb-primary:hover { opacity: .88; }
+    .phb-secondary { background: transparent; color: rgba(255,255,255,.7); font-family: var(--font-d); font-size: 16px; letter-spacing: 1px; padding: 12px 24px; border-radius: 5px; text-decoration: none; border: 1px solid rgba(255,255,255,.2); cursor: pointer; transition: border-color .15s; }
+    .phb-secondary:hover { border-color: var(--accent); color: #fff; }
+
+    /* ── PAIN POINTS ── */
+    .pain-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 20px; }
+    .pain-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; }
+    .pain-icon { font-size: 24px; margin-bottom: 10px; display: block; }
+    .pain-title { font-size: 14px; font-weight: 500; color: var(--text); margin-bottom: 6px; }
+    .pain-desc { font-size: 12px; color: var(--muted); line-height: 1.6; margin-bottom: 10px; }
+    .pain-solve { font-family: var(--font-m); font-size: 10px; color: var(--green); background: rgba(26,122,70,.07); border: 1px solid rgba(26,122,70,.2); padding: 5px 10px; border-radius: 4px; display: inline-block; }
+
+    /* ── PRICING ── */
+    .prop-pricing { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 20px; }
+    .prop-price-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+    .prop-price-card.best { border-color: var(--accent); position: relative; }
+    .prop-price-card.best::before { content: 'BEST VALUE'; position: absolute; top: 0; left: 0; right: 0; background: var(--accent); font-family: var(--font-m); font-size: 9px; letter-spacing: 2px; color: #fff; text-align: center; padding: 5px; }
+    .ppc-head { padding: 24px 20px 16px; background: var(--surface); border-bottom: 1px solid var(--border); }
+    .prop-price-card.best .ppc-head { padding-top: 34px; }
+    .ppc-name { font-family: var(--font-m); font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
+    .ppc-price { font-family: var(--font-d); font-size: 36px; color: var(--text); line-height: 1; }
+    .ppc-price sup { font-size: 16px; vertical-align: top; margin-top: 5px; display: inline-block; }
+    .ppc-price sub { font-family: var(--font-b); font-size: 12px; color: var(--muted); font-weight: 400; }
+    .ppc-savings { font-family: var(--font-m); font-size: 10px; color: var(--green); margin-top: 4px; }
+    .ppc-desc { font-size: 12px; color: var(--muted); margin-top: 6px; }
+    .ppc-body { padding: 20px; }
+    .ppc-features { list-style: none; display: flex; flex-direction: column; gap: 7px; margin-bottom: 16px; }
+    .ppc-features li { display: flex; gap: 8px; align-items: flex-start; font-size: 13px; color: var(--text); }
+    .pf-check { color: var(--green); flex-shrink: 0; }
+    .ppc-btn { display: block; width: 100%; padding: 11px; border-radius: 5px; text-align: center; font-family: var(--font-d); font-size: 15px; letter-spacing: 1px; text-decoration: none; border: none; cursor: pointer; transition: opacity .15s; }
+    .ppc-btn.primary { background: var(--accent); color: #fff; }
+    .ppc-btn.secondary { background: var(--card2); color: var(--text); border: 1px solid var(--border2); }
+    .ppc-btn:hover { opacity: .88; }
+
+    /* ── CONTACT FORM ── */
+    .contact-section { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; margin-bottom: 20px; }
+    .contact-grid { display: grid; grid-template-columns: 1fr 1fr; }
+    .contact-left { padding: 36px; background: #0f0f0f; position: relative; overflow: hidden; }
+    .contact-left-bg { position: absolute; inset: 0; background: radial-gradient(ellipse 80% 60% at 0% 50%, rgba(0, 180, 170, .18) 0%, transparent 70%); pointer-events: none; }
+    .contact-right { padding: 36px; }
+    .contact-title { font-family: var(--font-d); font-size: 32px; letter-spacing: 1px; color: #fff; margin-bottom: 10px; position: relative; }
+    .contact-title span { color: var(--accent); }
+    .contact-sub { font-size: 13px; color: rgba(255,255,255,.5); line-height: 1.65; margin-bottom: 24px; position: relative; }
+    .contact-promise { position: relative; display: flex; flex-direction: column; gap: 12px; }
+    .cp-item { display: flex; gap: 10px; align-items: flex-start; }
+    .cp-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--accent); flex-shrink: 0; margin-top: 7px; }
+    .cp-text { font-size: 13px; color: rgba(255,255,255,.6); line-height: 1.5; }
+    .cp-text strong { color: rgba(255,255,255,.9); font-weight: 500; }
+    .form-title { font-family: var(--font-d); font-size: 22px; letter-spacing: 1px; color: var(--text); margin-bottom: 6px; }
+    .form-sub { font-size: 13px; color: var(--muted); margin-bottom: 24px; }
+    .form-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .submit-btn { width: 100%; padding: 14px; background: var(--accent); color: #fff; font-family: var(--font-d); font-size: 18px; letter-spacing: 1px; border: none; border-radius: var(--radius-sm); cursor: pointer; transition: opacity .15s, transform .1s; margin-top: 4px; }
+    .submit-btn:hover { opacity: .88; }
+    .submit-btn:active { transform: scale(.98); }
+    .success-msg { display: none; background: rgba(26,122,70,.07); border: 1px solid rgba(26,122,70,.2); border-radius: var(--radius-sm); padding: 16px; text-align: center; }
+    .success-msg.show { display: block; }
+    .success-msg .s-icon { font-size: 28px; margin-bottom: 8px; display: block; }
+    .success-msg .s-title { font-family: var(--font-d); font-size: 18px; color: var(--green); margin-bottom: 4px; }
+    .success-msg .s-sub { font-size: 13px; color: var(--muted); }
+
+    /* ── HOW IT WORKS ── */
+    .how-grid-prop { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 20px; }
+    .how-card-prop { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; }
+    .how-num-prop { font-family: var(--font-d); font-size: 40px; color: rgba(0,0,0,.06); line-height: 1; margin-bottom: 10px; }
+    .how-title-prop { font-size: 14px; font-weight: 500; color: var(--text); margin-bottom: 4px; }
+    .how-desc-prop { font-size: 12px; color: var(--muted); line-height: 1.6; }
+
+    /* ── DASHBOARD PREVIEW ── */
+    .dashboard-preview { margin-bottom: 20px; }
+
+    /* ── EXISTING PORTAL TABS ── */
+    .prop-header { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 20px 22px; display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 20px; flex-wrap: wrap; }
+    .prop-info { display: flex; align-items: center; gap: 14px; }
+    .prop-icon { width: 48px; height: 48px; background: rgba(0, 180, 170, .10); border: 1px solid rgba(0, 180, 170, .25); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
+    .prop-name  { font-size: 16px; font-weight: 500; color: var(--text); }
+    .prop-addr  { font-size: 12px; color: var(--muted); margin-top: 2px; }
+    .prop-badges { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 4px; }
+    .prop-actions { display: flex; gap: 8px; }
+    .prop-btn { font-family: var(--font-m); font-size: 10px; letter-spacing: 1px; padding: 7px 14px; border-radius: 5px; cursor: pointer; text-decoration: none; transition: opacity .15s; }
+    .prop-btn.primary   { background: var(--accent); color: #fff; border: none; }
+    .prop-btn.secondary { background: transparent; color: var(--muted); border: 1px solid var(--border2); }
+    .prop-btn:hover { opacity: .85; }
+    .stats-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-bottom: 20px; }
+    .main-grid { display: grid; grid-template-columns: 1fr 340px; gap: 14px; }
+    .col-left  { display: flex; flex-direction: column; gap: 14px; }
+    .col-right { display: flex; flex-direction: column; gap: 14px; }
+    .vehicle-table { width: 100%; border-collapse: collapse; }
+    .vehicle-table th { font-family: var(--font-m); font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); padding: 10px 14px; text-align: left; border-bottom: 1px solid var(--border); background: var(--surface); white-space: nowrap; }
+    .vehicle-table td { padding: 11px 14px; border-bottom: 1px solid var(--border); font-size: 13px; color: var(--text); background: #fff; }
+    .vehicle-table tr:hover td { background: var(--surface); }
+    .vehicle-table tr:last-child td { border-bottom: none; }
+    .vt-tag { font-family: var(--font-m); font-size: 11px; color: var(--accent); }
+    .vt-scans { font-family: var(--font-m); font-size: 12px; color: var(--text); }
+    .vt-last { font-family: var(--font-m); font-size: 10px; color: var(--muted); }
+    .status-active { display: inline-flex; align-items: center; gap: 4px; font-family: var(--font-m); font-size: 10px; color: var(--green); }
+    .status-inactive { font-family: var(--font-m); font-size: 10px; color: var(--muted2); }
+    .status-dot-sm { width: 5px; height: 5px; border-radius: 50%; background: var(--green); flex-shrink: 0; }
+    .vt-action { font-family: var(--font-m); font-size: 10px; color: var(--accent); cursor: pointer; background: none; border: none; padding: 0; }
+    .table-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 12px 16px; border-bottom: 1px solid var(--border); flex-wrap: wrap; background: var(--surface); }
+    .toolbar-left { display: flex; gap: 8px; align-items: center; }
+    .toolbar-search { background: #fff; border: 1px solid var(--border); color: var(--text); font-family: var(--font-m); font-size: 11px; padding: 7px 12px; border-radius: 5px; outline: none; width: 200px; transition: border-color .15s; }
+    .toolbar-search:focus { border-color: var(--accent); }
+    .toolbar-search::placeholder { color: var(--muted2); }
+    .toolbar-filter { background: #fff; border: 1px solid var(--border); color: var(--muted); font-family: var(--font-m); font-size: 10px; padding: 7px 10px; border-radius: 5px; outline: none; cursor: pointer; width: auto; }
+    .toolbar-count { font-family: var(--font-m); font-size: 10px; color: var(--muted); }
+    .incident-item { display: flex; align-items: flex-start; gap: 10px; padding: 10px 16px; border-bottom: 1px solid var(--border); transition: background .15s; cursor: pointer; background: #fff; }
+    .incident-item:hover { background: var(--surface); }
+    .incident-item:last-child { border-bottom: none; }
+    .inc-icon { width: 30px; height: 30px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 13px; flex-shrink: 0; margin-top: 1px; }
+    .inc-icon.red    { background: rgba(0, 180, 170, .12); }
+    .inc-icon.blue   { background: rgba(26,26,26,.06); }
+    .inc-icon.amber  { background: rgba(160,96,16,.10); }
+    .inc-icon.green  { background: rgba(26,122,70,.10); }
+    .inc-body { flex: 1; min-width: 0; }
+    .inc-title { font-size: 12px; font-weight: 500; color: var(--text); }
+    .inc-meta  { font-family: var(--font-m); font-size: 10px; color: var(--muted); margin-top: 1px; }
+    .chart-outer { padding: 14px 16px 12px; background: #fff; }
+    .chart-bars { display: flex; align-items: flex-end; gap: 5px; height: 70px; margin-bottom: 5px; }
+    .bar-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; }
+    .bar     { width: 100%; border-radius: 2px 2px 0 0; min-height: 3px; cursor: pointer; transition: opacity .15s; }
+    .bar:hover { opacity: .75; }
+    .bar-lbl { font-family: var(--font-m); font-size: 8px; color: var(--muted2); }
+    .onboard-item { display: flex; align-items: flex-start; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--border); cursor: pointer; }
+    .onboard-item:last-child { border-bottom: none; }
+    .onboard-check { width: 20px; height: 20px; border-radius: 50%; border: 1px solid var(--border2); display: flex; align-items: center; justify-content: center; font-size: 11px; flex-shrink: 0; margin-top: 1px; transition: background .15s, border-color .15s; }
+    .onboard-check.done { background: var(--accent); border-color: var(--accent); color: #fff; }
+    .onboard-title { font-size: 13px; font-weight: 500; color: var(--text); }
+    .onboard-sub   { font-size: 11px; color: var(--muted); margin-top: 2px; }
+    .quick-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .qa-btn { background: var(--card2); border: 1px solid var(--border); border-radius: 7px; padding: 12px; cursor: pointer; text-align: left; transition: border-color .15s; color: var(--text); text-decoration: none; display: block; }
+    .qa-btn:hover { border-color: var(--accent); }
+    .qa-icon  { font-size: 18px; margin-bottom: 5px; display: block; }
+    .qa-label { font-size: 12px; font-weight: 500; color: var(--text); }
+    .qa-sub   { font-size: 10px; color: var(--muted); margin-top: 1px; font-family: var(--font-m); }
+    .alert-box { background: rgba(0, 180, 170, .05); border: 1px solid rgba(0, 180, 170, .20); border-radius: 7px; padding: 12px 14px; display: flex; gap: 10px; align-items: flex-start; }
+    .alert-box.green { background: rgba(26,122,70,.04); border-color: rgba(26,122,70,.2); }
+    .alert-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+    .alert-title { font-size: 12px; font-weight: 500; margin-bottom: 2px; color: var(--text); }
+    .alert-sub   { font-size: 11px; color: var(--muted); }
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.4); z-index: 200; display: flex; align-items: center; justify-content: center; padding: 20px; opacity: 0; pointer-events: none; transition: opacity .2s; }
+    .modal-overlay.open { opacity: 1; pointer-events: all; }
+    .modal { background: #fff; border: 1px solid var(--border2); border-radius: 12px; padding: 24px; width: 100%; max-width: 440px; transform: translateY(20px); transition: transform .2s; box-shadow: 0 8px 40px rgba(0,0,0,.12); }
+    .modal-overlay.open .modal { transform: translateY(0); }
+    .modal-title { font-family: var(--font-d); font-size: 22px; letter-spacing: 1px; margin-bottom: 6px; color: var(--text); }
+    .modal-sub { font-size: 13px; color: var(--muted); margin-bottom: 20px; }
+    .modal-actions { display: flex; gap: 8px; margin-top: 20px; }
+    .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px); background: #fff; border: 1px solid var(--accent); border-radius: 6px; padding: 10px 18px; font-family: var(--font-m); font-size: 12px; color: var(--accent); display: flex; align-items: center; gap: 8px; white-space: nowrap; transition: transform .3s ease; z-index: 999; box-shadow: 0 4px 20px rgba(0,0,0,.1); }
+    .toast.show { transform: translateX(-50%) translateY(0); }
+    @media (max-width: 800px) {
+      .pain-grid { grid-template-columns: 1fr; }
+      .prop-pricing { grid-template-columns: 1fr; }
+      .contact-grid { grid-template-columns: 1fr; }
+      .contact-left { display: none; }
+      .how-grid-prop { grid-template-columns: 1fr 1fr; }
+      .stats-grid { grid-template-columns: repeat(3, 1fr); }
+      .main-grid  { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 500px) {
+      .how-grid-prop { grid-template-columns: 1fr; }
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+      .prop-hero { padding: 32px 20px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <a href="landing.html" class="logo-mark"><img src="Rinqr_logo.png" alt="Rinqr" class="logo-img"></a>
+  <div class="nav-right">
+    <div class="nav-pill"><span class="pulse-dot"></span>Pilot spots available</div>
+    <a href="#contact" style="font-family:var(--font-m);font-size:10px;color:#fff;text-decoration:none;background:var(--accent);padding:6px 14px;border-radius:4px;">Request free pilot →</a>
+  </div>
+</nav>
+
+<div class="main">
+
+  <!-- HERO BANNER -->
+  <div class="prop-hero">
+    <div class="prop-hero-bg"></div>
+    <div class="prop-hero-grid"></div>
+    <div class="prop-hero-content">
+      <div class="prop-hero-eyebrow">For property managers</div>
+      <h1 class="prop-hero-title">STOP BEING THE<br>MIDDLE<span>MAN.</span></h1>
+      <p class="prop-hero-sub">Parking disputes, blocked spots, wrong spaces — your team fields these calls every single week. Rinqr lets residents resolve them directly, privately, in under 5 minutes. Without calling you.</p>
+      <div class="prop-hero-stats">
+        <div><div class="phs-val">96<span>%</span></div><div class="phs-label">Resolution rate</div></div>
+        <div><div class="phs-val">&lt;5<span>min</span></div><div class="phs-label">Avg resolve time</div></div>
+        <div><div class="phs-val">0</div><div class="phs-label">Apps to install</div></div>
+        <div><div class="phs-val">$1.50</div><div class="phs-label">Per unit per year</div></div>
+      </div>
+      <div class="prop-hero-btns">
+        <a href="#contact" class="phb-primary">Request a free pilot →</a>
+        <a href="#dashboard" class="phb-secondary">See the dashboard</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAIN POINTS -->
+  <div style="margin-bottom:8px">
+    <p class="label" style="margin-bottom:14px">The problems Rinqr eliminates</p>
+  </div>
+  <div class="pain-grid">
+    <div class="pain-card">
+      <span class="pain-icon">📞</span>
+      <div class="pain-title">Late-night complaint calls</div>
+      <p class="pain-desc">"Someone's in my spot." Your team gets these at 9pm. There's no way to reach the other driver. You call the tow. Everyone's unhappy.</p>
+      <span class="pain-solve">Rinqr: residents self-resolve in under 5 min</span>
+    </div>
+    <div class="pain-card">
+      <span class="pain-icon">🚚</span>
+      <div class="pain-title">Expensive, liability-heavy tows</div>
+      <p class="pain-desc">Towing costs $200–$400, creates angry residents, and sometimes leads to disputes. Managers prefer to avoid it but have no other tool.</p>
+      <span class="pain-solve">Rinqr: the step before the tow truck</span>
+    </div>
+    <div class="pain-card">
+      <span class="pain-icon">👤</span>
+      <div class="pain-title">No way to reach a vehicle owner</div>
+      <p class="pain-desc">Someone's blocking the lot exit. You have no idea whose car it is. You leave a note. You wait. The problem stays unsolved for hours.</p>
+      <span class="pain-solve">Rinqr: one QR scan, owner notified instantly</span>
+    </div>
+  </div>
+
+  <!-- HOW IT WORKS FOR PROPERTY -->
+  <p class="label" style="margin-bottom:14px">How it works for your property</p>
+  <div class="how-grid-prop">
+    <div class="how-card-prop">
+      <div class="how-num-prop">01</div>
+      <div class="how-title-prop">Request a free pilot</div>
+      <p class="how-desc-prop">Fill out the form below. We ship tags for your entire property at no cost for 60 days. Zero work from your team to get started.</p>
+    </div>
+    <div class="how-card-prop">
+      <div class="how-num-prop">02</div>
+      <div class="how-title-prop">Residents self-activate</div>
+      <p class="how-desc-prop">Each resident gets a tag and an activation card. Takes 60 seconds. Their phone number is encrypted — you never see it.</p>
+    </div>
+    <div class="how-card-prop">
+      <div class="how-num-prop">03</div>
+      <div class="how-title-prop">Disputes resolve themselves</div>
+      <p class="how-desc-prop">Blocked spot? Lights on? Wrong space? Whoever scans the tag sends a private message. Owner gets an SMS. Problem solved before you're involved.</p>
+    </div>
+    <div class="how-card-prop">
+      <div class="how-num-prop">04</div>
+      <div class="how-title-prop">You get the analytics</div>
+      <p class="how-desc-prop">Full dashboard showing scan activity, incident types, resolution rates, and tows prevented. Real data to share with ownership.</p>
+    </div>
+  </div>
+
+  <!-- PRICING -->
+  <p class="label" style="margin-bottom:14px" id="pricing">Property pricing</p>
+  <div class="prop-pricing">
+    <div class="prop-price-card">
+      <div class="ppc-head">
+        <div class="ppc-name">Starter Property</div>
+        <div class="ppc-price"><sup>$</sup>199<sub>/yr</sub></div>
+        <div class="ppc-savings">Under $1 per unit for a 200-unit building</div>
+        <div class="ppc-desc">For smaller properties up to 50 units.</div>
+      </div>
+      <div class="ppc-body">
+        <ul class="ppc-features">
+          <li><span class="pf-check">✓</span>Up to 50 tags</li>
+          <li><span class="pf-check">✓</span>Property manager portal</li>
+          <li><span class="pf-check">✓</span>Resident self-activation</li>
+          <li><span class="pf-check">✓</span>Incident dashboard</li>
+          <li><span class="pf-check">✓</span>Email support</li>
+        </ul>
+        <a href="#contact" class="ppc-btn secondary">Request pilot →</a>
+      </div>
+    </div>
+    <div class="prop-price-card best">
+      <div class="ppc-head">
+        <div class="ppc-name">Standard Property</div>
+        <div class="ppc-price"><sup>$</sup>299<sub>/yr</sub></div>
+        <div class="ppc-savings">$1.50/unit/yr for a 200-unit building</div>
+        <div class="ppc-desc">For complexes with 50–300 units.</div>
+      </div>
+      <div class="ppc-body">
+        <ul class="ppc-features">
+          <li><span class="pf-check">✓</span>Unlimited tags</li>
+          <li><span class="pf-check">✓</span>Everything in Starter</li>
+          <li><span class="pf-check">✓</span>Analytics dashboard</li>
+          <li><span class="pf-check">✓</span>Tow-prevention reports</li>
+          <li><span class="pf-check">✓</span>Dedicated onboarding</li>
+          <li><span class="pf-check">✓</span>White-label option</li>
+        </ul>
+        <a href="#contact" class="ppc-btn primary">Request pilot →</a>
+      </div>
+    </div>
+    <div class="prop-price-card">
+      <div class="ppc-head">
+        <div class="ppc-name">Enterprise</div>
+        <div class="ppc-price" style="font-size:28px">Custom</div>
+        <div class="ppc-savings">Volume pricing for 5+ properties</div>
+        <div class="ppc-desc">For property management companies.</div>
+      </div>
+      <div class="ppc-body">
+        <ul class="ppc-features">
+          <li><span class="pf-check">✓</span>All properties under one account</li>
+          <li><span class="pf-check">✓</span>Everything in Standard</li>
+          <li><span class="pf-check">✓</span>Multi-property dashboard</li>
+          <li><span class="pf-check">✓</span>API access</li>
+          <li><span class="pf-check">✓</span>Custom integrations</li>
+          <li><span class="pf-check">✓</span>Dedicated account manager</li>
+        </ul>
+        <a href="#contact" class="ppc-btn secondary">Talk to us →</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- DASHBOARD PREVIEW -->
+  <div id="dashboard" style="margin-bottom:8px">
+    <p class="label" style="margin-bottom:14px">Live dashboard preview</p>
+  </div>
+  <div class="prop-header">
+    <div class="prop-info">
+      <div class="prop-icon">🏢</div>
+      <div>
+        <div class="prop-name">Oak Ridge Apartments</div>
+        <div class="prop-addr">1240 Oak Ridge Blvd, Edison NJ 08820</div>
+        <div class="prop-badges">
+          <span class="badge badge-green">24 active tags</span>
+          <span class="badge badge-blue">Standard plan</span>
+          <span class="badge badge-muted">Est. March 2026</span>
+        </div>
+      </div>
+    </div>
+    <div class="prop-actions">
+      <button class="prop-btn secondary" onclick="showToast('Exporting CSV…')">Export data</button>
+      <button class="prop-btn primary" onclick="openModal('addtag')">+ Add vehicles</button>
+    </div>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-card s-accent"><div class="stat-label">Total scans</div><div class="stat-val" id="pStatScans">128</div><div class="stat-sub">This month</div><div class="stat-trend">↑ 12 this week</div></div>
+    <div class="stat-card s-green"><div class="stat-label">Active tags</div><div class="stat-val">24</div><div class="stat-sub">of 28 deployed</div><div class="stat-trend">4 unactivated</div></div>
+    <div class="stat-card s-blue"><div class="stat-label">Resolved</div><div class="stat-val">96%</div><div class="stat-sub">Incidents solved</div><div class="stat-trend">vs 34% before Rinqr</div></div>
+    <div class="stat-card s-amber"><div class="stat-label">Tows prevented</div><div class="stat-val" id="pStatTows">11</div><div class="stat-sub">This month</div><div class="stat-trend">~$3,300 saved</div></div>
+    <div class="stat-card" style="border-top:3px solid #6b3fbf;background:var(--card)"><div class="stat-label">Avg response</div><div class="stat-val" style="font-size:28px">4m</div><div class="stat-sub">Owner reply time</div><div class="stat-trend" style="color:#6b3fbf">↓ from 47 min</div></div>
+  </div>
+
+  <div class="main-grid" style="margin-bottom:20px">
+    <div class="col-left">
+      <div class="card">
+        <div class="card-head"><div class="card-title">Scan activity — last 7 days</div><div class="card-action">Full report →</div></div>
+        <div class="chart-outer"><div class="chart-bars" id="propChart"></div></div>
+      </div>
+      <div class="card">
+        <div class="card-head"><div class="card-title">Recent incidents</div><div class="card-action" onclick="simulateIncident()" style="cursor:pointer">+ Simulate scan</div></div>
+        <div id="incidentFeed"></div>
+      </div>
+    </div>
+    <div class="col-right">
+      <div class="alert-box"><div class="alert-icon">⚠️</div><div><div class="alert-title">4 tags not yet activated</div><div class="alert-sub">Send reminders to spaces 12, 17, 23, 31.</div></div></div>
+      <div class="card">
+        <div class="card-head"><div class="card-title">Quick actions</div></div>
+        <div class="card-body">
+          <div class="quick-actions">
+            <div class="qa-btn" onclick="openModal('addtag')"><span class="qa-icon">➕</span><div class="qa-label">Add vehicles</div><div class="qa-sub">Bulk or single</div></div>
+            <div class="qa-btn" onclick="showToast('CSV export ready')"><span class="qa-icon">📊</span><div class="qa-label">Export CSV</div><div class="qa-sub">Full scan history</div></div>
+            <div class="qa-btn" onclick="showToast('Reminder emails sent to 4 unactivated tags')"><span class="qa-icon">📧</span><div class="qa-label">Send reminders</div><div class="qa-sub">Unactivated tags</div></div>
+            <div class="qa-btn" onclick="simulateIncident()"><span class="qa-icon">🔔</span><div class="qa-label">Test alert</div><div class="qa-sub">Simulate scan</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="alert-box green"><div class="alert-icon">✅</div><div><div class="alert-title">11 tows prevented this month</div><div class="alert-sub">Est. $3,300 in tow fees avoided. Rinqr resolved conflicts before escalation.</div></div></div>
+    </div>
+  </div>
+
+  <!-- CONTACT FORM -->
+  <div id="contact">
+    <div class="contact-section">
+      <div class="contact-grid">
+        <div class="contact-left">
+          <div class="contact-left-bg"></div>
+          <div class="contact-title">LET'S RUN A<br><span>FREE PILOT.</span></div>
+          <p class="contact-sub">I'm Yatish, founder of Rinqr. I personally onboard every pilot property. No contracts, no upfront cost, no work for your team. Just fill out the form and I'll reach out same day.</p>
+          <div class="contact-promise">
+            <div class="cp-item"><div class="cp-dot"></div><div class="cp-text"><strong>Free for 60 days</strong> — tags, shipping, everything included</div></div>
+            <div class="cp-item"><div class="cp-dot"></div><div class="cp-text"><strong>Zero work for your team</strong> — residents opt in themselves</div></div>
+            <div class="cp-item"><div class="cp-dot"></div><div class="cp-text"><strong>I handle everything</strong> — you get a case study at the end</div></div>
+            <div class="cp-item"><div class="cp-dot"></div><div class="cp-text"><strong>No commitment required</strong> — if it doesn't work, no hard feelings</div></div>
+          </div>
+        </div>
+        <div class="contact-right">
+          <div class="form-title">REQUEST A PILOT</div>
+          <p class="form-sub">Takes 60 seconds. I'll respond same day.</p>
+          <div id="contactForm">
+            <div class="form-grid-2">
+              <div class="field"><label>First name</label><input type="text" id="cf-first" placeholder="Alex"></div>
+              <div class="field"><label>Last name</label><input type="text" id="cf-last" placeholder="Johnson"></div>
+            </div>
+            <div class="field"><label>Work email</label><input type="email" id="cf-email" placeholder="manager@propertyname.com"></div>
+            <div class="field"><label>Property name</label><input type="text" id="cf-property" placeholder="Oak Ridge Apartments"></div>
+            <div class="form-grid-2">
+              <div class="field"><label>City</label><input type="text" id="cf-city" placeholder="Edison"></div>
+              <div class="field"><label>Approx. units</label><input type="number" id="cf-units" placeholder="120"></div>
+            </div>
+            <div class="field"><label>Biggest parking headache <span style="color:var(--muted2)">(optional)</span></label><input type="text" id="cf-pain" placeholder="Blocked spots, guest parking…"></div>
+            <div class="privacy-note mb-16" style="margin-top:4px">🔒 Your info is only used to follow up about your pilot. Never shared or sold.</div>
+            <button class="submit-btn" onclick="submitForm()">Request my free pilot →</button>
+          </div>
+          <div class="success-msg" id="successMsg">
+            <span class="s-icon">✅</span>
+            <div class="s-title">PILOT REQUEST RECEIVED</div>
+            <p class="s-sub">I'll reach out to <span id="confirmedEmail"></span> same day to get started. — Yatish, Founder of Rinqr</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+  <div class="modal">
+    <div class="modal-title" id="modalTitle">Add vehicle</div>
+    <div class="modal-sub" id="modalSub">Enter details to assign a new Rinqr tag.</div>
+    <div id="modalContent">
+      <div class="field"><label>Parking space number</label><input type="text" placeholder="e.g. 29"></div>
+      <div class="field"><label>Occupant name</label><input type="text" placeholder="Full name"></div>
+      <div class="field"><label>Vehicle description</label><input type="text" placeholder="Black Honda Civic 2022"></div>
+      <div class="field"><label>Email for activation reminder</label><input type="email" placeholder="email@example.com"></div>
+    </div>
+    <div class="modal-actions">
+      <button class="prop-btn primary" onclick="showToast('New tag generated — activation email sent');closeModal()">Confirm</button>
+      <button class="prop-btn secondary" onclick="closeModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"><span>🔔</span><span id="toastMsg">Done</span></div>
+
+<!-- FOOTER -->
+<footer style="border-top:1px solid var(--border);padding:24px 20px;background:var(--surface);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
+  <a href="landing.html" class="logo-mark"><img src="Rinqr_logo.png" alt="Rinqr" class="logo-img"></a>
+  <div style="display:flex;gap:20px;flex-wrap:wrap">
+    <a href="landing.html" style="font-family:var(--font-m);font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--muted2);text-decoration:none">Home</a>
+    <a href="activate.html" style="font-family:var(--font-m);font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--muted2);text-decoration:none">Activate</a>
+    <a href="privacy.html" style="font-family:var(--font-m);font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--muted2);text-decoration:none">Privacy</a>
+    <a href="mailto:yatish@getrinqr.com" style="font-family:var(--font-m);font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--accent);text-decoration:none">yatish@getrinqr.com</a>
+  </div>
+  <div style="font-family:var(--font-m);font-size:10px;color:var(--muted2)">© 2026 RINQR</div>
+</footer>
+
+<script>
+const incidents = [
+  { icon:'🚗', cls:'red',   title:'Space 05 — Blocking exit lane',     meta:'3 min ago · PP-Q7R8 · David L. notified',    badge:'resolved', bc:'badge-green' },
+  { icon:'💡', cls:'blue',  title:'Space 01 — Headlights left on',     meta:'2 hr ago · PP-A1B2 · James T. notified',     badge:'resolved', bc:'badge-green' },
+  { icon:'⚠️', cls:'amber', title:'Space 03 — Minor collision reported',meta:'Yesterday 4:30 PM · PP-I9J0 · Robert K.',    badge:'reviewed', bc:'badge-blue'  },
+  { icon:'🅿️', cls:'red',   title:'Space 07 — Wrong spot occupied',    meta:'Yesterday 2:15 PM · PP-Y5Z6 · visitor car',  badge:'resolved', bc:'badge-green' },
+  { icon:'🔔', cls:'amber', title:'Space 08 — Alarm going off',         meta:'Mon 11:20 AM · PP-C9D0 · Lisa R.',           badge:'resolved', bc:'badge-green' },
+];
+let scanCount = 128;
+
+function renderFeed() {
+  document.getElementById('incidentFeed').innerHTML = incidents.slice(0,4).map(i =>
+    `<div class="incident-item">
+      <div class="inc-icon ${i.cls}">${i.icon}</div>
+      <div class="inc-body"><div class="inc-title">${i.title}</div><div class="inc-meta">${i.meta}</div></div>
+      <span class="badge ${i.bc}">${i.badge}</span>
+    </div>`).join('');
+}
+
+function renderChart() {
+  const days = ['M','T','W','T','F','S','S'];
+  const vals = [12,18,8,24,15,31,11];
+  const max  = Math.max(...vals);
+  const el   = document.getElementById('propChart');
+  if (!el) return;
+  el.innerHTML = '';
+  days.forEach((d,i) => {
+    const pct = Math.round((vals[i]/max)*100);
+    el.innerHTML += `<div class="bar-col">
+      <div class="bar" style="height:${pct}%;background:${i===5?'var(--accent)':'var(--border2)'}"></div>
+      <div class="bar-lbl">${d}</div>
+    </div>`;
+  });
+}
+
+function simulateIncident() {
+  const r = incidents[Math.floor(Math.random()*4)];
+  incidents.unshift({...r, meta:'Just now · live scan'});
+  scanCount++;
+  document.getElementById('pStatScans').textContent = scanCount;
+  renderFeed();
+  showToast('New incident: ' + r.title.split('—')[1].trim());
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  document.getElementById('toastMsg').textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+function openModal() { document.getElementById('modalOverlay').classList.add('open'); }
+function closeModal(e) {
+  if (e && e.target !== document.getElementById('modalOverlay')) return;
+  document.getElementById('modalOverlay').classList.remove('open');
+}
+
+function submitForm() {
+  const email = document.getElementById('cf-email').value.trim();
+  const first = document.getElementById('cf-first').value.trim();
+  const property = document.getElementById('cf-property').value.trim();
+  if (!first || !email || !property) {
+    showToast('Please fill in your name, email, and property name');
+    return;
+  }
+  document.getElementById('confirmedEmail').textContent = email;
+  document.getElementById('contactForm').style.display = 'none';
+  document.getElementById('successMsg').classList.add('show');
+}
+
+renderFeed();
+renderChart();
+</script>
+</body>
+</html>

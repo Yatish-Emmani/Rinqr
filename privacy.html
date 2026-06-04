@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Privacy Policy — Rinqr</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .page { max-width: 800px; margin: 0 auto; padding: 48px 24px 100px; }
+    .page-header { border-bottom: 1px solid var(--border); padding-bottom: 32px; margin-bottom: 40px; }
+    .page-eyebrow { font-family: var(--font-m); font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-bottom: 12px; }
+    .page-title { font-family: var(--font-d); font-size: 52px; letter-spacing: 2px; line-height: 1; color: var(--text); margin-bottom: 16px; }
+    .page-meta { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+    .nav-back { font-family: var(--font-m); font-size: 10px; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); text-decoration: none; display: flex; align-items: center; gap: 6px; padding: 4px 10px; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--surface); transition: border-color .15s, color .15s; }
+    .nav-back:hover { border-color: var(--accent); color: var(--accent); }
+    .summary { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; margin-bottom: 32px; }
+    .summary-label { font-family: var(--font-m); font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-bottom: 16px; }
+    .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px; }
+    .summary-item { display: flex; gap: 10px; align-items: flex-start; }
+    .summary-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--green); flex-shrink: 0; margin-top: 8px; }
+    .summary-text { font-size: 13px; color: var(--text); line-height: 1.5; }
+    .promise { border-left: 3px solid var(--accent); background: rgba(0, 180, 170, .05); border-radius: 0 var(--radius-sm) var(--radius-sm) 0; padding: 14px 18px; margin-bottom: 32px; font-size: 14px; color: var(--text); line-height: 1.7; }
+    .promise strong { font-weight: 500; color: var(--accent); }
+    .toc { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px 24px; margin-bottom: 48px; }
+    .toc-label { font-family: var(--font-m); font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-bottom: 14px; }
+    .toc-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 4px 24px; list-style: none; counter-reset: toc; }
+    .toc-grid li { counter-increment: toc; font-family: var(--font-m); font-size: 11px; letter-spacing: .5px; }
+    .toc-grid li::before { content: counter(toc, decimal-leading-zero) " "; color: var(--muted2); }
+    .toc-grid a { color: var(--accent); text-decoration: none; }
+    .toc-grid a:hover { text-decoration: underline; }
+    section { margin-bottom: 52px; scroll-margin-top: 24px; }
+    .section-num { font-family: var(--font-m); font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted2); margin-bottom: 8px; }
+    section h2 { font-family: var(--font-d); font-size: 32px; letter-spacing: 1px; color: var(--text); margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid var(--border); }
+    section h3 { font-family: var(--font-m); font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); margin: 22px 0 8px; }
+    p { font-size: 15px; color: var(--text); line-height: 1.7; margin-bottom: 12px; }
+    p:last-child { margin-bottom: 0; }
+    strong { font-weight: 500; }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .callout { border-radius: var(--radius-sm); padding: 14px 18px; margin: 20px 0; font-size: 14px; line-height: 1.65; }
+    .callout-green { background: rgba(26,122,70,.07); border-left: 3px solid var(--green); }
+    .callout-red   { background: rgba(0, 180, 170, .08); border-left: 3px solid var(--accent); }
+    .callout-amber { background: rgba(160,96,16,.07); border-left: 3px solid var(--amber); }
+    .callout strong { font-weight: 500; }
+    .data-table { width: 100%; border-collapse: collapse; margin: 16px 0 24px; font-size: 13px; border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+    .data-table thead { background: var(--surface); }
+    .data-table th { text-align: left; padding: 10px 14px; font-family: var(--font-m); font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); border-bottom: 1px solid var(--border); }
+    .data-table td { padding: 11px 14px; border-bottom: 1px solid var(--border); vertical-align: top; line-height: 1.55; color: var(--text); }
+    .data-table tr:last-child td { border-bottom: none; }
+    .data-table tr:hover td { background: var(--surface); }
+    .data-table .cat { font-weight: 500; font-family: var(--font-m); font-size: 11px; }
+    .rights-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; margin: 16px 0; }
+    .right-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 14px; }
+    .right-title { font-family: var(--font-m); font-size: 10px; letter-spacing: 1px; text-transform: uppercase; color: var(--text); font-weight: 500; margin-bottom: 5px; }
+    .right-desc { font-size: 12px; color: var(--muted); line-height: 1.5; }
+    .contact-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; }
+    .contact-card p { font-size: 14px; margin-bottom: 10px; }
+    .contact-card p:last-child { margin-bottom: 0; }
+    .full-divider { border: none; border-top: 1px solid var(--border); margin: 48px 0; }
+    .page-footer { background: var(--surface); border-top: 1px solid var(--border); padding: 24px; text-align: center; }
+    .footer-links { display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; margin-bottom: 12px; }
+    .footer-links a { font-family: var(--font-m); font-size: 10px; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); text-decoration: none; }
+    .footer-links a:hover { color: var(--accent); }
+    .footer-copy { font-family: var(--font-m); font-size: 10px; letter-spacing: 1px; color: var(--muted2); }
+  </style>
+</head>
+<body class="trust-context">
+
+<nav class="nav">
+  <a href="landing.html" class="logo-mark"><img src="Rinqr_logo.png" alt="Rinqr" class="logo-img"></a>
+  <a href="landing.html" class="nav-back">← Back to home</a>
+</nav>
+
+<div class="page">
+  <div class="page-header">
+    <div class="page-eyebrow">Legal</div>
+    <h1 class="page-title">PRIVACY POLICY</h1>
+    <div class="page-meta">
+      <span class="badge badge-muted">Effective June 1, 2026</span>
+      <span class="badge badge-muted">Last updated May 27, 2026</span>
+      <span class="badge badge-green">CCPA compliant</span>
+      <span class="badge badge-green">GDPR aligned</span>
+    </div>
+  </div>
+
+  <div class="summary">
+    <div class="summary-label">Plain-English Summary — read this first</div>
+    <div class="summary-grid">
+      <div class="summary-item"><div class="summary-dot"></div><div class="summary-text">We never show your phone number to anyone who scans your tag</div></div>
+      <div class="summary-item"><div class="summary-dot"></div><div class="summary-text">We never sell your data to advertisers or data brokers. Ever.</div></div>
+      <div class="summary-item"><div class="summary-dot"></div><div class="summary-text">Your phone number is encrypted at rest using AES-256</div></div>
+      <div class="summary-item"><div class="summary-dot"></div><div class="summary-text">Scanners only see your tag ID — never your identity</div></div>
+      <div class="summary-item"><div class="summary-dot"></div><div class="summary-text">You can delete your account and all data at any time</div></div>
+      <div class="summary-item"><div class="summary-dot"></div><div class="summary-text">We log scan events, not your vehicle's live location</div></div>
+      <div class="summary-item"><div class="summary-dot"></div><div class="summary-text">Twilio handles call relay — we share only what's necessary</div></div>
+      <div class="summary-item"><div class="summary-dot"></div><div class="summary-text">You're always in control. Your privacy is the product.</div></div>
+    </div>
+  </div>
+
+  <div class="promise">
+    <strong>Our core promise:</strong> Rinqr was built on a single principle — you should be reachable without being identifiable. Every decision in this policy flows from that. We don't monetize your data. We don't build advertising profiles. Your phone number is infrastructure, not inventory.
+  </div>
+
+  <div class="toc">
+    <div class="toc-label">Contents</div>
+    <ol class="toc-grid">
+      <li><a href="#s1">Who we are</a></li>
+      <li><a href="#s2">What data we collect</a></li>
+      <li><a href="#s3">How we collect it</a></li>
+      <li><a href="#s4">Why we use your data</a></li>
+      <li><a href="#s5">How we protect your data</a></li>
+      <li><a href="#s6">Who we share data with</a></li>
+      <li><a href="#s7">Data retention</a></li>
+      <li><a href="#s8">Your rights</a></li>
+      <li><a href="#s9">CCPA — California residents</a></li>
+      <li><a href="#s10">GDPR — EEA residents</a></li>
+      <li><a href="#s11">Children's privacy</a></li>
+      <li><a href="#s12">Cookies and tracking</a></li>
+      <li><a href="#s13">Third-party services</a></li>
+      <li><a href="#s14">Changes to this policy</a></li>
+      <li><a href="#s15">Contact us</a></li>
+    </ol>
+  </div>
+
+  <section id="s1">
+    <div class="section-num">01 — Who we are</div>
+    <h2>WHO WE ARE</h2>
+    <p>Rinqr ("Rinqr," "we," "us," or "our") is a privacy-first vehicle contact platform. Our service allows vehicle owners to be contacted anonymously via a QR tag — without their phone number, identity, or personal information being revealed to the person contacting them.</p>
+    <p>This Privacy Policy governs all data collected through our website at <strong>getrinqr.com</strong> and any associated subdomains, our web application, our physical QR tags, and any related services (collectively, the "Service").</p>
+    <p>Questions? Contact us at <a href="mailto:privacy@getrinqr.com">privacy@getrinqr.com</a></p>
+  </section>
+
+  <section id="s2">
+    <div class="section-num">02 — Data we collect</div>
+    <h2>WHAT WE COLLECT</h2>
+    <p>We collect only what is necessary to operate the Service.</p>
+    <table class="data-table">
+      <thead><tr><th>Category</th><th>What exactly</th><th>Who</th><th>Required?</th></tr></thead>
+      <tbody>
+        <tr><td class="cat">Phone number</td><td>Your mobile number, collected during tag activation and OTP verification</td><td>Tag owners only</td><td>Yes — core</td></tr>
+        <tr><td class="cat">Tag ID</td><td>A randomly generated alphanumeric identifier linked to your tag</td><td>Owners + scanners</td><td>Yes — core</td></tr>
+        <tr><td class="cat">Scan events</td><td>Timestamp, reason selected, scanner's phone (hashed), approximate IP-based location of the scan</td><td>Logged on every scan</td><td>Yes — service delivery</td></tr>
+        <tr><td class="cat">Scanner phone</td><td>Phone number entered by the scanner — used solely to establish the anonymous relay, deleted within 48 hours</td><td>Scanners</td><td>Yes — relay only</td></tr>
+        <tr><td class="cat">Emergency contact</td><td>Name and phone number of your designated emergency contact (Driver plan and above)</td><td>Paid plan owners</td><td>No — optional</td></tr>
+        <tr><td class="cat">Account info</td><td>Email address (if provided), account preferences</td><td>Dashboard accounts</td><td>No — email optional</td></tr>
+        <tr><td class="cat">Payment data</td><td>We never store card data. Payments handled by Stripe (PCI-DSS Level 1). We receive only a transaction confirmation.</td><td>Paying customers</td><td>Handled by Stripe</td></tr>
+        <tr><td class="cat">Usage data</td><td>Pages visited, browser type, device type — collected anonymously</td><td>All visitors</td><td>No — can opt out</td></tr>
+        <tr><td class="cat">IP address</td><td>Used for approximate scan geolocation and fraud prevention. Not stored beyond 30 days.</td><td>All users</td><td>Auto-collected</td></tr>
+      </tbody>
+    </table>
+    <div class="callout callout-green"><strong>What we never collect:</strong> Your vehicle's GPS location, license plate number, real name, home address, VIN, driving history, or any biometric data. Ever.</div>
+  </section>
+
+  <section id="s3">
+    <div class="section-num">03 — How we collect</div>
+    <h2>HOW WE COLLECT IT</h2>
+    <h3>Information you provide directly</h3>
+    <p>When you activate a Rinqr tag, you enter your phone number and verify it via a one-time passcode (OTP). This is the primary data collection event. You may also optionally provide an email address to create a dashboard account.</p>
+    <h3>Information collected when a tag is scanned</h3>
+    <p>When someone scans your QR tag, we collect the scan timestamp, the reason selected, and the phone number they enter. We also collect an approximate location based on their IP address — city-level precision only, not GPS. This lets you know roughly where your car was when it was scanned.</p>
+    <h3>Information from third-party services</h3>
+    <p>We use Twilio to power our anonymous phone relay. When a scan event triggers a call or SMS, Twilio processes the phone numbers involved. We share only the minimum necessary information with Twilio to complete the relay. See Section 13 for full details.</p>
+  </section>
+
+  <section id="s4">
+    <div class="section-num">04 — Why we use it</div>
+    <h2>WHY WE USE YOUR DATA</h2>
+    <h3>To deliver the core service</h3>
+    <p><strong>Legal basis: Contract performance.</strong> We need your phone number to route anonymous calls and SMS alerts to you. Without this, the Service cannot function.</p>
+    <h3>To verify your identity during activation</h3>
+    <p><strong>Legal basis: Contract performance + fraud prevention.</strong> We send a one-time passcode to confirm you control the phone number you're registering.</p>
+    <h3>To send you scan alerts</h3>
+    <p><strong>Legal basis: Contract performance.</strong> We send you an SMS alert each time your tag is scanned. This is not marketing — it is the Service itself.</p>
+    <h3>To log scan history (Driver plan and above)</h3>
+    <p><strong>Legal basis: Contract performance.</strong> Paid plan subscribers have access to a full scan history dashboard. You can export or delete this data at any time.</p>
+    <h3>To operate and improve the Service</h3>
+    <p><strong>Legal basis: Legitimate interest.</strong> We use anonymized, aggregated usage data to understand how the Service is used and diagnose technical issues. No individual is identifiable from this data.</p>
+    <h3>To comply with legal obligations</h3>
+    <p><strong>Legal basis: Legal obligation.</strong> We may retain certain data to comply with applicable law or respond to lawful requests from law enforcement. We will notify you of any such request unless prohibited by law.</p>
+    <div class="callout callout-red"><strong>What we never do with your data:</strong> We do not serve you advertisements. We do not sell your data. We do not build behavioral profiles. We do not share your phone number with the person who scanned your tag — ever, under any circumstance.</div>
+  </section>
+
+  <section id="s5">
+    <div class="section-num">05 — Protection</div>
+    <h2>HOW WE PROTECT YOUR DATA</h2>
+    <h3>Encryption at rest</h3>
+    <p>All phone numbers stored in our database are encrypted using AES-256. Encryption keys are stored separately from the data and rotated regularly. Even if our database were compromised, phone numbers would not be readable without the keys.</p>
+    <h3>Encryption in transit</h3>
+    <p>All data transmitted between your device and our servers is encrypted using TLS 1.2 or higher. We enforce HTTPS across all pages and API endpoints.</p>
+    <h3>Access controls</h3>
+    <p>Access to production systems and customer data is restricted to essential personnel only. All administrative access requires multi-factor authentication.</p>
+    <h3>The relay design is itself a privacy protection</h3>
+    <p>Our privacy architecture is structural, not just policy-based. When a call is relayed through Twilio, neither party receives the other's real number from the call metadata. This is not a setting we can accidentally turn off — it is how the system is built.</p>
+    <h3>Breach notification</h3>
+    <p>In the event of a data breach affecting your personal information, we will notify you by SMS or email within 72 hours of becoming aware, consistent with GDPR Article 33 and CCPA breach notification requirements.</p>
+    <div class="callout callout-amber"><strong>No system is perfectly secure.</strong> We implement industry-standard protections but cannot guarantee absolute security. Contact us immediately at <a href="mailto:security@getrinqr.com">security@getrinqr.com</a> if you suspect unauthorized use of your account.</div>
+  </section>
+
+  <section id="s6">
+    <div class="section-num">06 — Sharing</div>
+    <h2>WHO WE SHARE DATA WITH</h2>
+    <p>We share your data with a small number of third-party service providers. We share only the minimum necessary data, and all providers are contractually bound to protect your information.</p>
+    <table class="data-table">
+      <thead><tr><th>Provider</th><th>Purpose</th><th>Data shared</th><th>Their policy</th></tr></thead>
+      <tbody>
+        <tr><td class="cat">Twilio</td><td>SMS alerts, OTP verification, anonymous call relay</td><td>Phone numbers for relay only — not retained by Twilio beyond call completion</td><td><a href="https://www.twilio.com/en-us/legal/privacy" target="_blank" rel="noopener">twilio.com/privacy</a></td></tr>
+        <tr><td class="cat">Stripe</td><td>Payment processing</td><td>Payment card data — we never see or store this</td><td><a href="https://stripe.com/privacy" target="_blank" rel="noopener">stripe.com/privacy</a></td></tr>
+        <tr><td class="cat">Firebase</td><td>Database and authentication infrastructure</td><td>Encrypted account data stored per our data model</td><td><a href="https://firebase.google.com/support/privacy" target="_blank" rel="noopener">firebase.google.com/privacy</a></td></tr>
+      </tbody>
+    </table>
+    <h3>Law enforcement requests</h3>
+    <p>We may disclose your information when required by valid legal process. We will notify you of any such request unless legally prohibited from doing so, and will challenge requests we believe to be overbroad.</p>
+    <h3>Business transfers</h3>
+    <p>If Rinqr is acquired or merged, your data may be transferred as part of that transaction. We will notify you before your data is transferred and you will have the right to delete your account before any transfer takes effect.</p>
+    <div class="callout callout-green"><strong>We never sell your data.</strong> Not to data brokers. Not to advertising platforms. Not to anyone. This is not a loophole-filled statement — it is absolute.</div>
+  </section>
+
+  <section id="s7">
+    <div class="section-num">07 — Retention</div>
+    <h2>DATA RETENTION</h2>
+    <p>We keep your data only as long as necessary to provide the Service or as required by law.</p>
+    <table class="data-table">
+      <thead><tr><th>Data type</th><th>Retention period</th><th>Reason</th></tr></thead>
+      <tbody>
+        <tr><td class="cat">Phone number (owner)</td><td>Active account + 30 days after deletion</td><td>Service delivery; 30-day grace period for account recovery</td></tr>
+        <tr><td class="cat">Scan events (Starter)</td><td>90 days</td><td>Dispute resolution and service improvement</td></tr>
+        <tr><td class="cat">Scan events (Driver+)</td><td>Duration of paid subscription + 90 days</td><td>Dashboard history feature</td></tr>
+        <tr><td class="cat">Scanner phone numbers</td><td>48 hours after scan event</td><td>Sufficient for relay; deleted promptly after</td></tr>
+        <tr><td class="cat">Payment records</td><td>7 years</td><td>Legal and tax compliance</td></tr>
+        <tr><td class="cat">IP addresses</td><td>30 days</td><td>Fraud prevention and approximate scan location</td></tr>
+        <tr><td class="cat">OTP codes</td><td>10 minutes</td><td>Expire automatically; deleted after use</td></tr>
+        <tr><td class="cat">Anonymized analytics</td><td>Indefinitely</td><td>No personal data; used for product improvement</td></tr>
+      </tbody>
+    </table>
+    <p>When you delete your account, we initiate deletion of your personal data within 30 days. Payment records may be retained longer where required by law but will be isolated from active service data.</p>
+  </section>
+
+  <section id="s8">
+    <div class="section-num">08 — Your rights</div>
+    <h2>YOUR RIGHTS</h2>
+    <p>You have significant rights over your personal data. These apply regardless of where you live, though additional rights may apply to California and EEA residents (see Sections 9 and 10).</p>
+    <div class="rights-grid">
+      <div class="right-card"><div class="right-title">Right to access</div><div class="right-desc">Request a copy of all personal data we hold about you</div></div>
+      <div class="right-card"><div class="right-title">Right to deletion</div><div class="right-desc">Request deletion of your account and all associated personal data</div></div>
+      <div class="right-card"><div class="right-title">Right to correction</div><div class="right-desc">Correct any inaccurate data we hold about you</div></div>
+      <div class="right-card"><div class="right-title">Right to portability</div><div class="right-desc">Export your scan history and account data in a standard format</div></div>
+      <div class="right-card"><div class="right-title">Right to restrict</div><div class="right-desc">Restrict processing of your data while a dispute is resolved</div></div>
+      <div class="right-card"><div class="right-title">Right to object</div><div class="right-desc">Object to processing based on legitimate interest (e.g. analytics)</div></div>
+    </div>
+    <p style="margin-top:16px">To exercise any right, email <a href="mailto:privacy@getrinqr.com">privacy@getrinqr.com</a> with subject "Privacy Request." We respond within 30 days at no charge.</p>
+  </section>
+
+  <section id="s9">
+    <div class="section-num">09 — CCPA</div>
+    <h2>CALIFORNIA RESIDENTS</h2>
+    <p>If you are a California resident, the CCPA as amended by the CPRA grants you additional rights:</p>
+    <h3>Right to know</h3>
+    <p>You have the right to know what personal information we collect, use, disclose, and sell (we do not sell). You may request this for the 12 months preceding your request.</p>
+    <h3>Right to delete</h3>
+    <p>You have the right to request deletion of your personal information, subject to certain exceptions where retention is required by law.</p>
+    <h3>Right to opt out of sale</h3>
+    <p>We do not sell personal information. There is nothing to opt out of. This is a standing policy, not a toggleable setting.</p>
+    <h3>Right to non-discrimination</h3>
+    <p>We will not discriminate against you for exercising your CCPA rights. It will not affect your access, pricing, or quality of service.</p>
+    <p>To submit a CCPA request: <a href="mailto:privacy@getrinqr.com">privacy@getrinqr.com</a> with subject "CCPA Request."</p>
+  </section>
+
+  <section id="s10">
+    <div class="section-num">10 — GDPR</div>
+    <h2>EEA AND UK RESIDENTS</h2>
+    <p>If you are located in the European Economic Area or United Kingdom, GDPR applies to your personal data.</p>
+    <h3>Data controller</h3>
+    <p>Rinqr is the data controller. Contact: <a href="mailto:privacy@getrinqr.com">privacy@getrinqr.com</a></p>
+    <h3>Legal bases for processing</h3>
+    <p>We process personal data under: (a) contract performance — necessary to deliver the Service; (b) legitimate interests — for fraud prevention and service improvement; and (c) legal obligation — where required by applicable law.</p>
+    <h3>International data transfers</h3>
+    <p>Our Service is operated from the United States. If you access from the EEA or UK, your data will be transferred to and processed in the US. We ensure appropriate safeguards including Standard Contractual Clauses (SCCs) where applicable.</p>
+    <h3>Right to lodge a complaint</h3>
+    <p>You have the right to lodge a complaint with your local data protection authority. In the UK: the ICO at <a href="https://ico.org.uk" target="_blank" rel="noopener">ico.org.uk</a>. In the EU: contact your national supervisory authority.</p>
+  </section>
+
+  <section id="s11">
+    <div class="section-num">11 — Children</div>
+    <h2>CHILDREN'S PRIVACY</h2>
+    <p>The Service is not directed to children under the age of 13, and we do not knowingly collect personal information from children under 13. If you are under 13, please do not use the Service.</p>
+    <p>If we become aware that we have inadvertently collected information from a child under 13, we will take immediate steps to delete it. Contact us at <a href="mailto:privacy@getrinqr.com">privacy@getrinqr.com</a>.</p>
+    <p>Users between 13 and 18 may use the Service only with verifiable parental consent.</p>
+  </section>
+
+  <section id="s12">
+    <div class="section-num">12 — Cookies</div>
+    <h2>COOKIES AND TRACKING</h2>
+    <p>We use a minimal cookie footprint. Here is every cookie and tracking technology we use:</p>
+    <table class="data-table">
+      <thead><tr><th>Name</th><th>Type</th><th>Purpose</th><th>Duration</th></tr></thead>
+      <tbody>
+        <tr><td class="cat">session_id</td><td>Strictly necessary</td><td>Maintains your authenticated dashboard session</td><td>Session only</td></tr>
+        <tr><td class="cat">tag_activated</td><td>Functional</td><td>Remembers you've activated a tag to avoid re-prompting</td><td>365 days</td></tr>
+        <tr><td class="cat">analytics_anon</td><td>Analytics</td><td>Anonymous, cookieless page view analytics — no cross-site tracking, no fingerprinting</td><td>90 days</td></tr>
+      </tbody>
+    </table>
+    <p>We do not use advertising cookies, tracking pixels, or any technology that tracks you across other websites. We do not use Google Analytics. Disabling analytics cookies does not affect Service functionality.</p>
+  </section>
+
+  <section id="s13">
+    <div class="section-num">13 — Third parties</div>
+    <h2>THIRD-PARTY SERVICES</h2>
+    <h3>Twilio (call and SMS relay)</h3>
+    <p>Twilio processes phone numbers to establish anonymous relay connections. When a scan triggers a call, we pass both numbers to Twilio solely to establish the relay. Twilio does not retain these numbers after the call session ends. <a href="https://www.twilio.com/en-us/legal/privacy" target="_blank" rel="noopener">twilio.com/privacy</a></p>
+    <h3>Stripe (payments)</h3>
+    <p>Stripe processes all payment transactions. We do not see, store, or transmit payment card numbers. Stripe is PCI-DSS Level 1 certified. <a href="https://stripe.com/privacy" target="_blank" rel="noopener">stripe.com/privacy</a></p>
+    <h3>Firebase / Google Cloud (database)</h3>
+    <p>We use Firebase Firestore to store encrypted account and tag data. Google processes data as a data processor under our instructions. <a href="https://firebase.google.com/support/privacy" target="_blank" rel="noopener">firebase.google.com/privacy</a></p>
+    <div class="callout callout-green">We do not embed social media buttons, advertising SDKs, or any third-party JavaScript that communicates with external services not listed here.</div>
+  </section>
+
+  <section id="s14">
+    <div class="section-num">14 — Changes</div>
+    <h2>CHANGES TO THIS POLICY</h2>
+    <p>When we make material changes, we will notify you by SMS (if you are an active tag owner) and post a prominent notice on our website at least <strong>14 days</strong> before the changes take effect.</p>
+    <p>Non-material changes (corrections, clarifications) will be made without prior notice, but the "Last updated" date at the top will always reflect the most recent revision.</p>
+    <p>Your continued use of the Service after changes take effect constitutes acceptance. If you disagree, you may delete your account before changes take effect.</p>
+  </section>
+
+  <section id="s15">
+    <div class="section-num">15 — Contact</div>
+    <h2>CONTACT US</h2>
+    <div class="contact-card">
+      <p><strong>Privacy questions, data requests, or concerns</strong></p>
+      <p>
+        Privacy: <a href="mailto:privacy@getrinqr.com">privacy@getrinqr.com</a><br>
+        Security: <a href="mailto:security@getrinqr.com">security@getrinqr.com</a><br>
+        Support: <a href="mailto:support@getrinqr.com">support@getrinqr.com</a>
+      </p>
+      <p><strong>Mailing address</strong><br>
+      Rinqr · United States</p>
+      <p style="font-size:12px;color:var(--muted);margin-top:14px">We aim to respond to all privacy requests within 5 business days and are required by law to respond within 30 days.</p>
+    </div>
+  </section>
+
+  <hr class="full-divider">
+</div>
+
+<footer class="page-footer">
+  <div class="footer-links">
+    <a href="landing.html">Home</a>
+    <a href="activate.html">Activate</a>
+    <a href="signin.html">Sign in</a>
+    <a href="property.html">Business</a>
+    <a href="privacy.html">Privacy</a>
+    <a href="terms.html">Terms</a>
+  </div>
+  <div class="footer-copy">© 2026 RINQR · PRIVACY-FIRST VEHICLE CONTACT</div>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>Rinqr — Activate Your Tag</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    body {
+      max-width: 440px;
+      margin: 0 auto;
+      padding: 32px 20px 60px;
+      background: var(--bg);
+    }
+
+    .activate-hero { margin: 20px 0 28px; }
+    .activate-title {
+      font-family: var(--font-d);
+      font-size: 38px;
+      letter-spacing: 2px;
+      line-height: 1;
+      margin-bottom: 8px;
+      color: var(--text);
+    }
+    .activate-title span { color: var(--accent); }
+    .activate-sub { font-size: 13px; color: var(--muted); }
+
+    .activate-step { display: none; }
+    .activate-step.active { display: block; }
+
+    .step-pills { display: flex; gap: 6px; margin-bottom: 24px; }
+    .step-pill {
+      flex: 1;
+      height: 4px;
+      border-radius: 2px;
+      background: var(--border2);
+      transition: background .3s;
+    }
+    .step-pill.done   { background: var(--green);  }
+    .step-pill.active { background: var(--accent); }
+
+    .form-section {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      margin-bottom: 14px;
+    }
+    .form-section-title {
+      font-family: var(--font-m);
+      font-size: 10px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 16px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    #tagId {
+      font-family: var(--font-m);
+      font-size: 16px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+    }
+    .tag-hint { font-size: 11px; color: var(--muted); margin-top: 6px; }
+
+    .vehicle-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+      margin-top: 4px;
+    }
+    .vehicle-btn {
+      background: var(--card2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 12px 6px;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color .15s, background .15s;
+      color: var(--text);
+    }
+    .vehicle-btn:hover { border-color: var(--border2); }
+    .vehicle-btn.selected {
+      border-color: var(--accent);
+      background: rgba(0, 180, 170, .08);
+    }
+    .vehicle-btn .v-icon { font-size: 20px; display: block; margin-bottom: 4px; }
+    .vehicle-btn .v-text { font-size: 11px; color: var(--muted); }
+    .vehicle-btn.selected .v-text { color: var(--accent); }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-family: var(--font-m);
+      font-size: 11px;
+      color: var(--muted);
+      cursor: pointer;
+      margin-bottom: 20px;
+      background: none;
+      border: none;
+      padding: 0;
+    }
+    .back-link:hover { color: var(--accent); }
+
+    .success-wrap { text-align: center; padding: 20px 0; }
+    .success-big-icon {
+      font-size: 56px;
+      display: block;
+      margin-bottom: 16px;
+      animation: popIn .4s cubic-bezier(.175,.885,.32,1.275);
+    }
+    @keyframes popIn {
+      from { transform: scale(.5); opacity: 0; }
+      to   { transform: scale(1);  opacity: 1; }
+    }
+    .success-heading {
+      font-family: var(--font-d);
+      font-size: 32px;
+      letter-spacing: 2px;
+      color: var(--green);
+      margin-bottom: 6px;
+    }
+    .success-desc { font-size: 13px; color: var(--muted); margin-bottom: 24px; }
+
+    .tag-activated-card {
+      background: var(--card);
+      border: 1px solid rgba(26,122,70,.2);
+      border-radius: var(--radius);
+      padding: 16px 18px;
+      margin-bottom: 20px;
+      text-align: left;
+    }
+    .tag-activated-id {
+      font-family: var(--font-m);
+      font-size: 14px;
+      color: var(--accent);
+      letter-spacing: 2px;
+      margin-bottom: 4px;
+    }
+    .tag-activated-name { font-size: 15px; font-weight: 500; color: var(--text); }
+    .tag-activated-sub  { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+    .checklist { list-style: none; margin-bottom: 20px; text-align: left; }
+    .checklist li {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 13px;
+      color: var(--text);
+    }
+    .checklist li:last-child { border-bottom: none; }
+    .checklist .ck { color: var(--green); flex-shrink: 0; }
+
+    .how-steps { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+    .how-step {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 12px;
+      background: var(--card2);
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+    }
+    .how-num { font-family: var(--font-d); font-size: 20px; color: var(--accent); line-height: 1; min-width: 24px; }
+    .how-title { font-size: 13px; font-weight: 500; margin-bottom: 2px; color: var(--text); }
+    .how-sub   { font-size: 11px; color: var(--muted); }
+
+    .page-footer { margin-top: 32px; text-align: center; }
+    .powered-by { font-family: var(--font-m); font-size: 10px; letter-spacing: 1px; color: var(--muted2); }
+    .powered-by span { color: var(--accent); }
+  </style>
+</head>
+<body>
+
+  <a href="landing.html" class="logo-mark">
+    <img src="Rinqr_logo.png" alt="Rinqr" class="logo-img">
+  </a>
+
+  <div class="activate-hero">
+    <h1 class="activate-title">ACTIVATE<br>YOUR <span>TAG</span></h1>
+    <p class="activate-sub">Takes 60 seconds. Your number stays private forever.</p>
+  </div>
+
+  <div class="step-pills" id="stepPills">
+    <div class="step-pill active" id="pill0"></div>
+    <div class="step-pill" id="pill1"></div>
+    <div class="step-pill" id="pill2"></div>
+  </div>
+
+  <!-- STEP 1: TAG ID -->
+  <div class="activate-step active" id="astep1">
+    <div class="form-section">
+      <div class="form-section-title">Your tag ID</div>
+      <div class="field">
+        <label for="tagId">Tag ID (printed on your sticker)</label>
+        <input
+          type="text"
+          id="tagId"
+          placeholder="PP-XXXX-XXXX"
+          maxlength="12"
+          oninput="formatTagId(this); checkStep1()"
+        >
+        <p class="tag-hint">Found on the back of your Rinqr sticker packaging</p>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <div class="form-section-title">What type of vehicle?</div>
+      <div class="vehicle-grid">
+        <button class="vehicle-btn" onclick="selectVehicle(this)">
+          <span class="v-icon">🚗</span>
+          <span class="v-text">Car</span>
+        </button>
+        <button class="vehicle-btn" onclick="selectVehicle(this)">
+          <span class="v-icon">🚙</span>
+          <span class="v-text">SUV / Truck</span>
+        </button>
+        <button class="vehicle-btn" onclick="selectVehicle(this)">
+          <span class="v-icon">🏍️</span>
+          <span class="v-text">Motorcycle</span>
+        </button>
+        <button class="vehicle-btn" onclick="selectVehicle(this)">
+          <span class="v-icon">🚐</span>
+          <span class="v-text">Van</span>
+        </button>
+        <button class="vehicle-btn" onclick="selectVehicle(this)">
+          <span class="v-icon">🚌</span>
+          <span class="v-text">Bus</span>
+        </button>
+        <button class="vehicle-btn" onclick="selectVehicle(this)">
+          <span class="v-icon">🚛</span>
+          <span class="v-text">Truck</span>
+        </button>
+      </div>
+    </div>
+
+    <button class="btn btn-primary" id="step1Btn" disabled onclick="goActivateStep(2)">
+      Continue →
+    </button>
+  </div>
+
+  <!-- STEP 2: OWNER INFO -->
+  <div class="activate-step" id="astep2">
+    <button class="back-link" onclick="goActivateStep(1)">← Back</button>
+
+    <div class="form-section">
+      <div class="form-section-title">Your details</div>
+
+      <div class="field" id="nameField">
+        <label for="ownerName">Your name</label>
+        <input
+          type="text"
+          id="ownerName"
+          placeholder="Alex K."
+          oninput="checkStep2()"
+          autocomplete="name"
+        >
+        <span class="error-msg">Please enter your name</span>
+      </div>
+
+      <div class="field" id="phoneField">
+        <label for="ownerPhone">Your phone number</label>
+        <input
+          type="tel"
+          id="ownerPhone"
+          placeholder="(555) 000-0000"
+          maxlength="14"
+          oninput="formatPhoneField(this); checkStep2()"
+          autocomplete="tel"
+        >
+        <span class="error-msg">Please enter a valid 10-digit phone number</span>
+      </div>
+
+      <div class="field">
+        <label for="vehicleDesc">Vehicle description <span style="color:var(--muted2)">(optional)</span></label>
+        <input
+          type="text"
+          id="vehicleDesc"
+          placeholder="Black Honda Civic 2022"
+          autocomplete="off"
+        >
+      </div>
+
+      <div class="field">
+        <label for="propertyName">Apartment / property name <span style="color:var(--muted2)">(optional)</span></label>
+        <input
+          type="text"
+          id="propertyName"
+          placeholder="Maple Grove Apartments"
+          autocomplete="organization"
+        >
+      </div>
+
+      <div class="field">
+        <label for="unitNumber">Unit number <span style="color:var(--muted2)">(optional)</span></label>
+        <input
+          type="text"
+          id="unitNumber"
+          placeholder="4B"
+          autocomplete="off"
+        >
+      </div>
+    </div>
+
+    <div class="privacy-note mb-16">
+      🔒 Your number is encrypted and never shown to anyone who scans your tag
+    </div>
+
+    <button class="btn btn-primary" id="step2Btn" disabled onclick="activateTag()">
+      Activate my tag →
+    </button>
+  </div>
+
+  <!-- STEP 3: SUCCESS -->
+  <div class="activate-step" id="astep3">
+    <div class="success-wrap">
+      <span class="success-big-icon">✅</span>
+      <div class="success-heading">TAG ACTIVATED!</div>
+      <p class="success-desc">Your tag is live and protecting your privacy right now.</p>
+
+      <div class="tag-activated-card">
+        <div class="tag-activated-id" id="confirmedTagId">PP-7X4K-9M2R</div>
+        <div class="tag-activated-name" id="confirmedName">Alex K.</div>
+        <div class="tag-activated-sub" id="confirmedSub">Active · Privacy protected · 0 scans so far</div>
+      </div>
+
+      <ul class="checklist">
+        <li><span class="ck">✓</span><span>Tag linked to your private account</span></li>
+        <li><span class="ck">✓</span><span>Your real number encrypted and hidden</span></li>
+        <li><span class="ck">✓</span><span>SMS alerts enabled for all scans</span></li>
+        <li><span class="ck">✓</span><span>Masked call relay ready to use</span></li>
+        <li><span class="ck">✓</span><span>Emergency contact can be added in dashboard</span></li>
+      </ul>
+
+      <a href="dashboard.html" class="btn btn-primary">
+        Go to my dashboard →
+      </a>
+
+      <button class="btn btn-secondary mt-8" onclick="activateAnother()">
+        + Activate another tag
+      </button>
+    </div>
+  </div>
+
+  <!-- HOW IT WORKS -->
+  <div id="howItWorks" style="display:none">
+    <hr class="divider mt-24">
+    <p class="label mb-12" style="margin-top:20px">How it works after activation</p>
+    <div class="how-steps">
+      <div class="how-step">
+        <div class="how-num">1</div>
+        <div><div class="how-title">Stick your tag on your car</div><div class="how-sub">Windshield, bumper, or rear window — anywhere visible</div></div>
+      </div>
+      <div class="how-step">
+        <div class="how-num">2</div>
+        <div><div class="how-title">Someone scans your QR</div><div class="how-sub">No app needed. Works on any smartphone camera</div></div>
+      </div>
+      <div class="how-step">
+        <div class="how-num">3</div>
+        <div><div class="how-title">You get an instant SMS alert</div><div class="how-sub">Reason included. You decide whether to call back</div></div>
+      </div>
+      <div class="how-step">
+        <div class="how-num">4</div>
+        <div><div class="how-title">Call back anonymously</div><div class="how-sub">Neither side ever sees the other's real number</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-footer">
+    <div class="powered-by">Powered by <span>RINQR</span> · <a href="privacy.html" style="color:var(--muted2);text-decoration:none">Privacy Policy</a> · <a href="terms.html" style="color:var(--muted2);text-decoration:none">Terms</a></div>
+  </div>
+
+<script>
+  let selectedVehicle = '';
+  let activateStep    = 1;
+
+  function formatTagId(input) {
+    let v = input.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+    if (v.length > 8) v = v.slice(0, 8);
+    if (v.length > 4) v = v.slice(0,2) + '-' + v.slice(2,6) + '-' + v.slice(6);
+    else if (v.length > 2) v = v.slice(0,2) + '-' + v.slice(2);
+    input.value = v;
+  }
+
+  function selectVehicle(btn) {
+    document.querySelectorAll('.vehicle-btn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    selectedVehicle = btn.querySelector('.v-text').textContent;
+    checkStep1();
+  }
+
+  function checkStep1() {
+    const tagVal = document.getElementById('tagId').value.replace(/[^A-Z0-9]/g,'');
+    document.getElementById('step1Btn').disabled = !(tagVal.length >= 8 && selectedVehicle !== '');
+  }
+
+  function checkStep2() {
+    const name   = document.getElementById('ownerName').value.trim();
+    const digits = document.getElementById('ownerPhone').value.replace(/\D/g,'');
+    document.getElementById('step2Btn').disabled = !(name.length > 0 && digits.length >= 10);
+  }
+
+  function formatPhoneField(input) {
+    let v = input.value.replace(/\D/g,'');
+    if (v.length > 10) v = v.slice(0,10);
+    if (v.length >= 7)      v = '(' + v.slice(0,3) + ') ' + v.slice(3,6) + '-' + v.slice(6);
+    else if (v.length >= 4) v = '(' + v.slice(0,3) + ') ' + v.slice(3);
+    else if (v.length >= 1) v = '(' + v;
+    input.value = v;
+  }
+
+  function goActivateStep(n) {
+    document.querySelectorAll('.activate-step').forEach((s,i) => {
+      s.classList.toggle('active', i + 1 === n);
+    });
+    ['pill0','pill1','pill2'].forEach((id, i) => {
+      const pill = document.getElementById(id);
+      pill.classList.remove('active','done');
+      if (i + 1 < n)  pill.classList.add('done');
+      if (i + 1 === n) pill.classList.add('active');
+    });
+    document.getElementById('howItWorks').style.display = n === 3 ? 'block' : 'none';
+    activateStep = n;
+    window.scrollTo(0, 0);
+  }
+
+  async function activateTag() {
+    const btn          = document.getElementById('step2Btn');
+    const name         = document.getElementById('ownerName').value.trim();
+    const phone        = document.getElementById('ownerPhone').value.trim();
+    const tag          = document.getElementById('tagId').value.trim();
+    const vehicleDesc  = document.getElementById('vehicleDesc').value.trim();
+    const propertyName = document.getElementById('propertyName')?.value.trim() || '';
+    const unitNumber   = document.getElementById('unitNumber')?.value.trim()   || '';
+
+    // Show loading state
+    btn.textContent = '⏳ Activating…';
+    btn.disabled    = true;
+
+    // Clear any previous error
+    const prev = document.getElementById('activateError');
+    if (prev) prev.remove();
+
+    try {
+      const res  = await fetch('/api/activate', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          tagId:        tag,
+          ownerName:    name,
+          ownerPhone:   phone,
+          vehicleType:  selectedVehicle,
+          vehicleDesc,
+          propertyName,
+          unitNumber
+        })
+      });
+
+      const data = await res.json();
+
+      if (!res.ok || data.error) {
+        // Show inline error, re-enable button
+        const errEl       = document.createElement('p');
+        errEl.id          = 'activateError';
+        errEl.style.cssText = 'color:var(--accent);font-size:13px;margin-top:10px;text-align:center';
+        errEl.textContent = '⚠ ' + (data.message || 'Something went wrong. Please try again.');
+        btn.after(errEl);
+        btn.textContent = 'Activate my tag →';
+        btn.disabled    = false;
+        return;
+      }
+
+      // Fill success screen
+      document.getElementById('confirmedTagId').textContent = tag;
+      document.getElementById('confirmedName').textContent  = name;
+
+      // If linked to a property, show it in the success card
+      if (data.propertyLinked && data.propertyName) {
+        const sub = document.getElementById('confirmedSub');
+        if (sub) sub.textContent = `Active · ${data.propertyName}${unitNumber ? ', Unit ' + unitNumber : ''} · 0 scans so far`;
+      }
+
+      goActivateStep(3);
+
+    } catch (err) {
+      console.error('Activate error:', err);
+      const errEl       = document.createElement('p');
+      errEl.id          = 'activateError';
+      errEl.style.cssText = 'color:var(--accent);font-size:13px;margin-top:10px;text-align:center';
+      errEl.textContent = '⚠ Network error. Check your connection and try again.';
+      btn.after(errEl);
+      btn.textContent = 'Activate my tag →';
+      btn.disabled    = false;
+    }
+  }
+
+  function activateAnother() {
+    document.getElementById('tagId').value       = '';
+    document.getElementById('ownerName').value   = '';
+    document.getElementById('ownerPhone').value  = '';
+    document.getElementById('vehicleDesc').value = '';
+    const pn = document.getElementById('propertyName');
+    const un = document.getElementById('unitNumber');
+    if (pn) pn.value = '';
+    if (un) un.value = '';
+    document.querySelectorAll('.vehicle-btn').forEach(b => b.classList.remove('selected'));
+    selectedVehicle = '';
+    document.getElementById('step1Btn').disabled     = true;
+    document.getElementById('step2Btn').disabled     = true;
+    document.getElementById('step2Btn').textContent  = 'Activate my tag →';
+    goActivateStep(1);
+  }
+</script>
+
+</body>
+</html>

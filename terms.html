@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Terms of Service — Rinqr</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .page { max-width: 800px; margin: 0 auto; padding: 48px 24px 100px; }
+    .page-header { border-bottom: 1px solid var(--border); padding-bottom: 32px; margin-bottom: 40px; }
+    .page-eyebrow { font-family: var(--font-m); font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-bottom: 12px; }
+    .page-title { font-family: var(--font-d); font-size: 52px; letter-spacing: 2px; line-height: 1; color: var(--text); margin-bottom: 16px; }
+    .page-meta { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+    .nav-back { font-family: var(--font-m); font-size: 10px; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); text-decoration: none; display: flex; align-items: center; gap: 6px; padding: 4px 10px; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--surface); transition: border-color .15s, color .15s; }
+    .nav-back:hover { border-color: var(--accent); color: var(--accent); }
+    .summary { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; margin-bottom: 32px; }
+    .summary-label { font-family: var(--font-m); font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-bottom: 16px; }
+    .promise { border-left: 3px solid var(--accent); background: rgba(0, 180, 170, .05); border-radius: 0 var(--radius-sm) var(--radius-sm) 0; padding: 14px 18px; margin-bottom: 32px; font-size: 14px; color: var(--text); line-height: 1.7; }
+    .promise strong { font-weight: 500; color: var(--accent); }
+    .toc { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px 24px; margin-bottom: 48px; }
+    .toc-label { font-family: var(--font-m); font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-bottom: 14px; }
+    .toc-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 4px 24px; list-style: none; counter-reset: toc; }
+    .toc-grid li { counter-increment: toc; font-family: var(--font-m); font-size: 11px; letter-spacing: .5px; }
+    .toc-grid li::before { content: counter(toc, decimal-leading-zero) " "; color: var(--muted2); }
+    .toc-grid a { color: var(--accent); text-decoration: none; }
+    .toc-grid a:hover { text-decoration: underline; }
+    section { margin-bottom: 52px; scroll-margin-top: 24px; }
+    .section-num { font-family: var(--font-m); font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted2); margin-bottom: 8px; }
+    section h2 { font-family: var(--font-d); font-size: 32px; letter-spacing: 1px; color: var(--text); margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid var(--border); }
+    section h3 { font-family: var(--font-m); font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); margin: 22px 0 8px; }
+    p { font-size: 15px; color: var(--text); line-height: 1.7; margin-bottom: 12px; }
+    p:last-child { margin-bottom: 0; }
+    strong { font-weight: 500; }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .callout { border-radius: var(--radius-sm); padding: 14px 18px; margin: 20px 0; font-size: 14px; line-height: 1.65; }
+    .callout-green { background: rgba(26,122,70,.07); border-left: 3px solid var(--green); }
+    .callout-red   { background: rgba(0, 180, 170, .08); border-left: 3px solid var(--accent); }
+    .callout-amber { background: rgba(160,96,16,.07); border-left: 3px solid var(--amber); }
+    .full-divider { border: none; border-top: 1px solid var(--border); margin: 48px 0; }
+    .page-footer { background: var(--surface); border-top: 1px solid var(--border); padding: 24px; text-align: center; }
+    .footer-links { display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; margin-bottom: 12px; }
+    .footer-links a { font-family: var(--font-m); font-size: 10px; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); text-decoration: none; }
+    .footer-links a:hover { color: var(--accent); }
+    .footer-copy { font-family: var(--font-m); font-size: 10px; letter-spacing: 1px; color: var(--muted2); }
+  </style>
+</head>
+<body class="trust-context">
+
+<nav class="nav">
+  <a href="landing.html" class="logo-mark"><img src="Rinqr_logo.png" alt="Rinqr" class="logo-img"></a>
+  <a href="landing.html" class="nav-back">← Back to home</a>
+</nav>
+
+<div class="page">
+  <div class="page-header">
+    <div class="page-eyebrow">Legal</div>
+    <h1 class="page-title">TERMS OF SERVICE</h1>
+    <div class="page-meta">
+      <span class="badge badge-muted">Effective June 1, 2026</span>
+      <span class="badge badge-muted">Last updated May 27, 2026</span>
+    </div>
+  </div>
+
+  <div class="promise">
+    <strong>Plain English first:</strong> By using Rinqr you agree to use the service lawfully, not to abuse the relay system, and to keep your account information accurate. We provide the platform in good faith; please use it the same way.
+  </div>
+
+  <div class="toc">
+    <div class="toc-label">Contents</div>
+    <ol class="toc-grid">
+      <li><a href="#t1">Acceptance of terms</a></li>
+      <li><a href="#t2">Description of service</a></li>
+      <li><a href="#t3">Eligibility</a></li>
+      <li><a href="#t4">Account registration</a></li>
+      <li><a href="#t5">Acceptable use</a></li>
+      <li><a href="#t6">Prohibited conduct</a></li>
+      <li><a href="#t7">Payments and refunds</a></li>
+      <li><a href="#t8">Intellectual property</a></li>
+      <li><a href="#t9">Disclaimer of warranties</a></li>
+      <li><a href="#t10">Limitation of liability</a></li>
+      <li><a href="#t11">Indemnification</a></li>
+      <li><a href="#t12">Termination</a></li>
+      <li><a href="#t13">Governing law</a></li>
+      <li><a href="#t14">Changes to terms</a></li>
+      <li><a href="#t15">Contact</a></li>
+    </ol>
+  </div>
+
+  <section id="t1">
+    <div class="section-num">01 — Acceptance</div>
+    <h2>ACCEPTANCE OF TERMS</h2>
+    <p>By accessing or using the Rinqr platform, website, or physical QR tags (collectively, the "Service"), you agree to be bound by these Terms of Service ("Terms"). If you do not agree to these Terms, do not use the Service.</p>
+    <p>These Terms apply to all users including tag owners, visitors who scan tags, and business customers accessing the property manager portal.</p>
+  </section>
+
+  <section id="t2">
+    <div class="section-num">02 — Service</div>
+    <h2>DESCRIPTION OF SERVICE</h2>
+    <p>Rinqr provides a privacy-first vehicle contact platform. Tag owners attach a QR sticker to their vehicle and register a phone number with the Service. When someone scans the QR code, Rinqr routes communication between the scanner and the tag owner via an anonymous relay — neither party's real phone number is revealed to the other.</p>
+    <p>The Service includes: anonymous call and SMS relay, scan activity dashboard, scan history, emergency contact escalation, and a property manager portal for business customers.</p>
+  </section>
+
+  <section id="t3">
+    <div class="section-num">03 — Eligibility</div>
+    <h2>ELIGIBILITY</h2>
+    <p>You must be at least 18 years of age to create an account or activate a Rinqr tag. By using the Service, you represent and warrant that you meet this requirement. Users between 13 and 17 may use the scanner (contact) flow only with verifiable parental consent.</p>
+    <p>The Service is intended for lawful use in connection with vehicles you own or have authority to represent. You may not use the Service on behalf of a third party without their knowledge or consent.</p>
+  </section>
+
+  <section id="t4">
+    <div class="section-num">04 — Account registration</div>
+    <h2>ACCOUNT REGISTRATION</h2>
+    <p>To activate a tag, you must provide a valid mobile phone number and verify it via one-time passcode (OTP). You are responsible for maintaining the confidentiality of your account and for all activity that occurs under your account.</p>
+    <p>You agree to provide accurate, current, and complete information and to update it as necessary. We reserve the right to suspend accounts where information is found to be inaccurate, misleading, or in violation of these Terms.</p>
+  </section>
+
+  <section id="t5">
+    <div class="section-num">05 — Acceptable use</div>
+    <h2>ACCEPTABLE USE</h2>
+    <p>You may use the Service only for lawful purposes and in accordance with these Terms. The Service is designed to facilitate legitimate vehicle-related communication such as notifying a driver of a blocked driveway, lights left on, or a minor parking issue.</p>
+    <p>You agree not to use the Service in any way that could disable, overburden, or impair the Service infrastructure, or interfere with any other party's use and enjoyment of the Service.</p>
+  </section>
+
+  <section id="t6">
+    <div class="section-num">06 — Prohibited conduct</div>
+    <h2>PROHIBITED CONDUCT</h2>
+    <p>You must not use the Service to:</p>
+    <p><strong>Harass or threaten</strong> — Use the relay to harass, intimidate, stalk, or threaten any person.</p>
+    <p><strong>Fraud or impersonation</strong> — Impersonate any person or entity or misrepresent your affiliation with any person or entity.</p>
+    <p><strong>Spam</strong> — Initiate unsolicited or repeated scans of tags for purposes unrelated to the vehicle.</p>
+    <p><strong>Reverse engineering</strong> — Attempt to identify the real phone number of a tag owner or scanner through any means, including analysis of call metadata.</p>
+    <p><strong>System abuse</strong> — Attempt to bypass, circumvent, or disable any security or privacy feature of the Service.</p>
+    <div class="callout callout-red"><strong>Violation of these prohibitions may result in immediate account termination and, where applicable, referral to law enforcement.</strong></div>
+  </section>
+
+  <section id="t7">
+    <div class="section-num">07 — Payments</div>
+    <h2>PAYMENTS AND REFUNDS</h2>
+    <h3>Physical tag</h3>
+    <p>The one-time physical tag purchase ($9.99) covers the cost of the sticker and shipping. This fee is non-refundable once the tag has been shipped.</p>
+    <h3>Subscription plans</h3>
+    <p>Paid subscription plans are billed monthly or annually in advance. You may cancel at any time; your subscription will remain active through the end of the current billing period. We do not provide prorated refunds for mid-period cancellations.</p>
+    <h3>Refund exceptions</h3>
+    <p>If the Service is unavailable for more than 72 consecutive hours due to our infrastructure failure, you may request a prorated credit for the affected period. Contact <a href="mailto:support@getrinqr.com">support@getrinqr.com</a> within 30 days of the incident.</p>
+    <h3>Payment processing</h3>
+    <p>All payments are processed by Stripe. We never see or store your payment card details. See <a href="https://stripe.com/privacy" target="_blank" rel="noopener">Stripe's privacy policy</a> for details on how they handle payment data.</p>
+  </section>
+
+  <section id="t8">
+    <div class="section-num">08 — Intellectual property</div>
+    <h2>INTELLECTUAL PROPERTY</h2>
+    <p>The Rinqr name, logo, design, and platform code are owned by Rinqr and protected by applicable intellectual property laws. You are granted a limited, non-exclusive, non-transferable license to use the Service for its intended purpose.</p>
+    <p>You may not copy, modify, distribute, sell, or lease any part of the Service, or reverse engineer or attempt to extract the source code of the platform.</p>
+  </section>
+
+  <section id="t9">
+    <div class="section-num">09 — Disclaimers</div>
+    <h2>DISCLAIMER OF WARRANTIES</h2>
+    <p>THE SERVICE IS PROVIDED "AS IS" AND "AS AVAILABLE" WITHOUT WARRANTIES OF ANY KIND, EXPRESS OR IMPLIED. TO THE FULLEST EXTENT PERMITTED BY LAW, RINQR DISCLAIMS ALL WARRANTIES INCLUDING IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NON-INFRINGEMENT.</p>
+    <p>We do not warrant that the Service will be uninterrupted, error-free, or free of viruses or other harmful components. We do not warrant that any specific outcome (e.g., successfully reaching a vehicle owner, preventing a tow) will result from use of the Service.</p>
+    <div class="callout callout-amber"><strong>The Service is a communication relay tool.</strong> We cannot guarantee that tag owners will respond to contact attempts or that the Service will prevent vehicle-related incidents.</div>
+  </section>
+
+  <section id="t10">
+    <div class="section-num">10 — Liability</div>
+    <h2>LIMITATION OF LIABILITY</h2>
+    <p>TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, RINQR SHALL NOT BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES, INCLUDING LOSS OF PROFITS, DATA, GOODWILL, OR OTHER INTANGIBLE LOSSES, ARISING FROM YOUR USE OF OR INABILITY TO USE THE SERVICE.</p>
+    <p>IN NO EVENT SHALL RINQR'S AGGREGATE LIABILITY TO YOU FOR ALL CLAIMS EXCEED THE GREATER OF (A) THE AMOUNT YOU PAID FOR THE SERVICE IN THE TWELVE MONTHS PRECEDING THE CLAIM, OR (B) $50.</p>
+  </section>
+
+  <section id="t11">
+    <div class="section-num">11 — Indemnification</div>
+    <h2>INDEMNIFICATION</h2>
+    <p>You agree to indemnify, defend, and hold harmless Rinqr and its operators from and against any claims, liabilities, damages, losses, and expenses (including reasonable legal fees) arising out of or in any way connected with your access to or use of the Service, your violation of these Terms, or your violation of any rights of a third party.</p>
+  </section>
+
+  <section id="t12">
+    <div class="section-num">12 — Termination</div>
+    <h2>TERMINATION</h2>
+    <p>We reserve the right to suspend or terminate your access to the Service at any time, with or without notice, for conduct that we believe violates these Terms or is harmful to other users, us, third parties, or the integrity of the Service.</p>
+    <p>You may terminate your account at any time by requesting deletion via <a href="mailto:support@getrinqr.com">support@getrinqr.com</a>. Upon termination, your right to use the Service ceases immediately, and your data will be deleted in accordance with our <a href="privacy.html">Privacy Policy</a>.</p>
+  </section>
+
+  <section id="t13">
+    <div class="section-num">13 — Governing law</div>
+    <h2>GOVERNING LAW</h2>
+    <p>These Terms are governed by and construed in accordance with the laws of the State of New Jersey, United States, without regard to its conflict of law provisions. Any dispute arising from these Terms shall be subject to the exclusive jurisdiction of the courts located in New Jersey.</p>
+    <p>If any provision of these Terms is found to be unenforceable, the remaining provisions will continue in full force and effect.</p>
+  </section>
+
+  <section id="t14">
+    <div class="section-num">14 — Changes</div>
+    <h2>CHANGES TO TERMS</h2>
+    <p>We may update these Terms from time to time. When we make material changes, we will notify you by SMS (if you are an active tag owner) and post a notice on our website at least <strong>14 days</strong> before the changes take effect. Your continued use of the Service after changes take effect constitutes acceptance of the revised Terms.</p>
+  </section>
+
+  <section id="t15">
+    <div class="section-num">15 — Contact</div>
+    <h2>CONTACT</h2>
+    <p>For questions about these Terms:</p>
+    <p>
+      Email: <a href="mailto:legal@getrinqr.com">legal@getrinqr.com</a><br>
+      Support: <a href="mailto:support@getrinqr.com">support@getrinqr.com</a>
+    </p>
+    <p>Rinqr · United States</p>
+  </section>
+
+  <hr class="full-divider">
+</div>
+
+<footer class="page-footer">
+  <div class="footer-links">
+    <a href="landing.html">Home</a>
+    <a href="activate.html">Activate</a>
+    <a href="signin.html">Sign in</a>
+    <a href="property.html">Business</a>
+    <a href="privacy.html">Privacy</a>
+    <a href="terms.html">Terms</a>
+  </div>
+  <div class="footer-copy">© 2026 RINQR · PRIVACY-FIRST VEHICLE CONTACT</div>
+</footer>
+
+</body>
+</html>
