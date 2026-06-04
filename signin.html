@@ -6,217 +6,84 @@
   <title>Rinqr — Sign In</title>
   <link rel="stylesheet" href="style.css">
   <style>
-    body {
-      font-family: var(--font-b);
-      background: var(--surface);
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      -webkit-font-smoothing: antialiased;
-    }
-
-    .page-wrap {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      min-height: 100vh;
-    }
+    body { font-family: var(--font-b); background: var(--surface); min-height: 100vh; display: flex; flex-direction: column; -webkit-font-smoothing: antialiased; }
+    .page-wrap { display: grid; grid-template-columns: 1fr 1fr; min-height: 100vh; }
 
     /* ── LEFT PANEL ── */
-    .left-panel {
-      background: #0f0f0f;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      padding: 40px;
-      position: relative;
-      overflow: hidden;
-    }
-    .left-bg {
-      position: absolute; inset: 0;
-      background: radial-gradient(ellipse 80% 60% at 30% 50%, rgba(0, 180, 170, .20) 0%, transparent 70%);
-      pointer-events: none;
-    }
-    .left-grid {
-      position: absolute; inset: 0;
-      background-image:
-        linear-gradient(rgba(255,255,255,.04) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,.04) 1px, transparent 1px);
-      background-size: 48px 48px;
-      pointer-events: none;
-    }
+    .left-panel { background: #0f0f0f; display: flex; flex-direction: column; justify-content: space-between; padding: 40px; position: relative; overflow: hidden; }
+    .left-bg { position: absolute; inset: 0; background: radial-gradient(ellipse 80% 60% at 30% 50%, rgba(0, 180, 170, .20) 0%, transparent 70%); pointer-events: none; }
+    .left-grid { position: absolute; inset: 0; background-image: linear-gradient(rgba(255,255,255,.04) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.04) 1px, transparent 1px); background-size: 48px 48px; pointer-events: none; }
     .left-logo { position: relative; z-index: 1; }
-    /* Logo on dark panel — disable multiply blend, show as-is */
     .left-logo .logo-img { mix-blend-mode: normal; filter: brightness(1.1); }
-
     .left-hero { position: relative; z-index: 1; }
-    .left-title {
-      font-family: var(--font-d);
-      font-size: clamp(42px,5vw,68px);
-      letter-spacing: 2px;
-      line-height: .95;
-      color: #fff;
-      margin-bottom: 16px;
-    }
+    .left-title { font-family: var(--font-d); font-size: clamp(42px,5vw,68px); letter-spacing: 2px; line-height: .95; color: #fff; margin-bottom: 16px; }
     .left-title span { color: var(--accent); }
     .left-sub { font-size: 14px; color: rgba(255,255,255,.5); line-height: 1.65; max-width: 320px; }
-
     .left-stats { display: flex; gap: 24px; position: relative; z-index: 1; }
     .l-stat-val { font-family: var(--font-d); font-size: 26px; color: #fff; letter-spacing: 1px; }
     .l-stat-val span { color: var(--accent); }
     .l-stat-label { font-family: var(--font-m); font-size: 9px; letter-spacing: 1px; color: rgba(255,255,255,.4); text-transform: uppercase; margin-top: 1px; }
 
     /* ── RIGHT PANEL ── */
-    .right-panel {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: var(--bg);
-      padding: 40px 32px;
-    }
+    .right-panel { display: flex; align-items: center; justify-content: center; background: var(--bg); padding: 40px 32px; }
     .auth-box { width: 100%; max-width: 400px; }
 
-    .auth-tabs {
-      display: flex;
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      overflow: hidden;
-      margin-bottom: 32px;
-      background: var(--card2);
-    }
-    .auth-tab {
-      flex: 1;
-      padding: 11px;
-      text-align: center;
-      font-family: var(--font-m);
-      font-size: 11px;
-      letter-spacing: 1.5px;
-      text-transform: uppercase;
-      color: var(--muted);
-      cursor: pointer;
-      transition: all .2s;
-      border: none;
-      background: transparent;
-    }
-    .auth-tab.active {
-      background: var(--bg);
-      color: var(--accent);
-      box-shadow: 0 1px 4px rgba(0,0,0,.08);
-      margin: 3px;
-      border-radius: 7px;
-    }
+    .auth-tabs { display: flex; border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; margin-bottom: 32px; background: var(--card2); }
+    .auth-tab { flex: 1; padding: 11px; text-align: center; font-family: var(--font-m); font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); cursor: pointer; transition: all .2s; border: none; background: transparent; }
+    .auth-tab.active { background: var(--bg); color: var(--accent); box-shadow: 0 1px 4px rgba(0,0,0,.08); margin: 3px; border-radius: 7px; }
 
     .auth-heading { font-family: var(--font-d); font-size: 36px; letter-spacing: 2px; color: var(--text); margin-bottom: 6px; }
     .auth-sub { font-size: 13px; color: var(--muted); margin-bottom: 28px; }
 
     .pw-wrap { position: relative; }
     .pw-wrap input { padding-right: 44px; }
-    .pw-toggle {
-      position: absolute;
-      right: 14px; top: 50%;
-      transform: translateY(-50%);
-      background: none; border: none; cursor: pointer;
-      color: var(--muted2); font-size: 18px; line-height: 1; padding: 0;
-      transition: color .15s;
-    }
+    .pw-toggle { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: var(--muted2); font-size: 18px; line-height: 1; padding: 0; transition: color .15s; }
     .pw-toggle:hover { color: var(--muted); }
 
-    .btn-auth {
-      width: 100%; padding: 15px;
-      background: var(--accent); color: #fff;
-      font-family: var(--font-d); font-size: 18px; letter-spacing: 1px;
-      border: none; border-radius: var(--radius-sm); cursor: pointer;
-      transition: opacity .15s, transform .1s;
-      margin-top: 6px;
-    }
+    .btn-auth { width: 100%; padding: 15px; background: var(--accent); color: #fff; font-family: var(--font-d); font-size: 18px; letter-spacing: 1px; border: none; border-radius: var(--radius-sm); cursor: pointer; transition: opacity .15s, transform .1s; margin-top: 6px; }
     .btn-auth:hover { opacity: .88; }
     .btn-auth:active { transform: scale(.98); }
     .btn-auth:disabled { opacity: .35; cursor: not-allowed; transform: none; }
 
     .or-divider { display: flex; align-items: center; gap: 12px; margin: 18px 0; }
-    .or-line  { flex: 1; height: 1px; background: var(--border); }
-    .or-text  { font-family: var(--font-m); font-size: 10px; color: var(--muted2); letter-spacing: 1px; }
+    .or-line { flex: 1; height: 1px; background: var(--border); }
+    .or-text { font-family: var(--font-m); font-size: 10px; color: var(--muted2); letter-spacing: 1px; }
 
-    .btn-social {
-      width: 100%; padding: 13px;
-      background: var(--surface); color: var(--text);
-      border: 1px solid var(--border); border-radius: var(--radius-sm);
-      cursor: pointer; font-family: var(--font-b); font-size: 14px; font-weight: 500;
-      display: flex; align-items: center; justify-content: center; gap: 10px;
-      transition: border-color .15s, background .15s;
-      margin-bottom: 10px;
-    }
+    .btn-social { width: 100%; padding: 13px; background: var(--surface); color: var(--text); border: 1px solid var(--border); border-radius: var(--radius-sm); cursor: pointer; font-family: var(--font-b); font-size: 14px; font-weight: 500; display: flex; align-items: center; justify-content: center; gap: 10px; transition: border-color .15s, background .15s; margin-bottom: 10px; }
     .btn-social:hover { border-color: var(--border2); background: #fff; }
 
-    .auth-privacy-note {
-      display: flex;
-      align-items: flex-start;
-      gap: 8px;
-      font-size: 11px;
-      color: var(--muted);
-      line-height: 1.5;
-      margin-top: 16px;
-      padding: 12px;
-      background: rgba(26,122,70,.04);
-      border: 1px solid rgba(26,122,70,.15);
-      border-radius: var(--radius-sm);
-    }
+    .auth-privacy-note { display: flex; align-items: flex-start; gap: 8px; font-size: 11px; color: var(--muted); line-height: 1.5; margin-top: 16px; padding: 12px; background: rgba(26,122,70,.04); border: 1px solid rgba(26,122,70,.15); border-radius: var(--radius-sm); }
 
     .auth-form { display: none; }
     .auth-form.active { display: block; }
 
     .strength-bar { margin-top: 8px; }
     .strength-track { height: 3px; background: var(--border); border-radius: 2px; overflow: hidden; margin-bottom: 5px; }
-    .strength-fill  { height: 100%; border-radius: 2px; transition: width .3s, background .3s; }
-    .strength-text  { font-family: var(--font-m); font-size: 9px; letter-spacing: 1px; text-transform: uppercase; }
+    .strength-fill { height: 100%; border-radius: 2px; transition: width .3s, background .3s; }
+    .strength-text { font-family: var(--font-m); font-size: 9px; letter-spacing: 1px; text-transform: uppercase; }
 
-    .forgot-link {
-      font-family: var(--font-m); font-size: 10px; color: var(--accent);
-      text-decoration: none; cursor: pointer; border: none; background: none;
-      padding: 0; margin-top: 2px; align-self: flex-end;
-    }
+    .forgot-link { font-family: var(--font-m); font-size: 10px; color: var(--accent); text-decoration: none; cursor: pointer; border: none; background: none; padding: 0; margin-top: 2px; align-self: flex-end; }
     .forgot-link:hover { text-decoration: underline; }
 
-    .success-banner {
-      background: rgba(26,122,70,.06);
-      border: 1px solid rgba(26,122,70,.2);
-      border-radius: var(--radius-sm);
-      padding: 14px 16px;
-      display: none;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 20px;
-    }
+    .success-banner { background: rgba(26,122,70,.06); border: 1px solid rgba(26,122,70,.2); border-radius: var(--radius-sm); padding: 14px 16px; display: none; align-items: center; gap: 10px; margin-bottom: 20px; }
     .success-banner.show { display: flex; }
     .sb-icon { font-size: 18px; }
-    .sb-text  { font-size: 13px; color: var(--green); }
+    .sb-text { font-size: 13px; color: var(--green); }
 
-    .loading-dot {
-      display: inline-block;
-      width: 5px; height: 5px;
-      border-radius: 50%;
-      background: #fff;
-      animation: blink 1s infinite;
-      margin: 0 2px;
-    }
+    /* Manager badge — shows when we detect a manager email */
+    .manager-badge { display: none; background: rgba(0,180,170,.06); border: 1px solid rgba(0,180,170,.25); border-radius: var(--radius-sm); padding: 10px 14px; margin-bottom: 14px; align-items: center; gap: 10px; }
+    .manager-badge.show { display: flex; }
+    .mb-icon { font-size: 18px; }
+    .mb-text { font-size: 12px; color: var(--accent); }
+    .mb-text strong { font-weight: 500; }
+
+    .loading-dot { display: inline-block; width: 5px; height: 5px; border-radius: 50%; background: #fff; animation: blink 1s infinite; margin: 0 2px; }
     .loading-dot:nth-child(2) { animation-delay: .15s; }
-    .loading-dot:nth-child(3) { animation-delay: .3s;  }
+    .loading-dot:nth-child(3) { animation-delay: .3s; }
     @keyframes blink { 0%,80%,100%{opacity:.3} 40%{opacity:1} }
 
-    .tag-preview {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
-      padding: 12px 14px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 14px;
-    }
-    .tp-dot {
-      width: 7px; height: 7px; border-radius: 50%;
-      background: var(--green); flex-shrink: 0;
-      box-shadow: 0 0 0 3px rgba(26,122,70,.15);
-    }
+    .tag-preview { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px 14px; display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+    .tp-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); flex-shrink: 0; box-shadow: 0 0 0 3px rgba(26,122,70,.15); }
     .tp-text { font-family: var(--font-m); font-size: 11px; color: var(--muted); }
     .tp-text strong { color: var(--green); font-weight: 500; }
 
@@ -271,10 +138,16 @@
         <div class="auth-heading">WELCOME<br>BACK</div>
         <p class="auth-sub">Sign in to manage your tags and view activity.</p>
 
+        <!-- Manager detected badge (hidden until email matches) -->
+        <div class="manager-badge" id="managerBadge">
+          <span class="mb-icon">🏢</span>
+          <div class="mb-text">Property manager account detected — <strong>you'll be redirected to your dashboard</strong></div>
+        </div>
+
         <div class="field" id="loginEmailField">
           <label>Email address</label>
           <input type="email" id="loginEmail" placeholder="you@example.com"
-            oninput="clearErr('loginEmailField');checkLogin()" autocomplete="email">
+            oninput="clearErr('loginEmailField');checkLogin();checkIfManager()" autocomplete="email">
           <span class="err">Please enter a valid email</span>
         </div>
 
@@ -380,6 +253,99 @@
 </div>
 
 <script>
+  // ── Manager email detection ──────────────────────────────
+  // Debounced — checks after user stops typing for 600ms
+  let managerCheckTimer = null;
+
+  function checkIfManager() {
+    const email = document.getElementById('loginEmail').value.trim();
+    clearTimeout(managerCheckTimer);
+    document.getElementById('managerBadge').classList.remove('show');
+
+    if (!isEmail(email)) return;
+
+    managerCheckTimer = setTimeout(async () => {
+      try {
+        // Quick pre-check: call signin with a dummy password just to detect account type
+        const res  = await fetch('/api/signin', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password: '__check__' }),
+        });
+        const data = await res.json();
+        if (data.accountType === 'manager') {
+          document.getElementById('managerBadge').classList.add('show');
+        }
+      } catch (e) { /* silent */ }
+    }, 600);
+  }
+
+  // ── Login ────────────────────────────────────────────────
+  async function doLogin() {
+    const btn   = document.getElementById('loginBtn');
+    const email = document.getElementById('loginEmail').value.trim();
+    const pw    = document.getElementById('loginPw').value;
+
+    if (!isEmail(email)) {
+      document.getElementById('loginEmailField').classList.add('has-error');
+      return;
+    }
+
+    btn.innerHTML = '<span class="loading-dot"></span><span class="loading-dot"></span><span class="loading-dot"></span>';
+    btn.disabled  = true;
+
+    try {
+      const res  = await fetch('/api/signin', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password: pw }),
+      });
+      const data = await res.json();
+
+      if (!res.ok || data.error) {
+        btn.textContent = 'Sign in →';
+        btn.disabled    = false;
+        document.getElementById('loginPwField').classList.add('has-error');
+        return;
+      }
+
+      if (data.accountType === 'manager') {
+        btn.textContent      = `✓ Welcome back! Redirecting to ${data.propertyName}…`;
+        btn.style.background = '#1a7a46';
+        setTimeout(() => { window.location.href = data.dashboardUrl; }, 900);
+      } else {
+        btn.textContent      = '✓ Signed in! Redirecting…';
+        btn.style.background = '#1a7a46';
+        setTimeout(() => { window.location.href = data.dashboardUrl; }, 900);
+      }
+
+    } catch (err) {
+      btn.textContent = 'Sign in →';
+      btn.disabled    = false;
+    }
+  }
+
+  // ── Signup ───────────────────────────────────────────────
+  function doSignup() {
+    const btn   = document.getElementById('signupBtn');
+    const email = document.getElementById('signupEmail').value.trim();
+    const pw    = document.getElementById('signupPw').value;
+    if (!isEmail(email)) { document.getElementById('signupEmailField').classList.add('has-error'); return; }
+    if (pw.length < 8)   { document.getElementById('signupPwField').classList.add('has-error');   return; }
+    btn.innerHTML = '<span class="loading-dot"></span><span class="loading-dot"></span><span class="loading-dot"></span>';
+    btn.disabled  = true;
+    setTimeout(() => {
+      const banner = document.getElementById('successBanner');
+      document.getElementById('successText').textContent = 'Account created! Verification email sent to ' + email;
+      banner.classList.add('show');
+      btn.textContent      = 'Create account →';
+      btn.style.background = '#1a7a46';
+      btn.disabled         = false;
+      setTimeout(() => switchTab('login'), 2200);
+    }, 1800);
+  }
+
+  // ── Helpers ──────────────────────────────────────────────
   function switchTab(tab) {
     document.getElementById('tabLogin').classList.toggle('active',  tab==='login');
     document.getElementById('tabSignup').classList.toggle('active', tab==='signup');
@@ -394,10 +360,7 @@
     btn.textContent = inp.type==='password' ? '👁' : '🙈';
   }
 
-  function clearErr(fieldId) {
-    document.getElementById(fieldId).classList.remove('has-error');
-  }
-
+  function clearErr(fieldId) { document.getElementById(fieldId).classList.remove('has-error'); }
   function isEmail(v) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v); }
 
   function checkLogin() {
@@ -432,53 +395,21 @@
     let score = 0;
     if (pw.length>=8)  score++;
     if (pw.length>=12) score++;
-    if (/[A-Z]/.test(pw))       score++;
-    if (/[0-9]/.test(pw))       score++;
+    if (/[A-Z]/.test(pw))        score++;
+    if (/[0-9]/.test(pw))        score++;
     if (/[^A-Za-z0-9]/.test(pw)) score++;
     const levels = [
       {w:'20%', bg:'var(--accent)', label:'Weak',        color:'var(--accent)'},
       {w:'40%', bg:'var(--accent)', label:'Fair',        color:'var(--accent)'},
-      {w:'60%', bg:'#a06010', label:'Good',        color:'#a06010'},
-      {w:'80%', bg:'#1a7a46', label:'Strong',      color:'#1a7a46'},
-      {w:'100%',bg:'#1a7a46', label:'Very strong', color:'#1a7a46'},
+      {w:'60%', bg:'#a06010',       label:'Good',        color:'#a06010'},
+      {w:'80%', bg:'#1a7a46',       label:'Strong',      color:'#1a7a46'},
+      {w:'100%',bg:'#1a7a46',       label:'Very strong', color:'#1a7a46'},
     ];
     const l = levels[Math.min(score, levels.length-1)];
     fill.style.width      = l.w;
     fill.style.background = l.bg;
     text.textContent      = l.label;
     text.style.color      = l.color;
-  }
-
-  function doLogin() {
-    const btn   = document.getElementById('loginBtn');
-    const email = document.getElementById('loginEmail').value.trim();
-    if (!isEmail(email)) { document.getElementById('loginEmailField').classList.add('has-error'); return; }
-    btn.innerHTML = '<span class="loading-dot"></span><span class="loading-dot"></span><span class="loading-dot"></span>';
-    btn.disabled  = true;
-    setTimeout(() => {
-      btn.textContent      = '✓ Signed in! Redirecting…';
-      btn.style.background = '#1a7a46';
-      setTimeout(() => { window.location.href = 'dashboard.html'; }, 900);
-    }, 1600);
-  }
-
-  function doSignup() {
-    const btn   = document.getElementById('signupBtn');
-    const email = document.getElementById('signupEmail').value.trim();
-    const pw    = document.getElementById('signupPw').value;
-    if (!isEmail(email)) { document.getElementById('signupEmailField').classList.add('has-error'); return; }
-    if (pw.length < 8)   { document.getElementById('signupPwField').classList.add('has-error');   return; }
-    btn.innerHTML = '<span class="loading-dot"></span><span class="loading-dot"></span><span class="loading-dot"></span>';
-    btn.disabled  = true;
-    setTimeout(() => {
-      const banner = document.getElementById('successBanner');
-      document.getElementById('successText').textContent = 'Account created! Verification email sent to ' + email;
-      banner.classList.add('show');
-      btn.textContent      = 'Create account →';
-      btn.style.background = '#1a7a46';
-      btn.disabled         = false;
-      setTimeout(() => switchTab('login'), 2200);
-    }, 1800);
   }
 
   function doSocial(provider) {
