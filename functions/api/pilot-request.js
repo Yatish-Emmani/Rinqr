@@ -31,8 +31,8 @@ export async function onRequestPost(context) {
       body: JSON.stringify({
         // ⚠️  Change the `from` address to a verified domain in your Resend account.
         //     While testing you can use: from: 'onboarding@resend.dev'
-        from: 'Rinqr Leads <leads@getrinqr.com>',
-        to:   'yatish@getrinqr.com',
+        from: 'Rinqr Leads <leads@rinqr.com>',
+        to:   '32minebrook96b@gmail.com',
         reply_to: email,
         subject: `🏢 New pilot request — ${property}`,
         html: `

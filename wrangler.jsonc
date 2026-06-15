@@ -1,33 +1,28 @@
 {
-	"$schema": "node_modules/wrangler/config-schema.json",
-	"name": "rinqr",
-	"compatibility_date": "2026-06-04",
-	"observability": {
-		"enabled": true
-	},
-	"assets": {
-		"directory": "."
-	},
-	"compatibility_flags": [
-		"nodejs_compat"
-	],
-	// ── KV: simple key-value store for property lookups ──
-	// After running: npx wrangler kv namespace create "RINQR_DB"
-	// paste the returned id below
-	"kv_namespaces": [
-		{
-			"binding": "RINQR_DB",
-			"id": "7562c05d1962402db4e3e1e86794da9b"
-		}
-	],
-	// ── D1: SQL database for tags, scans, properties ──
-	// After running: npx wrangler d1 create rinqr-db
-	// paste the returned database_id below
-	"d1_databases": [
-		{
-			"binding": "rinqr_db",
-			"database_name": "rinqr-db",
-			"database_id": "93bda855-74a5-48a8-b782-af62377d3683"
-		}
-	]
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "rinqr",
+  "compatibility_date": "2026-06-04",
+  "main": "worker.js",
+  "observability": {
+    "enabled": true
+  },
+  "assets": {
+    "directory": "."
+  },
+  "compatibility_flags": [
+    "nodejs_compat"
+  ],
+  "kv_namespaces": [
+    {
+      "binding": "RINQR_DB",
+      "id": "7562c05d1962402db4e3e1e86794da9b"
+    }
+  ],
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "rinqr-db",
+      "database_id": "93bda855-74a5-48a8-b782-af62377d3683"
+    }
+  ]
 }
