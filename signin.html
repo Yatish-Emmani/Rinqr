@@ -11,10 +11,9 @@
 
     /* ── LEFT PANEL ── */
     .left-panel { background: #0f0f0f; display: flex; flex-direction: column; justify-content: space-between; padding: 40px; position: relative; overflow: hidden; }
-    .left-bg { position: absolute; inset: 0; background: radial-gradient(ellipse 80% 60% at 30% 50%, rgba(0, 180, 170, .20) 0%, transparent 70%); pointer-events: none; }
+    .left-bg { position: absolute; inset: 0; background: radial-gradient(ellipse 80% 60% at 30% 50%, rgba(0,180,170,.20) 0%, transparent 70%); pointer-events: none; }
     .left-grid { position: absolute; inset: 0; background-image: linear-gradient(rgba(255,255,255,.04) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.04) 1px, transparent 1px); background-size: 48px 48px; pointer-events: none; }
     .left-logo { position: relative; z-index: 1; }
-    .left-logo .logo-img { mix-blend-mode: normal; filter: brightness(1.1); }
     .left-hero { position: relative; z-index: 1; }
     .left-title { font-family: var(--font-d); font-size: clamp(42px,5vw,68px); letter-spacing: 2px; line-height: .95; color: #fff; margin-bottom: 16px; }
     .left-title span { color: var(--accent); }
@@ -62,13 +61,13 @@
     .strength-fill { height: 100%; border-radius: 2px; transition: width .3s, background .3s; }
     .strength-text { font-family: var(--font-m); font-size: 9px; letter-spacing: 1px; text-transform: uppercase; }
 
-    .forgot-link { font-family: var(--font-m); font-size: 10px; color: var(--accent); text-decoration: none; cursor: pointer; border: none; background: none; padding: 0; margin-top: 2px; align-self: flex-end; }
+    .forgot-link { font-family: var(--font-m); font-size: 10px; color: var(--accent); cursor: pointer; border: none; background: none; padding: 0; }
     .forgot-link:hover { text-decoration: underline; }
 
-    .success-banner { background: rgba(26,122,70,.06); border: 1px solid rgba(26,122,70,.2); border-radius: var(--radius-sm); padding: 14px 16px; display: none; align-items: center; gap: 10px; margin-bottom: 20px; }
-    .success-banner.show { display: flex; }
-    .sb-icon { font-size: 18px; }
-    .sb-text { font-size: 13px; color: var(--green); }
+    .alert-banner { border-radius: var(--radius-sm); padding: 13px 16px; display: none; align-items: center; gap: 10px; margin-bottom: 20px; font-size: 13px; line-height: 1.5; }
+    .alert-banner.show { display: flex; }
+    .alert-banner.success { background: rgba(26,122,70,.06); border: 1px solid rgba(26,122,70,.2); color: var(--green); }
+    .alert-banner.error   { background: rgba(0,180,170,.06); border: 1px solid rgba(0,180,170,.25); color: var(--accent); }
 
     .manager-badge { display: none; background: rgba(0,180,170,.06); border: 1px solid rgba(0,180,170,.25); border-radius: var(--radius-sm); padding: 10px 14px; margin-bottom: 14px; align-items: center; gap: 10px; }
     .manager-badge.show { display: flex; }
@@ -86,17 +85,15 @@
     .tp-text { font-family: var(--font-m); font-size: 11px; color: var(--muted); }
     .tp-text strong { color: var(--green); font-weight: 500; }
 
-    .err { font-size: 11px; color: var(--accent); display: none; font-family: var(--font-m); }
+    .err { font-size: 11px; color: var(--accent); display: none; font-family: var(--font-m); margin-top: 4px; }
     .has-error input { border-color: var(--accent); }
     .has-error .err { display: block; }
 
-    /* OTP input */
-    .otp-input {
-      font-size: 28px !important;
-      letter-spacing: 10px !important;
-      font-family: var(--font-m) !important;
-      text-align: center !important;
-    }
+    .otp-input { font-size: 28px !important; letter-spacing: 10px !important; font-family: var(--font-m) !important; text-align: center !important; }
+
+    /* next= banner shown when redirected from a protected page */
+    .redirect-notice { background: rgba(0,180,170,.06); border: 1px solid rgba(0,180,170,.2); border-radius: var(--radius-sm); padding: 10px 14px; margin-bottom: 20px; font-size: 12px; color: var(--accent); font-family: var(--font-m); display: none; }
+    .redirect-notice.show { display: block; }
 
     @media (max-width: 700px) {
       .page-wrap { grid-template-columns: 1fr; }
@@ -130,14 +127,20 @@
   <div class="right-panel">
     <div class="auth-box">
 
+      <!-- Shown when bounced from a protected page -->
+      <div class="redirect-notice" id="redirectNotice">
+        🔒 Sign in to access your dashboard
+      </div>
+
       <div class="auth-tabs">
         <button class="auth-tab active" id="tabLogin"  onclick="switchTab('login')">Sign in</button>
         <button class="auth-tab"        id="tabSignup" onclick="switchTab('signup')">Create account</button>
       </div>
 
-      <div class="success-banner" id="successBanner">
-        <span class="sb-icon">✅</span>
-        <span class="sb-text" id="successText">Account created! Check your phone for a verification code.</span>
+      <!-- Alert banner (success / error) -->
+      <div class="alert-banner" id="alertBanner">
+        <span id="alertIcon">✅</span>
+        <span id="alertText"></span>
       </div>
 
       <!-- ── LOGIN FORM ── -->
@@ -147,7 +150,7 @@
 
         <div class="manager-badge" id="managerBadge">
           <span class="mb-icon">🏢</span>
-          <div class="mb-text">Property manager account detected — <strong>you'll be redirected to your dashboard</strong></div>
+          <div class="mb-text">Property manager account — <strong>you'll be redirected to your portal</strong></div>
         </div>
 
         <div class="field" id="loginEmailField">
@@ -166,7 +169,8 @@
           <div class="pw-wrap">
             <input type="password" id="loginPw" placeholder="••••••••"
               oninput="clearErr('loginPwField'); checkLogin()"
-              autocomplete="current-password">
+              autocomplete="current-password"
+              onkeydown="if(event.key==='Enter') doLogin()">
             <button class="pw-toggle" onclick="togglePw('loginPw', this)" type="button">👁</button>
           </div>
           <span class="err">Incorrect email or password</span>
@@ -193,11 +197,11 @@
       <!-- ── SIGNUP FORM ── -->
       <div class="auth-form" id="formSignup">
         <div class="auth-heading">CREATE<br>ACCOUNT</div>
-        <p class="auth-sub">Join drivers protecting their privacy.</p>
+        <p class="auth-sub">Create your account first, then we'll walk you through getting your tag.</p>
 
         <div class="tag-preview">
           <div class="tp-dot"></div>
-          <div class="tp-text">Your first tag activation is <strong>included free</strong> with signup</div>
+          <div class="tp-text">Step 1 of 2 — after signup you'll choose and activate your tag</div>
         </div>
 
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
@@ -245,7 +249,9 @@
           <span class="err">Password must be at least 8 characters</span>
         </div>
 
-        <button class="btn-auth" id="signupBtn" disabled onclick="doSignup()">Create account →</button>
+        <button class="btn-auth" id="signupBtn" disabled onclick="doSignup()">
+          Create account →
+        </button>
 
         <div class="or-divider"><div class="or-line"></div><div class="or-text">or</div><div class="or-line"></div></div>
 
@@ -264,18 +270,44 @@
 
     </div>
   </div>
-</div><!-- end .page-wrap -->
+</div>
 
+<script src="auth.js"></script>
 <script>
+  // ─────────────────────────────────────────────────────────
+  //  Init — read URL params on load
+  // ─────────────────────────────────────────────────────────
+  (function init() {
+    const params = new URLSearchParams(window.location.search);
+
+    // If already logged in, go straight to the right place
+    const session = RinqrAuth.get();
+    if (session) {
+      RinqrAuth.redirectAfterLogin(session);
+      return;
+    }
+
+    // Pre-select signup tab if ?tab=signup
+    if (params.get('tab') === 'signup') {
+      switchTab('signup');
+    }
+
+    // Show "sign in to continue" notice if bounced from a protected page
+    if (params.get('next')) {
+      document.getElementById('redirectNotice').classList.add('show');
+    }
+  })();
+
   // ─────────────────────────────────────────────────────────
   //  State
   // ─────────────────────────────────────────────────────────
   let managerCheckTimer = null;
-  let otpMode           = false;   // true when signup is in OTP verification step
-  let pendingEmail      = '';      // email waiting for OTP verification
+  let otpMode           = false;
+  let pendingEmail      = '';
+  let resendLocked      = false;
 
   // ─────────────────────────────────────────────────────────
-  //  Manager email detection (debounced, fires on login tab)
+  //  Manager badge detection
   // ─────────────────────────────────────────────────────────
   function checkIfManager() {
     const email = document.getElementById('loginEmail').value.trim();
@@ -311,8 +343,7 @@
       return;
     }
 
-    btn.innerHTML = '<span class="loading-dot"></span><span class="loading-dot"></span><span class="loading-dot"></span>';
-    btn.disabled  = true;
+    setLoading(btn, true);
 
     try {
       const res  = await fetch('/api/signin', {
@@ -323,37 +354,42 @@
       const data = await res.json();
 
       if (!res.ok || data.error) {
-        btn.textContent = 'Sign in →';
-        btn.disabled    = false;
-        document.getElementById('loginPwField').classList.add('has-error');
-
-        // Special case: manager exists but has no password set yet
+        setLoading(btn, false, 'Sign in →');
         if (data.code === 'PASSWORD_NOT_SET') {
-          showBanner(data.message, false);
+          showAlert(data.message, 'error');
+        } else {
+          document.getElementById('loginPwField').classList.add('has-error');
         }
         return;
       }
 
+      // Save session
+      RinqrAuth.save({
+        accountType:  data.accountType,
+        email:        data.email,
+        propertyId:   data.propertyId   || null,
+        propertyName: data.propertyName || null,
+        dashboardUrl: data.dashboardUrl,
+      });
+
       const label = data.accountType === 'manager'
         ? `✓ Welcome back! Redirecting to ${data.propertyName}…`
         : '✓ Signed in! Redirecting…';
-
-      btn.textContent      = label;
+      setLoading(btn, false, label);
       btn.style.background = '#1a7a46';
-      setTimeout(() => { window.location.href = data.dashboardUrl; }, 900);
+
+      setTimeout(() => RinqrAuth.redirectAfterLogin(data), 800);
 
     } catch {
-      btn.textContent = 'Sign in →';
-      btn.disabled    = false;
-      showBanner('Network error — check your connection and try again.', false);
+      setLoading(btn, false, 'Sign in →');
+      showAlert('Network error — check your connection and try again.', 'error');
     }
   }
 
   // ─────────────────────────────────────────────────────────
-  //  Signup — step 1: create account
+  //  Signup — step 1
   // ─────────────────────────────────────────────────────────
   async function doSignup() {
-    // If we're already in OTP mode, hand off to the verifier
     if (otpMode) { await doVerifyOtp(); return; }
 
     const btn       = document.getElementById('signupBtn');
@@ -363,26 +399,11 @@
     const phone     = document.getElementById('signupPhone').value;
     const pw        = document.getElementById('signupPw').value;
 
-    // Client-side validation
-    if (!isEmail(email)) {
-      document.getElementById('signupEmailField').classList.add('has-error');
-      return;
-    }
-    if (pw.length < 8) {
-      document.getElementById('signupPwField').classList.add('has-error');
-      return;
-    }
-    if (phone.replace(/\D/g, '').length < 10) {
-      document.getElementById('signupPhoneField').classList.add('has-error');
-      return;
-    }
+    if (!isEmail(email)) { document.getElementById('signupEmailField').classList.add('has-error'); return; }
+    if (pw.length < 8)   { document.getElementById('signupPwField').classList.add('has-error');   return; }
+    if (phone.replace(/\D/g,'').length < 10) { document.getElementById('signupPhoneField').classList.add('has-error'); return; }
 
-    btn.innerHTML = '<span class="loading-dot"></span><span class="loading-dot"></span><span class="loading-dot"></span>';
-    btn.disabled  = true;
-
-    // Clear any previous API error
-    const prevErr = document.getElementById('signupApiError');
-    if (prevErr) prevErr.remove();
+    setLoading(btn, true);
 
     try {
       const res  = await fetch('/api/signup', {
@@ -393,29 +414,26 @@
       const data = await res.json();
 
       if (!res.ok || data.error) {
-        btn.textContent = 'Create account →';
-        btn.disabled    = false;
-        showApiError('signupBtn', data.message || 'Something went wrong. Please try again.');
+        setLoading(btn, false, 'Create account →');
+        showAlert(data.message || 'Something went wrong. Please try again.', 'error');
         return;
       }
 
-      // Account created — switch to OTP entry
       pendingEmail = email;
       otpMode      = true;
       showOtpStep(email);
 
     } catch {
-      btn.textContent = 'Create account →';
-      btn.disabled    = false;
-      showApiError('signupBtn', 'Network error — check your connection and try again.');
+      setLoading(btn, false, 'Create account →');
+      showAlert('Network error — check your connection and try again.', 'error');
     }
   }
 
   // ─────────────────────────────────────────────────────────
-  //  Signup — step 2: replace form with OTP entry
+  //  Signup — step 2: OTP screen
   // ─────────────────────────────────────────────────────────
   function showOtpStep(email) {
-    const masked = email.replace(/(.{2})(.*)(@.*)/, (_, a, b, c) => a + b.replace(/./g, '•') + c);
+    const masked = email.replace(/(.{2})(.*)(@.*)/, (_, a, b, c) => a + b.replace(/./g,'•') + c);
 
     document.getElementById('formSignup').innerHTML = `
       <div class="auth-heading" style="font-size:28px;line-height:1.1;margin-bottom:8px">
@@ -429,43 +447,32 @@
 
       <div class="field" id="otpField">
         <label>Verification code</label>
-        <input
-          type="text"
-          id="otpInput"
-          class="otp-input"
-          placeholder="000000"
-          maxlength="6"
-          inputmode="numeric"
-          autocomplete="one-time-code"
-          oninput="this.value = this.value.replace(/\\D/g, ''); checkOtp()"
-        >
-        <span class="err">Invalid or expired code — request a new one below</span>
+        <input type="text" id="otpInput" class="otp-input"
+          placeholder="000000" maxlength="6"
+          inputmode="numeric" autocomplete="one-time-code"
+          oninput="this.value=this.value.replace(/\\D/g,''); checkOtp()">
+        <span class="err">Invalid or expired code</span>
       </div>
 
       <button class="btn-auth" id="signupBtn" disabled onclick="doVerifyOtp()">
         Verify →
       </button>
 
-      <p style="font-size:11px;color:var(--muted2);text-align:center;margin-top:14px;line-height:1.6">
+      <p style="font-size:11px;color:var(--muted2);text-align:center;margin-top:14px">
         Didn't receive it?
-        <button
-          onclick="resendOtp()"
-          id="resendBtn"
+        <button id="resendBtn" onclick="resendOtp()"
           style="background:none;border:none;color:var(--accent);cursor:pointer;font-size:11px;font-family:var(--font-m);padding:0">
           Resend code
         </button>
         <span id="resendCooldown" style="display:none;color:var(--muted2)"></span>
       </p>
-
-      <p style="font-size:11px;color:var(--muted2);text-align:center;margin-top:6px">
+      <p style="font-size:11px;color:var(--muted2);text-align:center;margin-top:4px">
         <button onclick="cancelOtp()"
           style="background:none;border:none;color:var(--muted2);cursor:pointer;font-size:11px;font-family:var(--font-m);padding:0">
           ← Go back
         </button>
       </p>
     `;
-
-    // Auto-focus the OTP input
     setTimeout(() => document.getElementById('otpInput')?.focus(), 80);
   }
 
@@ -483,8 +490,7 @@
     const btn = document.getElementById('signupBtn');
     if (!otp || otp.length < 6) return;
 
-    btn.innerHTML = '<span class="loading-dot"></span><span class="loading-dot"></span><span class="loading-dot"></span>';
-    btn.disabled  = true;
+    setLoading(btn, true);
 
     try {
       const res  = await fetch('/api/auth/verify-otp', {
@@ -496,34 +502,38 @@
 
       if (!res.ok || data.error) {
         document.getElementById('otpField').classList.add('has-error');
-        btn.textContent = 'Verify →';
-        btn.disabled    = false;
+        setLoading(btn, false, 'Verify →');
         return;
       }
 
-      btn.textContent      = '✓ Verified! Redirecting…';
+      // Save driver session
+      RinqrAuth.save({
+        accountType:  'driver',
+        email:        pendingEmail,
+        propertyId:   null,
+        propertyName: null,
+        dashboardUrl: '/activate.html',   // new users go to activate first
+      });
+
+      setLoading(btn, false, '✓ Verified! Setting up your tag…');
       btn.style.background = '#1a7a46';
-      setTimeout(() => { window.location.href = data.dashboardUrl; }, 900);
+
+      // New users always land on activate.html, not dashboard
+      setTimeout(() => { window.location.replace('/activate.html'); }, 900);
 
     } catch {
-      btn.textContent = 'Verify →';
-      btn.disabled    = false;
+      setLoading(btn, false, 'Verify →');
       document.getElementById('otpField').classList.add('has-error');
     }
   }
 
-  // Resend with a 30-second cooldown
-  let resendLocked = false;
   async function resendOtp() {
     if (resendLocked) return;
     resendLocked = true;
-
     const resendBtn  = document.getElementById('resendBtn');
     const cooldownEl = document.getElementById('resendCooldown');
     resendBtn.style.display  = 'none';
     cooldownEl.style.display = 'inline';
-
-    // Show 30-second countdown
     let secs = 30;
     cooldownEl.textContent = `(wait ${secs}s)`;
     const iv = setInterval(() => {
@@ -537,15 +547,12 @@
         cooldownEl.textContent = `(wait ${secs}s)`;
       }
     }, 1000);
-
-    // Show feedback banner
-    showBanner('New verification code sent to your phone.', true);
+    showAlert('New verification code sent to your phone.', 'success');
   }
 
   function cancelOtp() {
     otpMode      = false;
     pendingEmail = '';
-    // Restore the original signup form by switching tabs
     switchTab('signup');
   }
 
@@ -553,32 +560,25 @@
   //  Tab switching
   // ─────────────────────────────────────────────────────────
   function switchTab(tab) {
-    // If we're leaving signup mid-OTP, reset state
-    if (tab === 'login' && otpMode) {
-      otpMode      = false;
-      pendingEmail = '';
-    }
-
-    document.getElementById('tabLogin').classList.toggle('active',  tab === 'login');
-    document.getElementById('tabSignup').classList.toggle('active', tab === 'signup');
-    document.getElementById('formLogin').classList.toggle('active', tab === 'login');
+    if (tab === 'login' && otpMode) { otpMode = false; pendingEmail = ''; }
+    document.getElementById('tabLogin').classList.toggle('active',   tab === 'login');
+    document.getElementById('tabSignup').classList.toggle('active',  tab === 'signup');
+    document.getElementById('formLogin').classList.toggle('active',  tab === 'login');
     document.getElementById('formSignup').classList.toggle('active', tab === 'signup');
-    document.getElementById('successBanner').classList.remove('show');
+    hideAlert();
   }
 
   // ─────────────────────────────────────────────────────────
-  //  Social auth (placeholder — wire up your OAuth provider)
+  //  Social (placeholder)
   // ─────────────────────────────────────────────────────────
   function doSocial(provider) {
     const btn = event.currentTarget;
-    const orig = btn.innerHTML;
     btn.textContent = `⏳ Connecting to ${provider}…`;
     btn.disabled    = true;
-    // Replace with real OAuth redirect in production:
-    //   window.location.href = `/auth/${provider.toLowerCase()}`;
     setTimeout(() => {
-      btn.textContent      = `✓ Connected! Redirecting…`;
-      setTimeout(() => { window.location.href = 'dashboard.html'; }, 900);
+      // Wire up real OAuth here; for now demo redirect
+      RinqrAuth.save({ accountType: 'driver', email: '', dashboardUrl: '/activate.html' });
+      window.location.replace('/activate.html');
     }, 1400);
   }
 
@@ -592,13 +592,35 @@
       document.getElementById('loginEmail').focus();
       return;
     }
-    // In production: POST /api/auth/reset-password { email }
-    showBanner(`Password reset link sent to ${email}`, true);
+    // POST /api/auth/reset-password in production
+    showAlert(`Password reset link sent to ${email}`, 'success');
   }
 
   // ─────────────────────────────────────────────────────────
   //  Helpers
   // ─────────────────────────────────────────────────────────
+  function setLoading(btn, loading, label) {
+    if (loading) {
+      btn.innerHTML = '<span class="loading-dot"></span><span class="loading-dot"></span><span class="loading-dot"></span>';
+      btn.disabled  = true;
+    } else {
+      btn.textContent = label || '';
+      btn.disabled    = false;
+    }
+  }
+
+  function showAlert(msg, type = 'success') {
+    const banner = document.getElementById('alertBanner');
+    document.getElementById('alertIcon').textContent = type === 'success' ? '✅' : '⚠️';
+    document.getElementById('alertText').textContent = msg;
+    banner.className = `alert-banner show ${type}`;
+    if (type === 'success') setTimeout(hideAlert, 4000);
+  }
+
+  function hideAlert() {
+    document.getElementById('alertBanner').classList.remove('show');
+  }
+
   function togglePw(id, btn) {
     const inp = document.getElementById(id);
     inp.type  = inp.type === 'password' ? 'text' : 'password';
@@ -609,9 +631,7 @@
     document.getElementById(fieldId).classList.remove('has-error');
   }
 
-  function isEmail(v) {
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
-  }
+  function isEmail(v) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v); }
 
   function checkLogin() {
     const email = document.getElementById('loginEmail').value.trim();
@@ -623,18 +643,18 @@
     if (otpMode) return;
     const first = document.getElementById('signupFirst').value.trim();
     const email = document.getElementById('signupEmail').value.trim();
-    const phone = document.getElementById('signupPhone').value.replace(/\D/g, '');
+    const phone = document.getElementById('signupPhone').value.replace(/\D/g,'');
     const pw    = document.getElementById('signupPw').value;
     document.getElementById('signupBtn').disabled =
       !(first && isEmail(email) && phone.length >= 10 && pw.length >= 8);
   }
 
   function formatPhone(inp) {
-    let v = inp.value.replace(/\D/g, '');
-    if (v.length > 10) v = v.slice(0, 10);
-    if (v.length >= 7)      v = '(' + v.slice(0,3) + ') ' + v.slice(3,6) + '-' + v.slice(6);
-    else if (v.length >= 4) v = '(' + v.slice(0,3) + ') ' + v.slice(3);
-    else if (v.length >= 1) v = '(' + v;
+    let v = inp.value.replace(/\D/g,'');
+    if (v.length > 10) v = v.slice(0,10);
+    if (v.length >= 7)      v = '('+v.slice(0,3)+') '+v.slice(3,6)+'-'+v.slice(6);
+    else if (v.length >= 4) v = '('+v.slice(0,3)+') '+v.slice(3);
+    else if (v.length >= 1) v = '('+v;
     inp.value = v;
   }
 
@@ -645,47 +665,23 @@
     if (!pw) { bar.style.display = 'none'; return; }
     bar.style.display = 'block';
     let score = 0;
-    if (pw.length >= 8)            score++;
-    if (pw.length >= 12)           score++;
-    if (/[A-Z]/.test(pw))         score++;
-    if (/[0-9]/.test(pw))         score++;
-    if (/[^A-Za-z0-9]/.test(pw))  score++;
+    if (pw.length >= 8)           score++;
+    if (pw.length >= 12)          score++;
+    if (/[A-Z]/.test(pw))        score++;
+    if (/[0-9]/.test(pw))        score++;
+    if (/[^A-Za-z0-9]/.test(pw)) score++;
     const levels = [
-      { w: '20%',  bg: 'var(--accent)', label: 'Weak',        color: 'var(--accent)' },
-      { w: '40%',  bg: 'var(--accent)', label: 'Fair',        color: 'var(--accent)' },
-      { w: '60%',  bg: '#a06010',       label: 'Good',        color: '#a06010'       },
-      { w: '80%',  bg: '#1a7a46',       label: 'Strong',      color: '#1a7a46'       },
-      { w: '100%', bg: '#1a7a46',       label: 'Very strong', color: '#1a7a46'       },
+      { w:'20%',  bg:'var(--accent)', label:'Weak',        color:'var(--accent)' },
+      { w:'40%',  bg:'var(--accent)', label:'Fair',        color:'var(--accent)' },
+      { w:'60%',  bg:'#a06010',       label:'Good',        color:'#a06010'       },
+      { w:'80%',  bg:'#1a7a46',       label:'Strong',      color:'#1a7a46'       },
+      { w:'100%', bg:'#1a7a46',       label:'Very strong', color:'#1a7a46'       },
     ];
     const l = levels[Math.min(score, levels.length - 1)];
     fill.style.width      = l.w;
     fill.style.background = l.bg;
     text.textContent      = l.label;
     text.style.color      = l.color;
-  }
-
-  // Show the top success/info banner
-  function showBanner(msg, isSuccess = true) {
-    const banner = document.getElementById('successBanner');
-    const icon   = banner.querySelector('.sb-icon');
-    const text   = document.getElementById('successText');
-    icon.textContent         = isSuccess ? '✅' : '⚠️';
-    banner.querySelector('.sb-text').style.color = isSuccess ? 'var(--green)' : 'var(--accent)';
-    text.textContent = msg;
-    banner.classList.add('show');
-    setTimeout(() => banner.classList.remove('show'), 4000);
-  }
-
-  // Show an inline API error below a button
-  function showApiError(beforeElementId, msg) {
-    let errEl = document.getElementById('signupApiError');
-    if (!errEl) {
-      errEl    = document.createElement('p');
-      errEl.id = 'signupApiError';
-      errEl.style.cssText = 'color:var(--accent);font-size:13px;margin-bottom:10px;text-align:center;font-family:var(--font-m)';
-      document.getElementById(beforeElementId)?.before(errEl);
-    }
-    errEl.textContent = '⚠ ' + msg;
   }
 </script>
 </body>

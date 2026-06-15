@@ -4,73 +4,43 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Rinqr — Dashboard</title>
+  <script src="auth.js"></script>
+  <script>
+    // Guard — redirect immediately if not a driver session
+    (function() {
+      var s = (function() {
+        try {
+          var raw = localStorage.getItem('rinqr_session');
+          if (!raw) return null;
+          var sess = JSON.parse(raw);
+          if (Date.now() - (sess.ts||0) > 7*24*60*60*1000) { localStorage.removeItem('rinqr_session'); return null; }
+          return sess;
+        } catch(e) { return null; }
+      })();
+      if (!s || s.accountType !== 'driver') {
+        var next = encodeURIComponent(window.location.pathname + window.location.search);
+        window.location.replace('/signin.html?next=' + next);
+      }
+    })();
+  </script>
   <link rel="stylesheet" href="style.css">
   <style>
     body { min-height: 100vh; background: var(--surface); }
-
-    .main {
-      max-width: 1080px;
-      margin: 0 auto;
-      padding: 24px 20px 60px;
-    }
-
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 10px;
-      margin-bottom: 20px;
-    }
-
-    .two-col {
-      display: grid;
-      grid-template-columns: 1fr 320px;
-      gap: 14px;
-    }
+    .main { max-width: 1080px; margin: 0 auto; padding: 24px 20px 60px; }
+    .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 20px; }
+    .two-col { display: grid; grid-template-columns: 1fr 320px; gap: 14px; }
     .col-left  { display: flex; flex-direction: column; gap: 14px; }
     .col-right { display: flex; flex-direction: column; gap: 14px; }
-
     .chart-outer { padding: 16px 18px 14px; background: #fff; }
-    .chart-bars {
-      display: flex;
-      align-items: flex-end;
-      gap: 6px;
-      height: 80px;
-      margin-bottom: 6px;
-    }
+    .chart-bars { display: flex; align-items: flex-end; gap: 6px; height: 80px; margin-bottom: 6px; }
     .bar-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; }
-    .bar {
-      width: 100%;
-      border-radius: 3px 3px 0 0;
-      min-height: 4px;
-      cursor: pointer;
-      transition: opacity .15s;
-    }
+    .bar { width: 100%; border-radius: 3px 3px 0 0; min-height: 4px; cursor: pointer; transition: opacity .15s; }
     .bar:hover { opacity: .75; }
     .bar-label { font-family: var(--font-m); font-size: 9px; color: var(--muted2); letter-spacing: .5px; }
-
     .scan-list { padding: 0 18px; background: #fff; }
-
-    .tag-card {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      padding: 14px 16px;
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      margin-bottom: 10px;
-      transition: border-color .15s;
-      cursor: pointer;
-    }
+    .tag-card { display: flex; align-items: center; gap: 14px; padding: 14px 16px; background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 10px; transition: border-color .15s; cursor: pointer; }
     .tag-card:hover { border-color: var(--accent); }
-    .tag-qr {
-      width: 50px; height: 50px;
-      background: #fff;
-      border-radius: 5px;
-      padding: 4px;
-      border: 1px solid var(--border);
-      flex-shrink: 0;
-    }
+    .tag-qr { width: 50px; height: 50px; background: #fff; border-radius: 5px; padding: 4px; border: 1px solid var(--border); flex-shrink: 0; }
     .tag-qr svg { width: 100%; height: 100%; display: block; }
     .tag-info { flex: 1; min-width: 0; }
     .tag-id   { font-family: var(--font-m); font-size: 11px; color: var(--accent); margin-bottom: 2px; }
@@ -81,169 +51,47 @@
     .status-dot.on  { background: var(--green); box-shadow: 0 0 0 3px rgba(26,122,70,.15); }
     .status-dot.off { background: var(--muted2); }
     .status-text { font-family: var(--font-m); font-size: 10px; color: var(--muted); }
-
-    .profile-row {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      padding: 16px 18px;
-      border-bottom: 1px solid var(--border);
-      background: #fff;
-    }
-    .profile-avatar {
-      width: 48px; height: 48px;
-      border-radius: 50%;
-      background: var(--accent);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-family: var(--font-d);
-      font-size: 22px;
-      color: #fff;
-      flex-shrink: 0;
-    }
+    .profile-row { display: flex; align-items: center; gap: 14px; padding: 16px 18px; border-bottom: 1px solid var(--border); background: #fff; }
+    .profile-avatar { width: 48px; height: 48px; border-radius: 50%; background: var(--accent); display: flex; align-items: center; justify-content: center; font-family: var(--font-d); font-size: 22px; color: #fff; flex-shrink: 0; }
     .profile-name  { font-size: 15px; font-weight: 500; color: var(--text); }
     .profile-email { font-family: var(--font-m); font-size: 11px; color: var(--muted); margin-top: 2px; }
-    .plan-badge {
-      display: inline-block;
-      font-family: var(--font-m);
-      font-size: 10px;
-      color: var(--amber);
-      background: rgba(160,96,16,.08);
-      border: 1px solid rgba(160,96,16,.2);
-      padding: 2px 8px;
-      border-radius: 4px;
-      margin-top: 4px;
-    }
-
-    .setting-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 13px 18px;
-      border-bottom: 1px solid var(--border);
-      background: #fff;
-    }
+    .plan-badge { display: inline-block; font-family: var(--font-m); font-size: 10px; color: var(--amber); background: rgba(160,96,16,.08); border: 1px solid rgba(160,96,16,.2); padding: 2px 8px; border-radius: 4px; margin-top: 4px; }
+    .setting-row { display: flex; align-items: center; justify-content: space-between; padding: 13px 18px; border-bottom: 1px solid var(--border); background: #fff; }
     .setting-row:last-child { border-bottom: none; }
     .setting-label { font-size: 13px; font-weight: 500; color: var(--text); }
     .setting-sub   { font-size: 11px; color: var(--muted); margin-top: 2px; }
-
-    .emergency-card {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      background: rgba(0, 180, 170, .05);
-      border: 1px solid rgba(0, 180, 170, .18);
-      border-radius: var(--radius-sm);
-      padding: 14px;
-    }
+    .emergency-card { display: flex; align-items: center; gap: 12px; background: rgba(0,180,170,.05); border: 1px solid rgba(0,180,170,.18); border-radius: var(--radius-sm); padding: 14px; }
     .ec-icon { font-size: 20px; flex-shrink: 0; }
     .ec-name { font-size: 13px; font-weight: 500; color: var(--text); }
     .ec-sub  { font-size: 11px; color: var(--muted); margin-top: 1px; }
-    .ec-edit { font-family: var(--font-m); font-size: 10px; color: var(--accent); cursor: pointer; margin-left: auto; flex-shrink: 0; }
-
-    .masked-chip {
-      font-family: var(--font-m);
-      font-size: 12px;
-      color: var(--accent);
-      background: rgba(0, 180, 170, .08);
-      border: 1px solid rgba(0, 180, 170, .25);
-      padding: 8px 14px;
-      border-radius: 5px;
-      display: inline-block;
-    }
-
+    .masked-chip { font-family: var(--font-m); font-size: 12px; color: var(--accent); background: rgba(0,180,170,.08); border: 1px solid rgba(0,180,170,.25); padding: 8px 14px; border-radius: 5px; display: inline-block; }
     .sub-bar-wrap { background: var(--card2); border-radius: 3px; height: 5px; overflow: hidden; margin: 10px 0 6px; }
     .sub-bar-fill { background: var(--accent); height: 100%; width: 40%; border-radius: 3px; }
-
-    .map-mock {
-      margin: 14px;
-      background: var(--card2);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
-      height: 130px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-direction: column;
-      gap: 8px;
-    }
-    .map-ping {
-      width: 12px; height: 12px;
-      border-radius: 50%;
-      background: var(--accent);
-      animation: mapPing 2s ease-in-out infinite;
-    }
-    @keyframes mapPing {
-      0%,100% { box-shadow: 0 0 0 0 rgba(0, 180, 170, .45); }
-      50%      { box-shadow: 0 0 0 14px rgba(0, 180, 170, 0); }
-    }
+    .map-mock { margin: 14px; background: var(--card2); border: 1px solid var(--border); border-radius: var(--radius-sm); height: 130px; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 8px; }
+    .map-ping { width: 12px; height: 12px; border-radius: 50%; background: var(--accent); animation: mapPing 2s ease-in-out infinite; }
+    @keyframes mapPing { 0%,100%{box-shadow:0 0 0 0 rgba(0,180,170,.45)} 50%{box-shadow:0 0 0 14px rgba(0,180,170,0)} }
     .map-label { font-family: var(--font-m); font-size: 10px; color: var(--muted); }
-
-    .filter-select {
-      background: var(--card2);
-      border: 1px solid var(--border);
-      color: var(--muted);
-      font-family: var(--font-m);
-      font-size: 10px;
-      padding: 6px 10px;
-      border-radius: 5px;
-      outline: none;
-      width: auto;
-      cursor: pointer;
-    }
-
-    .toast {
-      position: fixed;
-      bottom: 24px; left: 50%;
-      transform: translateX(-50%) translateY(80px);
-      background: #fff;
-      border: 1px solid var(--accent);
-      border-radius: var(--radius-sm);
-      padding: 10px 18px;
-      font-family: var(--font-m);
-      font-size: 12px;
-      color: var(--accent);
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      white-space: nowrap;
-      transition: transform .3s ease;
-      z-index: 999;
-      box-shadow: 0 4px 20px rgba(0,0,0,.1);
-    }
+    .filter-select { background: var(--card2); border: 1px solid var(--border); color: var(--muted); font-family: var(--font-m); font-size: 10px; padding: 6px 10px; border-radius: 5px; outline: none; cursor: pointer; }
+    .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px); background: #fff; border: 1px solid var(--accent); border-radius: var(--radius-sm); padding: 10px 18px; font-family: var(--font-m); font-size: 12px; color: var(--accent); display: flex; align-items: center; gap: 8px; white-space: nowrap; transition: transform .3s ease; z-index: 999; box-shadow: 0 4px 20px rgba(0,0,0,.1); }
     .toast.show { transform: translateX(-50%) translateY(0); }
-
-    @media (max-width: 720px) {
-      .stats-grid { grid-template-columns: repeat(2, 1fr); }
-      .two-col    { grid-template-columns: 1fr; }
-    }
-    @media (max-width: 400px) {
-      .stats-grid { grid-template-columns: 1fr 1fr; }
-    }
+    @media (max-width: 720px) { .stats-grid { grid-template-columns: repeat(2,1fr); } .two-col { grid-template-columns: 1fr; } }
   </style>
 </head>
 <body>
 
-<!-- NAV -->
 <nav class="nav">
   <a href="dashboard.html" class="logo-mark">
     <img src="Rinqr_logo.png" alt="Rinqr" class="logo-img">
   </a>
   <div class="nav-right">
-    <div class="nav-pill">
-      <span class="pulse-dot"></span>
-      2 tags active
-    </div>
+    <div class="nav-pill"><span class="pulse-dot"></span>2 tags active</div>
     <a href="property.html" style="font-family:var(--font-m);font-size:10px;color:var(--muted);text-decoration:none;border:1px solid var(--border);padding:4px 10px;border-radius:4px;margin-right:4px">B2B Portal</a>
-    <a href="activate.html" style="font-family:var(--font-m);font-size:10px;color:var(--accent);text-decoration:none;border:1px solid rgba(0, 180, 170, .35);padding:4px 10px;border-radius:4px;">+ Add tag</a>
-    <div class="nav-avatar" onclick="window.location.href='signin.html'" title="Sign out">AK</div>
+    <a href="activate.html" style="font-family:var(--font-m);font-size:10px;color:var(--accent);text-decoration:none;border:1px solid rgba(0,180,170,.35);padding:4px 10px;border-radius:4px;">+ Add tag</a>
+    <div class="nav-avatar" id="navAvatar" onclick="signOut()" title="Sign out" style="cursor:pointer">?</div>
   </div>
 </nav>
 
 <div class="main">
-
-  <!-- TABS -->
   <div class="tabs">
     <div class="tab active" onclick="showTab('overview', this)">Overview</div>
     <div class="tab" onclick="showTab('tags', this)">My Tags</div>
@@ -287,11 +135,8 @@
             <div class="card-title">Scan activity — last 7 days</div>
             <div class="card-action">Export →</div>
           </div>
-          <div class="chart-outer">
-            <div class="chart-bars" id="chartBars"></div>
-          </div>
+          <div class="chart-outer"><div class="chart-bars" id="chartBars"></div></div>
         </div>
-
         <div class="card">
           <div class="card-head">
             <div class="card-title">Recent scans</div>
@@ -300,7 +145,6 @@
           <div class="scan-list" id="scanFeed" style="padding-bottom:4px"></div>
         </div>
       </div>
-
       <div class="col-right">
         <div class="card">
           <div class="card-head">
@@ -310,62 +154,29 @@
           <div class="card-body">
             <div style="display:flex;flex-direction:column;gap:8px">
               <div style="display:flex;align-items:center;gap:10px;padding:10px;background:var(--card2);border-radius:var(--radius-sm);border:1px solid var(--border)">
-                <div style="width:36px;height:36px;background:#fff;border-radius:4px;padding:3px;flex-shrink:0;border:1px solid var(--border)">
-                  <svg viewBox="0 0 9 9" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges" style="width:100%;height:100%;display:block">
-                    <rect width="9" height="9" fill="white"/><rect x="0" y="0" width="4" height="4" fill="#111"/><rect x="1" y="1" width="2" height="2" fill="white"/><rect x="5" y="0" width="4" height="4" fill="#111"/><rect x="6" y="1" width="2" height="2" fill="white"/><rect x="0" y="5" width="4" height="4" fill="#111"/><rect x="1" y="6" width="2" height="2" fill="white"/><rect x="5" y="5" width="2" height="2" fill="#111"/><rect x="7" y="7" width="2" height="2" fill="#111"/>
-                  </svg>
-                </div>
-                <div style="flex:1">
-                  <div style="font-family:var(--font-m);font-size:10px;color:var(--accent)">PP-7X4K-9M2R</div>
-                  <div style="font-size:12px;font-weight:500;margin-top:1px;color:var(--text)">Main Car</div>
-                </div>
-                <div style="display:flex;align-items:center;gap:5px">
-                  <span class="status-dot on"></span>
-                  <span class="status-text">Active</span>
-                </div>
+                <div style="width:36px;height:36px;background:#fff;border-radius:4px;padding:3px;flex-shrink:0;border:1px solid var(--border)"><svg viewBox="0 0 9 9" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges" style="width:100%;height:100%;display:block"><rect width="9" height="9" fill="white"/><rect x="0" y="0" width="4" height="4" fill="#111"/><rect x="1" y="1" width="2" height="2" fill="white"/><rect x="5" y="0" width="4" height="4" fill="#111"/><rect x="6" y="1" width="2" height="2" fill="white"/><rect x="0" y="5" width="4" height="4" fill="#111"/><rect x="1" y="6" width="2" height="2" fill="white"/><rect x="5" y="5" width="2" height="2" fill="#111"/><rect x="7" y="7" width="2" height="2" fill="#111"/></svg></div>
+                <div style="flex:1"><div style="font-family:var(--font-m);font-size:10px;color:var(--accent)">PP-7X4K-9M2R</div><div style="font-size:12px;font-weight:500;margin-top:1px;color:var(--text)">Main Car</div></div>
+                <div style="display:flex;align-items:center;gap:5px"><span class="status-dot on"></span><span class="status-text">Active</span></div>
               </div>
               <div style="display:flex;align-items:center;gap:10px;padding:10px;background:var(--card2);border-radius:var(--radius-sm);border:1px solid var(--border)">
-                <div style="width:36px;height:36px;background:#fff;border-radius:4px;padding:3px;flex-shrink:0;border:1px solid var(--border)">
-                  <svg viewBox="0 0 9 9" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges" style="width:100%;height:100%;display:block">
-                    <rect width="9" height="9" fill="white"/><rect x="0" y="0" width="4" height="4" fill="#111"/><rect x="1" y="1" width="2" height="2" fill="white"/><rect x="5" y="0" width="4" height="4" fill="#111"/><rect x="6" y="1" width="2" height="2" fill="white"/><rect x="0" y="5" width="4" height="4" fill="#111"/><rect x="1" y="6" width="2" height="2" fill="white"/><rect x="5" y="5" width="2" height="2" fill="#111"/><rect x="7" y="7" width="2" height="2" fill="#111"/>
-                  </svg>
-                </div>
-                <div style="flex:1">
-                  <div style="font-family:var(--font-m);font-size:10px;color:var(--accent)">PP-B3R8-2K7P</div>
-                  <div style="font-size:12px;font-weight:500;margin-top:1px;color:var(--text)">Partner's Car</div>
-                </div>
-                <div style="display:flex;align-items:center;gap:5px">
-                  <span class="status-dot on"></span>
-                  <span class="status-text">Active</span>
-                </div>
+                <div style="width:36px;height:36px;background:#fff;border-radius:4px;padding:3px;flex-shrink:0;border:1px solid var(--border)"><svg viewBox="0 0 9 9" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges" style="width:100%;height:100%;display:block"><rect width="9" height="9" fill="white"/><rect x="0" y="0" width="4" height="4" fill="#111"/><rect x="1" y="1" width="2" height="2" fill="white"/><rect x="5" y="0" width="4" height="4" fill="#111"/><rect x="6" y="1" width="2" height="2" fill="white"/><rect x="0" y="5" width="4" height="4" fill="#111"/><rect x="1" y="6" width="2" height="2" fill="white"/><rect x="5" y="5" width="2" height="2" fill="#111"/><rect x="7" y="7" width="2" height="2" fill="#111"/></svg></div>
+                <div style="flex:1"><div style="font-family:var(--font-m);font-size:10px;color:var(--accent)">PP-B3R8-2K7P</div><div style="font-size:12px;font-weight:500;margin-top:1px;color:var(--text)">Partner's Car</div></div>
+                <div style="display:flex;align-items:center;gap:5px"><span class="status-dot on"></span><span class="status-text">Active</span></div>
               </div>
             </div>
           </div>
         </div>
-
         <div class="card">
           <div class="card-head"><div class="card-title">Last scan location</div></div>
-          <div class="map-mock">
-            <div class="map-ping"></div>
-            <div class="map-label">Oak St &amp; 3rd Ave</div>
-            <div style="font-size:11px;color:var(--muted2);font-family:var(--font-m)">2 min ago</div>
-          </div>
+          <div class="map-mock"><div class="map-ping"></div><div class="map-label">Oak St &amp; 3rd Ave</div><div style="font-size:11px;color:var(--muted2);font-family:var(--font-m)">2 min ago</div></div>
         </div>
-
         <div class="card">
           <div class="card-head"><div class="card-title">Emergency contact</div></div>
           <div class="card-body">
             <div class="emergency-card" style="flex-direction:column;align-items:flex-start;gap:8px">
-              <div style="display:flex;align-items:center;gap:10px">
-                <div class="ec-icon">🆘</div>
-                <div>
-                  <div class="ec-name" style="color:var(--muted)">No emergency contact set</div>
-                  <div class="ec-sub">Add one to protect yourself if calls go unanswered</div>
-                </div>
-              </div>
+              <div style="display:flex;align-items:center;gap:10px"><div class="ec-icon">🆘</div><div><div class="ec-name" style="color:var(--muted)">No emergency contact set</div><div class="ec-sub">Add one to protect yourself if calls go unanswered</div></div></div>
               <button class="btn btn-ghost" style="padding:8px 14px;font-size:14px;width:auto">+ Add emergency contact</button>
             </div>
-            <p style="font-size:11px;color:var(--muted);margin-top:10px">Contacted automatically when 2 consecutive calls go unanswered.</p>
           </div>
         </div>
       </div>
@@ -376,71 +187,21 @@
   <div class="tab-panel" id="tab-tags">
     <div style="margin-top:20px">
       <div class="tag-card">
-        <div class="tag-qr">
-          <svg viewBox="0 0 9 9" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
-            <rect width="9" height="9" fill="white"/><rect x="0" y="0" width="4" height="4" fill="#111"/><rect x="1" y="1" width="2" height="2" fill="white"/><rect x="5" y="0" width="4" height="4" fill="#111"/><rect x="6" y="1" width="2" height="2" fill="white"/><rect x="0" y="5" width="4" height="4" fill="#111"/><rect x="1" y="6" width="2" height="2" fill="white"/><rect x="5" y="5" width="2" height="2" fill="#111"/><rect x="7" y="7" width="2" height="2" fill="#111"/>
-          </svg>
-        </div>
-        <div class="tag-info">
-          <div class="tag-id">PP-7X4K-9M2R</div>
-          <div class="tag-name">Main Car</div>
-          <div class="tag-meta">32 scans · activated 3 months ago</div>
-        </div>
-        <div class="tag-status">
-          <span class="status-dot on"></span>
-          <span class="status-text">Active</span>
-          <label class="toggle" style="margin-left:6px">
-            <input type="checkbox" checked onchange="toggleTagStatus(this, 0)">
-            <span class="toggle-slider"></span>
-          </label>
-        </div>
+        <div class="tag-qr"><svg viewBox="0 0 9 9" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges"><rect width="9" height="9" fill="white"/><rect x="0" y="0" width="4" height="4" fill="#111"/><rect x="1" y="1" width="2" height="2" fill="white"/><rect x="5" y="0" width="4" height="4" fill="#111"/><rect x="6" y="1" width="2" height="2" fill="white"/><rect x="0" y="5" width="4" height="4" fill="#111"/><rect x="1" y="6" width="2" height="2" fill="white"/><rect x="5" y="5" width="2" height="2" fill="#111"/><rect x="7" y="7" width="2" height="2" fill="#111"/></svg></div>
+        <div class="tag-info"><div class="tag-id">PP-7X4K-9M2R</div><div class="tag-name">Main Car</div><div class="tag-meta">32 scans · activated 3 months ago</div></div>
+        <div class="tag-status"><span class="status-dot on"></span><span class="status-text">Active</span><label class="toggle" style="margin-left:6px"><input type="checkbox" checked onchange="toggleTagStatus(this,0)"><span class="toggle-slider"></span></label></div>
       </div>
-
       <div class="tag-card">
-        <div class="tag-qr">
-          <svg viewBox="0 0 9 9" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
-            <rect width="9" height="9" fill="white"/><rect x="0" y="0" width="4" height="4" fill="#111"/><rect x="1" y="1" width="2" height="2" fill="white"/><rect x="5" y="0" width="4" height="4" fill="#111"/><rect x="6" y="1" width="2" height="2" fill="white"/><rect x="0" y="5" width="4" height="4" fill="#111"/><rect x="1" y="6" width="2" height="2" fill="white"/><rect x="5" y="5" width="2" height="2" fill="#111"/><rect x="7" y="7" width="2" height="2" fill="#111"/>
-          </svg>
-        </div>
-        <div class="tag-info">
-          <div class="tag-id">PP-B3R8-2K7P</div>
-          <div class="tag-name">Partner's Car</div>
-          <div class="tag-meta">15 scans · activated 6 weeks ago</div>
-        </div>
-        <div class="tag-status">
-          <span class="status-dot on"></span>
-          <span class="status-text">Active</span>
-          <label class="toggle" style="margin-left:6px">
-            <input type="checkbox" checked onchange="toggleTagStatus(this, 1)">
-            <span class="toggle-slider"></span>
-          </label>
-        </div>
+        <div class="tag-qr"><svg viewBox="0 0 9 9" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges"><rect width="9" height="9" fill="white"/><rect x="0" y="0" width="4" height="4" fill="#111"/><rect x="1" y="1" width="2" height="2" fill="white"/><rect x="5" y="0" width="4" height="4" fill="#111"/><rect x="6" y="1" width="2" height="2" fill="white"/><rect x="0" y="5" width="4" height="4" fill="#111"/><rect x="1" y="6" width="2" height="2" fill="white"/><rect x="5" y="5" width="2" height="2" fill="#111"/><rect x="7" y="7" width="2" height="2" fill="#111"/></svg></div>
+        <div class="tag-info"><div class="tag-id">PP-B3R8-2K7P</div><div class="tag-name">Partner's Car</div><div class="tag-meta">15 scans · activated 6 weeks ago</div></div>
+        <div class="tag-status"><span class="status-dot on"></span><span class="status-text">Active</span><label class="toggle" style="margin-left:6px"><input type="checkbox" checked onchange="toggleTagStatus(this,1)"><span class="toggle-slider"></span></label></div>
       </div>
-
       <div class="tag-card" style="opacity:.4">
-        <div class="tag-qr">
-          <svg viewBox="0 0 9 9" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
-            <rect width="9" height="9" fill="white"/><rect x="0" y="0" width="4" height="4" fill="#111"/><rect x="1" y="1" width="2" height="2" fill="white"/><rect x="5" y="0" width="4" height="4" fill="#111"/><rect x="6" y="1" width="2" height="2" fill="white"/><rect x="0" y="5" width="4" height="4" fill="#111"/><rect x="1" y="6" width="2" height="2" fill="white"/><rect x="5" y="5" width="2" height="2" fill="#111"/><rect x="7" y="7" width="2" height="2" fill="#111"/>
-          </svg>
-        </div>
-        <div class="tag-info">
-          <div class="tag-id">PP-9QJ2-5N1X</div>
-          <div class="tag-name">Spare Tag</div>
-          <div class="tag-meta">0 scans · not activated yet</div>
-        </div>
-        <div class="tag-status">
-          <span class="status-dot off"></span>
-          <span class="status-text">Inactive</span>
-          <label class="toggle" style="margin-left:6px">
-            <input type="checkbox">
-            <span class="toggle-slider"></span>
-          </label>
-        </div>
+        <div class="tag-qr"><svg viewBox="0 0 9 9" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges"><rect width="9" height="9" fill="white"/><rect x="0" y="0" width="4" height="4" fill="#111"/><rect x="1" y="1" width="2" height="2" fill="white"/><rect x="5" y="0" width="4" height="4" fill="#111"/><rect x="6" y="1" width="2" height="2" fill="white"/><rect x="0" y="5" width="4" height="4" fill="#111"/><rect x="1" y="6" width="2" height="2" fill="white"/><rect x="5" y="5" width="2" height="2" fill="#111"/><rect x="7" y="7" width="2" height="2" fill="#111"/></svg></div>
+        <div class="tag-info"><div class="tag-id">PP-9QJ2-5N1X</div><div class="tag-name">Spare Tag</div><div class="tag-meta">0 scans · not activated yet</div></div>
+        <div class="tag-status"><span class="status-dot off"></span><span class="status-text">Inactive</span><label class="toggle" style="margin-left:6px"><input type="checkbox"><span class="toggle-slider"></span></label></div>
       </div>
-
-      <a href="activate.html" class="btn btn-ghost" style="display:block;text-align:center;padding:14px;text-decoration:none;margin-top:4px">
-        ＋ Activate a new tag
-      </a>
+      <a href="activate.html" class="btn btn-ghost" style="display:block;text-align:center;padding:14px;text-decoration:none;margin-top:4px">＋ Activate a new tag</a>
     </div>
   </div>
 
@@ -450,16 +211,8 @@
       <div class="card-head">
         <div class="card-title">All scan history</div>
         <div style="display:flex;gap:6px">
-          <select class="filter-select">
-            <option>All tags</option>
-            <option>PP-7X4K</option>
-            <option>PP-B3R8</option>
-          </select>
-          <select class="filter-select">
-            <option>Last 30 days</option>
-            <option>Last 7 days</option>
-            <option>All time</option>
-          </select>
+          <select class="filter-select"><option>All tags</option><option>PP-7X4K</option><option>PP-B3R8</option></select>
+          <select class="filter-select"><option>Last 30 days</option><option>Last 7 days</option><option>All time</option></select>
         </div>
       </div>
       <div id="fullActivityList" style="padding:0 18px 4px"></div>
@@ -472,95 +225,38 @@
       <div class="col-left">
         <div class="card">
           <div class="profile-row">
-            <div class="profile-avatar">AK</div>
+            <div class="profile-avatar" id="settingsAvatar">?</div>
             <div>
               <div class="profile-name">Account</div>
-              <div class="profile-email">your@email.com</div>
+              <div class="profile-email" id="settingsEmail">—</div>
               <div class="plan-badge">Pro · $4.99/mo</div>
             </div>
           </div>
-          <div class="setting-row">
-            <div class="setting-info">
-              <div class="setting-label">SMS alerts</div>
-              <div class="setting-sub">Get a text every time your tag is scanned</div>
-            </div>
-            <label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label>
-          </div>
-          <div class="setting-row">
-            <div class="setting-info">
-              <div class="setting-label">Masked call relay</div>
-              <div class="setting-sub">Allow scanners to call you anonymously</div>
-            </div>
-            <label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label>
-          </div>
-          <div class="setting-row">
-            <div class="setting-info">
-              <div class="setting-label">Do Not Disturb</div>
-              <div class="setting-sub">Block calls 10pm – 7am</div>
-            </div>
-            <label class="toggle"><input type="checkbox"><span class="toggle-slider"></span></label>
-          </div>
-          <div class="setting-row">
-            <div class="setting-info">
-              <div class="setting-label">Scan location logging</div>
-              <div class="setting-sub">Save approximate scan location</div>
-            </div>
-            <label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label>
-          </div>
-          <div class="setting-row">
-            <div class="setting-info">
-              <div class="setting-label">Weekly digest email</div>
-              <div class="setting-sub">Summary of activity every Monday</div>
-            </div>
-            <label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label>
-          </div>
+          <div class="setting-row"><div class="setting-info"><div class="setting-label">SMS alerts</div><div class="setting-sub">Get a text every time your tag is scanned</div></div><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></div>
+          <div class="setting-row"><div class="setting-info"><div class="setting-label">Masked call relay</div><div class="setting-sub">Allow scanners to call you anonymously</div></div><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></div>
+          <div class="setting-row"><div class="setting-info"><div class="setting-label">Do Not Disturb</div><div class="setting-sub">Block calls 10pm – 7am</div></div><label class="toggle"><input type="checkbox"><span class="toggle-slider"></span></label></div>
+          <div class="setting-row"><div class="setting-info"><div class="setting-label">Scan location logging</div><div class="setting-sub">Save approximate scan location</div></div><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></div>
+          <div class="setting-row"><div class="setting-info"><div class="setting-label">Weekly digest email</div><div class="setting-sub">Summary of activity every Monday</div></div><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></div>
           <div class="setting-row" style="border-bottom:none">
-            <div class="setting-info">
-              <div class="setting-label" style="color:var(--accent)">Sign out</div>
-              <div class="setting-sub">Return to the sign in page</div>
-            </div>
-            <a href="signin.html" style="font-family:var(--font-m);font-size:10px;color:var(--accent);text-decoration:none;border:1px solid rgba(0, 180, 170, .35);padding:5px 12px;border-radius:4px;">Sign out →</a>
+            <div class="setting-info"><div class="setting-label" style="color:var(--accent)">Sign out</div><div class="setting-sub">Clears your session on this device</div></div>
+            <button onclick="signOut()" style="font-family:var(--font-m);font-size:10px;color:var(--accent);background:transparent;border:1px solid rgba(0,180,170,.35);padding:5px 12px;border-radius:4px;cursor:pointer;">Sign out →</button>
           </div>
         </div>
       </div>
-
       <div class="col-right">
         <div class="card">
           <div class="card-head"><div class="card-title">Your masked number</div></div>
           <div class="card-body">
-            <p style="font-size:12px;color:var(--muted);margin-bottom:10px">
-              This is the only number ever shown to a scanner. Your real number never leaves our servers.
-            </p>
+            <p style="font-size:12px;color:var(--muted);margin-bottom:10px">This is the only number ever shown to a scanner.</p>
             <div class="masked-chip">+1 (888) 555-0174</div>
             <p style="font-family:var(--font-m);font-size:10px;color:var(--muted2);margin-top:8px">Powered by Twilio relay</p>
           </div>
         </div>
-
-        <div class="card">
-          <div class="card-head"><div class="card-title">Emergency contact</div></div>
-          <div class="card-body">
-            <div class="emergency-card" style="flex-direction:column;align-items:flex-start;gap:8px;margin-bottom:10px">
-              <div style="display:flex;align-items:center;gap:10px">
-                <div class="ec-icon">🆘</div>
-                <div>
-                  <div class="ec-name" style="color:var(--muted)">No emergency contact set</div>
-                  <div class="ec-sub">Add one to protect yourself if calls go unanswered</div>
-                </div>
-              </div>
-              <button class="btn btn-ghost" style="padding:8px 14px;font-size:14px;width:auto">+ Add emergency contact</button>
-            </div>
-            <p style="font-size:11px;color:var(--muted)">Auto-contacted if you miss 2 consecutive calls from the same scan event.</p>
-          </div>
-        </div>
-
         <div class="card">
           <div class="card-head"><div class="card-title">Subscription</div></div>
           <div class="card-body">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-              <div>
-                <div style="font-size:14px;font-weight:500;color:var(--text)">Pro Plan</div>
-                <div style="font-size:11px;color:var(--muted);margin-top:2px">Up to 5 tags · full history · emergency contact</div>
-              </div>
+              <div><div style="font-size:14px;font-weight:500;color:var(--text)">Pro Plan</div><div style="font-size:11px;color:var(--muted);margin-top:2px">Up to 5 tags · full history</div></div>
               <div style="font-family:var(--font-d);font-size:22px;color:var(--amber)">$4.99<span style="font-size:12px;color:var(--muted);font-family:var(--font-b)">/mo</span></div>
             </div>
             <div class="sub-bar-wrap"><div class="sub-bar-fill"></div></div>
@@ -571,16 +267,33 @@
       </div>
     </div>
   </div>
-
 </div>
 
-<!-- TOAST -->
-<div class="toast" id="toast">
-  <span>🔔</span>
-  <span id="toastMsg">New scan on PP-7X4K — Blocking driveway</span>
-</div>
+<div class="toast" id="toast"><span>🔔</span><span id="toastMsg">New scan on PP-7X4K</span></div>
 
 <script>
+  // ── Session ───────────────────────────────────────────────
+  const session = RinqrAuth.get();
+
+  function signOut() {
+    RinqrAuth.clear();
+    window.location.replace('/signin.html');
+  }
+
+  // Populate email / initials from session
+  (function applySession() {
+    if (!session) return;
+    const email    = session.email || '';
+    const initials = email ? email.slice(0,2).toUpperCase() : '?';
+    const nav      = document.getElementById('navAvatar');
+    const sAvatar  = document.getElementById('settingsAvatar');
+    const sEmail   = document.getElementById('settingsEmail');
+    if (nav)     nav.textContent     = initials;
+    if (sAvatar) sAvatar.textContent = initials;
+    if (sEmail)  sEmail.textContent  = email || '—';
+  })();
+
+  // ── Scan feed ─────────────────────────────────────────────
   const scanData = [
     { emoji:'🚗', cls:'ic-red',   reason:'Blocking driveway',    meta:'2 min ago · PP-7X4K',          badge:'masked call', bc:'badge-accent' },
     { emoji:'💡', cls:'ic-blue',  reason:'Left lights on',        meta:'1 hr ago · PP-7X4K',           badge:'sms',         bc:'badge-blue'  },
@@ -591,92 +304,66 @@
     { emoji:'🔔', cls:'ic-amber', reason:'Alarm going off',       meta:'Sat 7:22 PM · PP-7X4K',        badge:'sms',         bc:'badge-blue'  },
     { emoji:'💬', cls:'ic-green', reason:'Other message',         meta:'Fri 6:48 PM · PP-B3R8',        badge:'masked call', bc:'badge-accent' },
   ];
-
-  let scanCount = 47;
-  let callCount = 31;
+  let scanCount = 47, callCount = 31;
 
   function scanItemHTML(s, isNew) {
-    return `<div class="scan-item${isNew ? ' slide-in' : ''}">
+    return `<div class="scan-item${isNew?' slide-in':''}">
       <div class="scan-icon ${s.cls}">${s.emoji}</div>
-      <div class="scan-body">
-        <div class="scan-reason">${s.reason}</div>
-        <div class="scan-meta">${s.meta}</div>
-      </div>
+      <div class="scan-body"><div class="scan-reason">${s.reason}</div><div class="scan-meta">${s.meta}</div></div>
       <span class="badge ${s.bc}">${s.badge}</span>
     </div>`;
   }
 
   function renderFeed() {
-    document.getElementById('scanFeed').innerHTML = scanData.slice(0,5).map((s,i) => scanItemHTML(s, i===0)).join('');
+    document.getElementById('scanFeed').innerHTML = scanData.slice(0,5).map((s,i) => scanItemHTML(s,i===0)).join('');
   }
-
   function renderActivity() {
-    document.getElementById('fullActivityList').innerHTML = scanData.map(s => scanItemHTML(s, false)).join('');
+    document.getElementById('fullActivityList').innerHTML = scanData.map(s => scanItemHTML(s,false)).join('');
   }
-
   function buildChart() {
-    const days = ['M','T','W','T','F','S','S'];
-    const vals = [3,7,2,9,5,12,4];
-    const max  = Math.max(...vals);
-    const el   = document.getElementById('chartBars');
-    el.innerHTML = '';
+    const days=['M','T','W','T','F','S','S'], vals=[3,7,2,9,5,12,4], max=Math.max(...vals);
+    const el=document.getElementById('chartBars'); el.innerHTML='';
     days.forEach((d,i) => {
-      const pct  = Math.round((vals[i]/max)*100);
-      const isHi = i===5;
-      el.innerHTML += `<div class="bar-col">
-        <div class="bar" style="height:${pct}%;background:${isHi?'var(--accent)':'var(--border2)'}" title="${vals[i]} scans on ${d}"></div>
-        <div class="bar-label">${d}</div>
-      </div>`;
+      const pct=Math.round((vals[i]/max)*100);
+      el.innerHTML+=`<div class="bar-col"><div class="bar" style="height:${pct}%;background:${i===5?'var(--accent)':'var(--border2)'}" title="${vals[i]} scans"></div><div class="bar-label">${d}</div></div>`;
     });
   }
-
-  const simReasons = [
-    { emoji:'🚗', cls:'ic-red',   reason:'Blocking driveway', badge:'masked call', bc:'badge-accent' },
-    { emoji:'💡', cls:'ic-blue',  reason:'Left lights on',     badge:'sms',         bc:'badge-blue'  },
-    { emoji:'⚠️', cls:'ic-amber', reason:'Minor accident',     badge:'missed',      bc:'badge-amber' },
-    { emoji:'💬', cls:'ic-green', reason:'Other message',      badge:'masked call', bc:'badge-accent' },
-    { emoji:'🔔', cls:'ic-amber', reason:'Alarm going off',    badge:'sms',         bc:'badge-blue'  },
+  const simReasons=[
+    {emoji:'🚗',cls:'ic-red',  reason:'Blocking driveway',badge:'masked call',bc:'badge-accent'},
+    {emoji:'💡',cls:'ic-blue', reason:'Left lights on',   badge:'sms',        bc:'badge-blue' },
+    {emoji:'⚠️',cls:'ic-amber',reason:'Minor accident',   badge:'missed',     bc:'badge-amber'},
+    {emoji:'💬',cls:'ic-green',reason:'Other message',    badge:'masked call',bc:'badge-accent'},
+    {emoji:'🔔',cls:'ic-amber',reason:'Alarm going off',  badge:'sms',        bc:'badge-blue' },
   ];
-
   function simulateScan() {
-    const r = simReasons[Math.floor(Math.random()*simReasons.length)];
+    const r=simReasons[Math.floor(Math.random()*simReasons.length)];
     scanData.unshift({...r, meta:'Just now · PP-7X4K · live scan'});
     scanCount++; callCount++;
-    document.getElementById('statScans').textContent = scanCount;
-    document.getElementById('statCalls').textContent = callCount;
-    renderFeed();
-    renderActivity();
+    document.getElementById('statScans').textContent=scanCount;
+    document.getElementById('statCalls').textContent=callCount;
+    renderFeed(); renderActivity();
     showToast(`New scan on PP-7X4K — ${r.reason}`);
   }
-
   function showToast(msg) {
-    const t = document.getElementById('toast');
-    document.getElementById('toastMsg').textContent = msg;
-    t.classList.add('show');
-    setTimeout(() => t.classList.remove('show'), 3000);
+    const t=document.getElementById('toast');
+    document.getElementById('toastMsg').textContent=msg;
+    t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),3000);
   }
-
   function showTab(id, el) {
-    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-    document.getElementById('tab-' + id).classList.add('active');
+    document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+    document.getElementById('tab-'+id).classList.add('active');
     el.classList.add('active');
   }
-
-  function toggleTagStatus(checkbox, tagIdx) {
-    const card  = checkbox.closest('.tag-card');
-    const dot   = card.querySelector('.status-dot');
-    const text  = card.querySelector('.status-text');
-    const isOn  = checkbox.checked;
-    dot.className    = 'status-dot ' + (isOn ? 'on' : 'off');
-    text.textContent = isOn ? 'Active' : 'Paused';
-    showToast(isOn ? 'Tag reactivated' : 'Tag paused — no scans will connect');
+  function toggleTagStatus(checkbox, idx) {
+    const card=checkbox.closest('.tag-card');
+    const dot=card.querySelector('.status-dot'), text=card.querySelector('.status-text');
+    const isOn=checkbox.checked;
+    dot.className='status-dot '+(isOn?'on':'off');
+    text.textContent=isOn?'Active':'Paused';
+    showToast(isOn?'Tag reactivated':'Tag paused — no scans will connect');
   }
-
-  renderFeed();
-  renderActivity();
-  buildChart();
+  renderFeed(); renderActivity(); buildChart();
 </script>
-
 </body>
 </html>
