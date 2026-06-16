@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contact Us — Rinqr</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html{scroll-behavior:smooth}
+    body{background:#0d0d0d;color:#e8edf2;font-family:'Plus Jakarta Sans',sans-serif;-webkit-font-smoothing:antialiased;min-height:100vh}
+    :root{
+      --cyan:#00b4aa;--cyan2:#00d4c8;
+      --bg:#0d0d0d;--bg2:#141414;--bg3:#1a1a1a;
+      --border:rgba(255,255,255,0.08);--border2:rgba(0,180,170,0.25);
+      --text:#e8edf2;--muted:rgba(232,237,242,0.5);--muted2:rgba(232,237,242,0.3);
+      --mono:'DM Mono',monospace;
+    }
+
+    /* NAV */
+    .nav{
+      position:sticky;top:0;z-index:100;
+      background:rgba(13,13,13,0.9);backdrop-filter:blur(20px);
+      border-bottom:1px solid var(--border);
+      padding:0 48px;height:64px;
+      display:flex;align-items:center;justify-content:space-between;
+    }
+    .nav-logo{display:flex;align-items:center;text-decoration:none}
+    .nav-logo img{height:36px;width:auto}
+    .nav-back{
+      font-family:var(--mono);font-size:11px;letter-spacing:1px;
+      color:var(--muted);text-decoration:none;
+      display:flex;align-items:center;gap:6px;
+      border:1px solid var(--border);padding:6px 14px;border-radius:7px;
+      transition:border-color .15s,color .15s;
+    }
+    .nav-back:hover{border-color:var(--border2);color:var(--cyan)}
+
+    /* PAGE */
+    .page{max-width:1100px;margin:0 auto;padding:80px 48px 100px}
+
+    .page-eyebrow{
+      font-family:var(--mono);font-size:11px;letter-spacing:3px;
+      text-transform:uppercase;color:var(--cyan);
+      margin-bottom:14px;display:flex;align-items:center;gap:10px;
+    }
+    .page-eyebrow::before{content:'';width:24px;height:1px;background:var(--cyan);opacity:.5}
+    .page-title{
+      font-size:clamp(40px,5vw,68px);font-weight:800;
+      letter-spacing:-2px;line-height:1.0;
+      margin-bottom:16px;color:var(--text);
+    }
+    .page-title span{color:var(--cyan)}
+    .page-sub{font-size:17px;color:var(--muted);line-height:1.65;max-width:480px;margin-bottom:60px}
+
+    /* GRID */
+    .contact-grid{display:grid;grid-template-columns:1fr 1.2fr;gap:60px;align-items:start}
+
+    /* LEFT INFO */
+    .info-cards{display:flex;flex-direction:column;gap:14px}
+    .info-card{
+      background:rgba(255,255,255,0.03);
+      border:1px solid var(--border);
+      border-radius:14px;padding:22px 24px;
+      transition:border-color .2s;
+    }
+    .info-card:hover{border-color:var(--border2)}
+    .info-card-icon{font-size:24px;margin-bottom:10px;display:block}
+    .info-card-title{font-size:15px;font-weight:700;color:var(--text);margin-bottom:4px}
+    .info-card-desc{font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:10px}
+    .info-card-link{
+      font-family:var(--mono);font-size:12px;color:var(--cyan);
+      text-decoration:none;display:inline-flex;align-items:center;gap:5px;
+    }
+    .info-card-link:hover{text-decoration:underline}
+
+    /* FORM */
+    .form-card{
+      background:rgba(255,255,255,0.03);
+      border:1px solid var(--border);
+      border-radius:16px;padding:36px;
+    }
+    .form-title{font-size:22px;font-weight:700;color:var(--text);margin-bottom:6px}
+    .form-sub{font-size:14px;color:var(--muted);margin-bottom:28px}
+    .field{display:flex;flex-direction:column;gap:8px;margin-bottom:16px}
+    .field label{
+      font-family:var(--mono);font-size:10px;letter-spacing:2px;
+      text-transform:uppercase;color:var(--muted2);
+    }
+    .field input,.field textarea,.field select{
+      background:rgba(255,255,255,0.05);
+      border:1px solid var(--border);
+      border-radius:9px;
+      padding:13px 16px;
+      color:var(--text);
+      font-family:'Plus Jakarta Sans',sans-serif;
+      font-size:15px;
+      outline:none;
+      transition:border-color .15s,background .15s;
+      width:100%;
+    }
+    .field input:focus,.field textarea:focus,.field select:focus{
+      border-color:var(--border2);
+      background:rgba(0,180,170,0.04);
+    }
+    .field input::placeholder,.field textarea::placeholder{color:rgba(232,237,242,.25)}
+    .field textarea{resize:vertical;min-height:120px;line-height:1.6}
+    .field select{cursor:pointer;appearance:none;
+      background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='rgba(232,237,242,.3)' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-repeat:no-repeat;background-position:right 16px center;
+      padding-right:40px;
+    }
+    .field select option{background:#1a1a1a}
+    .form-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+    .submit-btn{
+      width:100%;padding:15px;
+      background:var(--cyan);color:#0d0d0d;
+      font-family:'Plus Jakarta Sans',sans-serif;
+      font-size:16px;font-weight:700;
+      border:none;border-radius:10px;cursor:pointer;
+      transition:background .2s,transform .1s;
+      margin-top:8px;
+    }
+    .submit-btn:hover{background:var(--cyan2);transform:translateY(-1px)}
+    .submit-btn:active{transform:scale(.98)}
+    .submit-btn:disabled{opacity:.4;cursor:not-allowed;transform:none}
+    .privacy-note{
+      font-family:var(--mono);font-size:11px;
+      color:var(--muted2);text-align:center;margin-top:12px;
+      line-height:1.5;
+    }
+
+    /* SUCCESS STATE */
+    .success-state{
+      display:none;text-align:center;padding:40px 20px;
+      animation:fadeInUp .4s ease;
+    }
+    @keyframes fadeInUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+    .success-state.show{display:block}
+    .success-icon{font-size:52px;margin-bottom:16px;display:block}
+    .success-title{font-size:24px;font-weight:800;color:var(--cyan2);letter-spacing:-0.5px;margin-bottom:8px}
+    .success-desc{font-size:15px;color:var(--muted);line-height:1.65;margin-bottom:24px}
+    .success-back{
+      display:inline-flex;align-items:center;gap:8px;
+      font-family:var(--mono);font-size:12px;color:var(--cyan);
+      text-decoration:none;border:1px solid var(--border2);
+      padding:10px 20px;border-radius:8px;
+      transition:background .15s;
+    }
+    .success-back:hover{background:rgba(0,180,170,.08)}
+
+    /* LOADING */
+    .loading-dot{display:inline-block;width:5px;height:5px;border-radius:50%;background:#0d0d0d;animation:blink 1s infinite;margin:0 2px}
+    .loading-dot:nth-child(2){animation-delay:.15s}
+    .loading-dot:nth-child(3){animation-delay:.3s}
+    @keyframes blink{0%,80%,100%{opacity:.3}40%{opacity:1}}
+
+    /* FOOTER */
+    .page-footer{
+      border-top:1px solid var(--border);
+      padding:24px 48px;
+      display:flex;align-items:center;justify-content:space-between;
+      flex-wrap:wrap;gap:12px;
+      background:rgba(0,0,0,.3);
+    }
+    .footer-links{display:flex;gap:24px;flex-wrap:wrap}
+    .footer-link{
+      font-family:var(--mono);font-size:11px;letter-spacing:1px;
+      color:var(--muted2);text-decoration:none;text-transform:uppercase;
+      transition:color .15s;
+    }
+    .footer-link:hover{color:var(--cyan)}
+
+    @media(max-width:800px){
+      .contact-grid{grid-template-columns:1fr}
+      .page{padding:60px 20px 80px}
+      .form-grid-2{grid-template-columns:1fr}
+      .page-footer{padding:20px;flex-direction:column;align-items:flex-start}
+      .nav{padding:0 20px}
+    }
+  </style>
+</head>
+<body>
+
+<nav class="nav">
+  <a href="landing.html" class="nav-logo">
+    <img src="Rinqr_logo.png" alt="Rinqr">
+  </a>
+  <a href="landing.html" class="nav-back">← Back to home</a>
+</nav>
+
+<div class="page">
+  <div class="page-eyebrow">Contact</div>
+  <h1 class="page-title">Get in <span>touch.</span></h1>
+  <p class="page-sub">Have a question, partnership idea, or want to run a pilot at your property? We respond same day.</p>
+
+  <div class="contact-grid">
+
+    <!-- LEFT: Contact info -->
+    <div class="info-cards">
+      <div class="info-card">
+        <span class="info-card-icon">💬</span>
+        <div class="info-card-title">General support</div>
+        <div class="info-card-desc">Questions about your tag, account, or how Rinqr works.</div>
+        <a href="mailto:support@getrinqr.com" class="info-card-link">support@getrinqr.com →</a>
+      </div>
+      <div class="info-card">
+        <span class="info-card-icon">🏢</span>
+        <div class="info-card-title">Property & business</div>
+        <div class="info-card-desc">Interested in Rinqr for your apartment complex, office park, or fleet? Let's talk about a free pilot.</div>
+        <a href="property.html#contact" class="info-card-link">Request a pilot →</a>
+      </div>
+      <div class="info-card">
+        <span class="info-card-icon">🔒</span>
+        <div class="info-card-title">Privacy & security</div>
+        <div class="info-card-desc">Data requests, security disclosures, or privacy policy questions.</div>
+        <a href="mailto:privacy@getrinqr.com" class="info-card-link">privacy@getrinqr.com →</a>
+      </div>
+      <div class="info-card">
+        <span class="info-card-icon">⚡</span>
+        <div class="info-card-title">Response time</div>
+        <div class="info-card-desc">We respond to every message same day, Monday through Friday. Urgent issues typically within 2 hours.</div>
+      </div>
+    </div>
+
+    <!-- RIGHT: Contact form -->
+    <div class="form-card">
+      <div id="contactFormWrap">
+        <div class="form-title">Send us a message</div>
+        <p class="form-sub">Fill out the form and we'll get back to you same day.</p>
+
+        <div class="form-grid-2">
+          <div class="field">
+            <label>First name</label>
+            <input type="text" id="cf-first" placeholder="Alex" autocomplete="given-name">
+          </div>
+          <div class="field">
+            <label>Last name</label>
+            <input type="text" id="cf-last" placeholder="K." autocomplete="family-name">
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Email address</label>
+          <input type="email" id="cf-email" placeholder="you@example.com" autocomplete="email">
+        </div>
+
+        <div class="field">
+          <label>Subject</label>
+          <select id="cf-subject">
+            <option value="" disabled selected>Select a topic…</option>
+            <option value="support">Tag or account support</option>
+            <option value="property">Property / business pilot</option>
+            <option value="billing">Billing question</option>
+            <option value="privacy">Privacy or data request</option>
+            <option value="press">Press or partnership</option>
+            <option value="other">Something else</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label>Message</label>
+          <textarea id="cf-message" placeholder="Tell us what's on your mind…"></textarea>
+        </div>
+
+        <div class="privacy-note" style="text-align:left;margin-bottom:16px">
+          🔒 Your info is only used to respond to your message. Never shared or sold.
+        </div>
+
+        <button class="submit-btn" id="submitBtn" onclick="submitContact()">
+          Send message →
+        </button>
+        <div class="privacy-note">We respond same day · No spam · Ever</div>
+      </div>
+
+      <div class="success-state" id="successState">
+        <span class="success-icon">✅</span>
+        <div class="success-title">Message received!</div>
+        <p class="success-desc">
+          Thanks for reaching out. We'll get back to you at <strong id="confirmedEmail" style="color:var(--text)"></strong> same day.
+        </p>
+        <a href="landing.html" class="success-back">← Back to Rinqr</a>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<footer class="page-footer">
+  <a href="landing.html" style="text-decoration:none;display:flex;align-items:center">
+    <img src="Rinqr_logo.png" alt="Rinqr" style="height:28px;width:auto">
+  </a>
+  <div class="footer-links">
+    <a href="landing.html"  class="footer-link">Home</a>
+    <a href="property.html" class="footer-link">Business</a>
+    <a href="privacy.html"  class="footer-link">Privacy</a>
+    <a href="terms.html"    class="footer-link">Terms</a>
+  </div>
+  <div style="font-family:var(--mono);font-size:11px;color:rgba(232,237,242,.2)">© 2026 Rinqr</div>
+</footer>
+
+<script>
+  async function submitContact() {
+    const btn     = document.getElementById('submitBtn');
+    const first   = document.getElementById('cf-first').value.trim();
+    const last    = document.getElementById('cf-last').value.trim();
+    const email   = document.getElementById('cf-email').value.trim();
+    const subject = document.getElementById('cf-subject').value;
+    const message = document.getElementById('cf-message').value.trim();
+
+    // Basic validation
+    if (!first || !email || !subject || !message) {
+      // Highlight empty required fields
+      [['cf-first',first],['cf-email',email],['cf-message',message]].forEach(([id,val]) => {
+        const el = document.getElementById(id);
+        el.style.borderColor = val ? 'var(--border)' : 'rgba(0,180,170,.6)';
+      });
+      return;
+    }
+
+    btn.innerHTML = '<span class="loading-dot"></span><span class="loading-dot"></span><span class="loading-dot"></span>';
+    btn.disabled  = true;
+
+    try {
+      const res  = await fetch('/api/pilot-request', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          first, last, email,
+          property: subject,
+          city: '',
+          units: '',
+          pain: message,
+        }),
+      });
+      // Show success regardless (pilot-request sends email to Yatish)
+      document.getElementById('confirmedEmail').textContent = email;
+      document.getElementById('contactFormWrap').style.display = 'none';
+      document.getElementById('successState').classList.add('show');
+    } catch {
+      btn.textContent = 'Send message →';
+      btn.disabled    = false;
+    }
+  }
+
+  // Clear red borders on input
+  ['cf-first','cf-email','cf-message'].forEach(id => {
+    document.getElementById(id).addEventListener('input', function() {
+      this.style.borderColor = '';
+    });
+  });
+</script>
+</body>
+</html>

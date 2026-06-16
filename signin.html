@@ -4,114 +4,90 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Rinqr — Sign In</title>
+  <script src="auth.js"></script>
+  <script>
+    // Already logged in? Go straight to the right place
+    (function() {
+      var s = RinqrAuth.get();
+      if (s) RinqrAuth.redirectAfterLogin(s);
+    })();
+  </script>
   <link rel="stylesheet" href="style.css">
   <style>
-    body { font-family: var(--font-b); background: var(--surface); min-height: 100vh; display: flex; flex-direction: column; -webkit-font-smoothing: antialiased; }
-    .page-wrap { display: grid; grid-template-columns: 1fr 1fr; min-height: 100vh; }
-
-    /* ── LEFT PANEL ── */
-    .left-panel { background: #0f0f0f; display: flex; flex-direction: column; justify-content: space-between; padding: 40px; position: relative; overflow: hidden; }
-    .left-bg { position: absolute; inset: 0; background: radial-gradient(ellipse 80% 60% at 30% 50%, rgba(0,180,170,.20) 0%, transparent 70%); pointer-events: none; }
-    .left-grid { position: absolute; inset: 0; background-image: linear-gradient(rgba(255,255,255,.04) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.04) 1px, transparent 1px); background-size: 48px 48px; pointer-events: none; }
-    .left-logo { position: relative; z-index: 1; }
-    .left-hero { position: relative; z-index: 1; }
-    .left-title { font-family: var(--font-d); font-size: clamp(42px,5vw,68px); letter-spacing: 2px; line-height: .95; color: #fff; margin-bottom: 16px; }
-    .left-title span { color: var(--accent); }
-    .left-sub { font-size: 14px; color: rgba(255,255,255,.5); line-height: 1.65; max-width: 320px; }
-    .left-stats { display: flex; gap: 24px; position: relative; z-index: 1; }
-    .l-stat-val { font-family: var(--font-d); font-size: 26px; color: #fff; letter-spacing: 1px; }
-    .l-stat-val span { color: var(--accent); }
-    .l-stat-label { font-family: var(--font-m); font-size: 9px; letter-spacing: 1px; color: rgba(255,255,255,.4); text-transform: uppercase; margin-top: 1px; }
-
-    /* ── RIGHT PANEL ── */
-    .right-panel { display: flex; align-items: center; justify-content: center; background: var(--bg); padding: 40px 32px; }
-    .auth-box { width: 100%; max-width: 400px; }
-
-    .auth-tabs { display: flex; border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; margin-bottom: 32px; background: var(--card2); }
-    .auth-tab { flex: 1; padding: 11px; text-align: center; font-family: var(--font-m); font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); cursor: pointer; transition: all .2s; border: none; background: transparent; }
-    .auth-tab.active { background: var(--bg); color: var(--accent); box-shadow: 0 1px 4px rgba(0,0,0,.08); margin: 3px; border-radius: 7px; }
-
-    .auth-heading { font-family: var(--font-d); font-size: 36px; letter-spacing: 2px; color: var(--text); margin-bottom: 6px; }
-    .auth-sub { font-size: 13px; color: var(--muted); margin-bottom: 28px; }
-
-    .pw-wrap { position: relative; }
-    .pw-wrap input { padding-right: 44px; }
-    .pw-toggle { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: var(--muted2); font-size: 18px; line-height: 1; padding: 0; transition: color .15s; }
-    .pw-toggle:hover { color: var(--muted); }
-
-    .btn-auth { width: 100%; padding: 15px; background: var(--accent); color: #fff; font-family: var(--font-d); font-size: 18px; letter-spacing: 1px; border: none; border-radius: var(--radius-sm); cursor: pointer; transition: opacity .15s, transform .1s; margin-top: 6px; }
-    .btn-auth:hover { opacity: .88; }
-    .btn-auth:active { transform: scale(.98); }
-    .btn-auth:disabled { opacity: .35; cursor: not-allowed; transform: none; }
-
-    .or-divider { display: flex; align-items: center; gap: 12px; margin: 18px 0; }
-    .or-line { flex: 1; height: 1px; background: var(--border); }
-    .or-text { font-family: var(--font-m); font-size: 10px; color: var(--muted2); letter-spacing: 1px; }
-
-    .btn-social { width: 100%; padding: 13px; background: var(--surface); color: var(--text); border: 1px solid var(--border); border-radius: var(--radius-sm); cursor: pointer; font-family: var(--font-b); font-size: 14px; font-weight: 500; display: flex; align-items: center; justify-content: center; gap: 10px; transition: border-color .15s, background .15s; margin-bottom: 10px; }
-    .btn-social:hover { border-color: var(--border2); background: #fff; }
-
-    .auth-privacy-note { display: flex; align-items: flex-start; gap: 8px; font-size: 11px; color: var(--muted); line-height: 1.5; margin-top: 16px; padding: 12px; background: rgba(26,122,70,.04); border: 1px solid rgba(26,122,70,.15); border-radius: var(--radius-sm); }
-
-    .auth-form { display: none; }
-    .auth-form.active { display: block; }
-
-    .strength-bar { margin-top: 8px; }
-    .strength-track { height: 3px; background: var(--border); border-radius: 2px; overflow: hidden; margin-bottom: 5px; }
-    .strength-fill { height: 100%; border-radius: 2px; transition: width .3s, background .3s; }
-    .strength-text { font-family: var(--font-m); font-size: 9px; letter-spacing: 1px; text-transform: uppercase; }
-
-    .forgot-link { font-family: var(--font-m); font-size: 10px; color: var(--accent); cursor: pointer; border: none; background: none; padding: 0; }
-    .forgot-link:hover { text-decoration: underline; }
-
-    .alert-banner { border-radius: var(--radius-sm); padding: 13px 16px; display: none; align-items: center; gap: 10px; margin-bottom: 20px; font-size: 13px; line-height: 1.5; }
-    .alert-banner.show { display: flex; }
-    .alert-banner.success { background: rgba(26,122,70,.06); border: 1px solid rgba(26,122,70,.2); color: var(--green); }
-    .alert-banner.error   { background: rgba(0,180,170,.06); border: 1px solid rgba(0,180,170,.25); color: var(--accent); }
-
-    .manager-badge { display: none; background: rgba(0,180,170,.06); border: 1px solid rgba(0,180,170,.25); border-radius: var(--radius-sm); padding: 10px 14px; margin-bottom: 14px; align-items: center; gap: 10px; }
-    .manager-badge.show { display: flex; }
-    .mb-icon { font-size: 18px; }
-    .mb-text { font-size: 12px; color: var(--accent); }
-    .mb-text strong { font-weight: 500; }
-
-    .loading-dot { display: inline-block; width: 5px; height: 5px; border-radius: 50%; background: #fff; animation: blink 1s infinite; margin: 0 2px; }
-    .loading-dot:nth-child(2) { animation-delay: .15s; }
-    .loading-dot:nth-child(3) { animation-delay: .3s; }
+    body { font-family:var(--font-b); background:var(--surface); min-height:100vh; display:flex; flex-direction:column; -webkit-font-smoothing:antialiased; }
+    .page-wrap { display:grid; grid-template-columns:1fr 1fr; min-height:100vh; }
+    .left-panel { background:#0f0f0f; display:flex; flex-direction:column; justify-content:space-between; padding:40px; position:relative; overflow:hidden; }
+    .left-bg { position:absolute; inset:0; background:radial-gradient(ellipse 80% 60% at 30% 50%, rgba(0,180,170,.20) 0%, transparent 70%); pointer-events:none; }
+    .left-grid { position:absolute; inset:0; background-image:linear-gradient(rgba(255,255,255,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.04) 1px,transparent 1px); background-size:48px 48px; pointer-events:none; }
+    .left-logo { position:relative; z-index:1; }
+    .left-hero { position:relative; z-index:1; }
+    .left-title { font-family:var(--font-d); font-size:clamp(42px,5vw,68px); letter-spacing:2px; line-height:.95; color:#fff; margin-bottom:16px; }
+    .left-title span { color:var(--accent); }
+    .left-sub { font-size:14px; color:rgba(255,255,255,.5); line-height:1.65; max-width:320px; }
+    .left-stats { display:flex; gap:24px; position:relative; z-index:1; }
+    .l-stat-val { font-family:var(--font-d); font-size:26px; color:#fff; letter-spacing:1px; }
+    .l-stat-val span { color:var(--accent); }
+    .l-stat-label { font-family:var(--font-m); font-size:9px; letter-spacing:1px; color:rgba(255,255,255,.4); text-transform:uppercase; margin-top:1px; }
+    .right-panel { display:flex; align-items:center; justify-content:center; background:var(--bg); padding:40px 32px; }
+    .auth-box { width:100%; max-width:400px; }
+    .auth-tabs { display:flex; border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; margin-bottom:32px; background:var(--card2); }
+    .auth-tab { flex:1; padding:11px; text-align:center; font-family:var(--font-m); font-size:11px; letter-spacing:1.5px; text-transform:uppercase; color:var(--muted); cursor:pointer; transition:all .2s; border:none; background:transparent; }
+    .auth-tab.active { background:var(--bg); color:var(--accent); box-shadow:0 1px 4px rgba(0,0,0,.08); margin:3px; border-radius:7px; }
+    .auth-heading { font-family:var(--font-d); font-size:36px; letter-spacing:2px; color:var(--text); margin-bottom:6px; }
+    .auth-sub { font-size:13px; color:var(--muted); margin-bottom:28px; }
+    .pw-wrap { position:relative; }
+    .pw-wrap input { padding-right:44px; }
+    .pw-toggle { position:absolute; right:14px; top:50%; transform:translateY(-50%); background:none; border:none; cursor:pointer; color:var(--muted2); font-size:18px; line-height:1; padding:0; }
+    .btn-auth { width:100%; padding:15px; background:var(--accent); color:#fff; font-family:var(--font-d); font-size:18px; letter-spacing:1px; border:none; border-radius:var(--radius-sm); cursor:pointer; transition:opacity .15s,transform .1s; margin-top:6px; }
+    .btn-auth:hover { opacity:.88; }
+    .btn-auth:active { transform:scale(.98); }
+    .btn-auth:disabled { opacity:.35; cursor:not-allowed; transform:none; }
+    .or-divider { display:flex; align-items:center; gap:12px; margin:18px 0; }
+    .or-line { flex:1; height:1px; background:var(--border); }
+    .or-text { font-family:var(--font-m); font-size:10px; color:var(--muted2); letter-spacing:1px; }
+    .btn-social { width:100%; padding:13px; background:var(--surface); color:var(--text); border:1px solid var(--border); border-radius:var(--radius-sm); cursor:pointer; font-family:var(--font-b); font-size:14px; font-weight:500; display:flex; align-items:center; justify-content:center; gap:10px; transition:border-color .15s,background .15s; margin-bottom:10px; }
+    .btn-social:hover { border-color:var(--border2); background:#fff; }
+    .auth-privacy-note { display:flex; align-items:flex-start; gap:8px; font-size:11px; color:var(--muted); line-height:1.5; margin-top:16px; padding:12px; background:rgba(26,122,70,.04); border:1px solid rgba(26,122,70,.15); border-radius:var(--radius-sm); }
+    .auth-form { display:none; }
+    .auth-form.active { display:block; }
+    .strength-bar { margin-top:8px; }
+    .strength-track { height:3px; background:var(--border); border-radius:2px; overflow:hidden; margin-bottom:5px; }
+    .strength-fill { height:100%; border-radius:2px; transition:width .3s,background .3s; }
+    .strength-text { font-family:var(--font-m); font-size:9px; letter-spacing:1px; text-transform:uppercase; }
+    .forgot-link { font-family:var(--font-m); font-size:10px; color:var(--accent); cursor:pointer; border:none; background:none; padding:0; }
+    .forgot-link:hover { text-decoration:underline; }
+    .alert-banner { border-radius:var(--radius-sm); padding:13px 16px; display:none; align-items:center; gap:10px; margin-bottom:20px; font-size:13px; line-height:1.5; }
+    .alert-banner.show { display:flex; }
+    .alert-banner.success { background:rgba(26,122,70,.06); border:1px solid rgba(26,122,70,.2); color:var(--green); }
+    .alert-banner.error   { background:rgba(0,180,170,.06); border:1px solid rgba(0,180,170,.25); color:var(--accent); }
+    .manager-badge { display:none; background:rgba(0,180,170,.06); border:1px solid rgba(0,180,170,.25); border-radius:var(--radius-sm); padding:10px 14px; margin-bottom:14px; align-items:center; gap:10px; }
+    .manager-badge.show { display:flex; }
+    .mb-icon { font-size:18px; }
+    .mb-text { font-size:12px; color:var(--accent); }
+    .mb-text strong { font-weight:500; }
+    .loading-dot { display:inline-block; width:5px; height:5px; border-radius:50%; background:#fff; animation:blink 1s infinite; margin:0 2px; }
+    .loading-dot:nth-child(2){ animation-delay:.15s; }
+    .loading-dot:nth-child(3){ animation-delay:.3s; }
     @keyframes blink { 0%,80%,100%{opacity:.3} 40%{opacity:1} }
-
-    .tag-preview { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px 14px; display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
-    .tp-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); flex-shrink: 0; box-shadow: 0 0 0 3px rgba(26,122,70,.15); }
-    .tp-text { font-family: var(--font-m); font-size: 11px; color: var(--muted); }
-    .tp-text strong { color: var(--green); font-weight: 500; }
-
-    .err { font-size: 11px; color: var(--accent); display: none; font-family: var(--font-m); margin-top: 4px; }
-    .has-error input { border-color: var(--accent); }
-    .has-error .err { display: block; }
-
-    .otp-input { font-size: 28px !important; letter-spacing: 10px !important; font-family: var(--font-m) !important; text-align: center !important; }
-
-    /* next= banner shown when redirected from a protected page */
-    .redirect-notice { background: rgba(0,180,170,.06); border: 1px solid rgba(0,180,170,.2); border-radius: var(--radius-sm); padding: 10px 14px; margin-bottom: 20px; font-size: 12px; color: var(--accent); font-family: var(--font-m); display: none; }
-    .redirect-notice.show { display: block; }
-
-    @media (max-width: 700px) {
-      .page-wrap { grid-template-columns: 1fr; }
-      .left-panel { display: none; }
-      .right-panel { padding: 32px 20px; }
-    }
+    .tag-preview { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-sm); padding:12px 14px; display:flex; align-items:center; gap:10px; margin-bottom:14px; }
+    .tp-dot { width:7px; height:7px; border-radius:50%; background:var(--green); flex-shrink:0; box-shadow:0 0 0 3px rgba(26,122,70,.15); }
+    .tp-text { font-family:var(--font-m); font-size:11px; color:var(--muted); }
+    .tp-text strong { color:var(--green); font-weight:500; }
+    .err { font-size:11px; color:var(--accent); display:none; font-family:var(--font-m); margin-top:4px; }
+    .has-error input { border-color:var(--accent); }
+    .has-error .err { display:block; }
+    .redirect-notice { background:rgba(0,180,170,.06); border:1px solid rgba(0,180,170,.2); border-radius:var(--radius-sm); padding:10px 14px; margin-bottom:20px; font-size:12px; color:var(--accent); font-family:var(--font-m); display:none; }
+    .redirect-notice.show { display:block; }
+    @media (max-width:700px) { .page-wrap{grid-template-columns:1fr} .left-panel{display:none} .right-panel{padding:32px 20px} }
   </style>
 </head>
 <body>
 <div class="page-wrap">
 
-  <!-- LEFT PANEL -->
   <div class="left-panel">
     <div class="left-bg"></div>
     <div class="left-grid"></div>
-    <a href="landing.html" class="logo-mark left-logo">
-      <img src="Rinqr_logo.png" alt="Rinqr" class="logo-img">
-    </a>
+    <a href="landing.html" class="logo-mark left-logo"><img src="Rinqr_logo.png" alt="Rinqr" class="logo-img"></a>
     <div class="left-hero">
       <div class="left-title">PROTECT<br>YOUR <span>NUMBER.</span><br>STAY<br>REACHABLE.</div>
       <p class="left-sub">Rinqr links your vehicle to a private relay. Anyone can reach you — no one sees your real number.</p>
@@ -123,27 +99,21 @@
     </div>
   </div>
 
-  <!-- RIGHT PANEL -->
   <div class="right-panel">
     <div class="auth-box">
-
-      <!-- Shown when bounced from a protected page -->
-      <div class="redirect-notice" id="redirectNotice">
-        🔒 Sign in to access your dashboard
-      </div>
+      <div class="redirect-notice" id="redirectNotice">🔒 Sign in to access your dashboard</div>
 
       <div class="auth-tabs">
         <button class="auth-tab active" id="tabLogin"  onclick="switchTab('login')">Sign in</button>
         <button class="auth-tab"        id="tabSignup" onclick="switchTab('signup')">Create account</button>
       </div>
 
-      <!-- Alert banner (success / error) -->
       <div class="alert-banner" id="alertBanner">
         <span id="alertIcon">✅</span>
         <span id="alertText"></span>
       </div>
 
-      <!-- ── LOGIN FORM ── -->
+      <!-- LOGIN -->
       <div class="auth-form active" id="formLogin">
         <div class="auth-heading">WELCOME<br>BACK</div>
         <p class="auth-sub">Sign in to manage your tags and view activity.</p>
@@ -170,8 +140,8 @@
             <input type="password" id="loginPw" placeholder="••••••••"
               oninput="clearErr('loginPwField'); checkLogin()"
               autocomplete="current-password"
-              onkeydown="if(event.key==='Enter') doLogin()">
-            <button class="pw-toggle" onclick="togglePw('loginPw', this)" type="button">👁</button>
+              onkeydown="if(event.key==='Enter')doLogin()">
+            <button class="pw-toggle" onclick="togglePw('loginPw',this)" type="button">👁</button>
           </div>
           <span class="err">Incorrect email or password</span>
         </div>
@@ -179,7 +149,6 @@
         <button class="btn-auth" id="loginBtn" disabled onclick="doLogin()">Sign in →</button>
 
         <div class="or-divider"><div class="or-line"></div><div class="or-text">or</div><div class="or-line"></div></div>
-
         <button class="btn-social" onclick="doSocial('Google')">
           <svg width="18" height="18" viewBox="0 0 18 18"><path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/><path d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z" fill="#34A853"/><path d="M3.964 10.706c-.18-.54-.282-1.117-.282-1.706s.102-1.166.282-1.706V4.962H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.038l3.007-2.332z" fill="#FBBC05"/><path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.962L3.964 6.294C4.672 4.169 6.656 3.58 9 3.58z" fill="#EA4335"/></svg>
           Continue with Google
@@ -188,49 +157,35 @@
           <svg width="16" height="18" viewBox="0 0 16 18" fill="currentColor"><path d="M13.178 9.613c-.02-2.187 1.787-3.245 1.868-3.295-1.02-1.49-2.605-1.694-3.165-1.714-1.342-.137-2.62.797-3.298.797-.677 0-1.72-.776-2.83-.755-1.45.02-2.793.845-3.54 2.14-1.51 2.614-.386 6.49 1.082 8.614.72 1.038 1.574 2.2 2.694 2.159 1.083-.043 1.492-.696 2.8-.696 1.307 0 1.676.696 2.82.674 1.164-.02 1.9-1.054 2.613-2.094.825-1.197 1.163-2.356 1.183-2.417-.026-.01-2.265-.867-2.287-3.413z"/><path d="M11.02 2.76C11.6 2.06 12 1.097 11.873 0c-.908.037-2.006.606-2.658 1.37-.583.678-1.094 1.76-.957 2.798.999.077 2.022-.51 2.762-1.408z"/></svg>
           Continue with Apple
         </button>
-
-        <div class="auth-privacy-note">
-          🔒 Your credentials are encrypted end-to-end. We never see your password.
-        </div>
+        <div class="auth-privacy-note">🔒 Your credentials are encrypted end-to-end. We never see your password.</div>
       </div>
 
-      <!-- ── SIGNUP FORM ── -->
+      <!-- SIGNUP -->
       <div class="auth-form" id="formSignup">
         <div class="auth-heading">CREATE<br>ACCOUNT</div>
-        <p class="auth-sub">Create your account first, then we'll walk you through getting your tag.</p>
+        <p class="auth-sub">Create your account, then activate your tag.</p>
 
         <div class="tag-preview">
           <div class="tp-dot"></div>
-          <div class="tp-text">Step 1 of 2 — after signup you'll choose and activate your tag</div>
+          <div class="tp-text">Step 1 of 2 — after signup you'll activate your tag</div>
         </div>
 
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-          <div class="field">
-            <label>First name</label>
-            <input type="text" id="signupFirst" placeholder="Alex"
-              oninput="checkSignup()" autocomplete="given-name">
-          </div>
-          <div class="field">
-            <label>Last name</label>
-            <input type="text" id="signupLast" placeholder="K."
-              oninput="checkSignup()" autocomplete="family-name">
-          </div>
+          <div class="field"><label>First name</label><input type="text" id="signupFirst" placeholder="Alex" oninput="checkSignup()" autocomplete="given-name"></div>
+          <div class="field"><label>Last name</label><input type="text" id="signupLast" placeholder="K." oninput="checkSignup()" autocomplete="family-name"></div>
         </div>
 
         <div class="field" id="signupEmailField">
           <label>Email address</label>
           <input type="email" id="signupEmail" placeholder="you@example.com"
-            oninput="clearErr('signupEmailField'); checkSignup()"
-            autocomplete="email">
+            oninput="clearErr('signupEmailField'); checkSignup()" autocomplete="email">
           <span class="err">Please enter a valid email</span>
         </div>
 
         <div class="field" id="signupPhoneField">
           <label>Phone number</label>
-          <input type="tel" id="signupPhone" placeholder="(555) 000-0000"
-            maxlength="14"
-            oninput="formatPhone(this); checkSignup()"
-            autocomplete="tel">
+          <input type="tel" id="signupPhone" placeholder="(555) 000-0000" maxlength="14"
+            oninput="formatPhone(this); checkSignup()" autocomplete="tel">
           <span class="err">Please enter a valid 10-digit number</span>
         </div>
 
@@ -240,7 +195,7 @@
             <input type="password" id="signupPw" placeholder="Min. 8 characters"
               oninput="checkSignup(); updateStrength(this.value); clearErr('signupPwField')"
               autocomplete="new-password">
-            <button class="pw-toggle" onclick="togglePw('signupPw', this)" type="button">👁</button>
+            <button class="pw-toggle" onclick="togglePw('signupPw',this)" type="button">👁</button>
           </div>
           <div class="strength-bar" id="strengthBar" style="display:none">
             <div class="strength-track"><div class="strength-fill" id="strengthFill"></div></div>
@@ -249,22 +204,16 @@
           <span class="err">Password must be at least 8 characters</span>
         </div>
 
-        <button class="btn-auth" id="signupBtn" disabled onclick="doSignup()">
-          Create account →
-        </button>
+        <button class="btn-auth" id="signupBtn" disabled onclick="doSignup()">Create account →</button>
 
         <div class="or-divider"><div class="or-line"></div><div class="or-text">or</div><div class="or-line"></div></div>
-
         <button class="btn-social" onclick="doSocial('Google')">
           <svg width="18" height="18" viewBox="0 0 18 18"><path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/><path d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z" fill="#34A853"/><path d="M3.964 10.706c-.18-.54-.282-1.117-.282-1.706s.102-1.166.282-1.706V4.962H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.038l3.007-2.332z" fill="#FBBC05"/><path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.962L3.964 6.294C4.672 4.169 6.656 3.58 9 3.58z" fill="#EA4335"/></svg>
           Sign up with Google
         </button>
 
         <p style="font-size:10px;color:var(--muted2);text-align:center;margin-top:14px;line-height:1.5">
-          By creating an account you agree to our
-          <a href="terms.html" style="color:var(--accent)">Terms</a> and
-          <a href="privacy.html" style="color:var(--accent)">Privacy Policy</a>.
-          Your phone number is encrypted and never shared.
+          By creating an account you agree to our <a href="terms.html" style="color:var(--accent)">Terms</a> and <a href="privacy.html" style="color:var(--accent)">Privacy Policy</a>.
         </p>
       </div>
 
@@ -272,416 +221,147 @@
   </div>
 </div>
 
-<script src="auth.js"></script>
 <script>
-  // ─────────────────────────────────────────────────────────
-  //  Init — read URL params on load
-  // ─────────────────────────────────────────────────────────
+  // Read URL params on load
   (function init() {
     const params = new URLSearchParams(window.location.search);
-
-    // If already logged in, go straight to the right place
-    const session = RinqrAuth.get();
-    if (session) {
-      RinqrAuth.redirectAfterLogin(session);
-      return;
-    }
-
-    // Pre-select signup tab if ?tab=signup
-    if (params.get('tab') === 'signup') {
-      switchTab('signup');
-    }
-
-    // Show "sign in to continue" notice if bounced from a protected page
-    if (params.get('next')) {
-      document.getElementById('redirectNotice').classList.add('show');
-    }
+    if (params.get('tab') === 'signup') switchTab('signup');
+    if (params.get('next')) document.getElementById('redirectNotice').classList.add('show');
   })();
 
-  // ─────────────────────────────────────────────────────────
-  //  State
-  // ─────────────────────────────────────────────────────────
   let managerCheckTimer = null;
-  let otpMode           = false;
-  let pendingEmail      = '';
-  let resendLocked      = false;
 
-  // ─────────────────────────────────────────────────────────
-  //  Manager badge detection
-  // ─────────────────────────────────────────────────────────
   function checkIfManager() {
     const email = document.getElementById('loginEmail').value.trim();
     clearTimeout(managerCheckTimer);
     document.getElementById('managerBadge').classList.remove('show');
     if (!isEmail(email)) return;
-
     managerCheckTimer = setTimeout(async () => {
       try {
-        const res  = await fetch('/api/signin', {
-          method:  'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body:    JSON.stringify({ email, password: '__check__' }),
-        });
+        const res  = await fetch('/api/signin', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ email, password: '__check__' }) });
         const data = await res.json();
-        if (data.accountType === 'manager') {
-          document.getElementById('managerBadge').classList.add('show');
-        }
+        if (data.accountType === 'manager') document.getElementById('managerBadge').classList.add('show');
       } catch { /* silent */ }
     }, 600);
   }
 
-  // ─────────────────────────────────────────────────────────
-  //  Login
-  // ─────────────────────────────────────────────────────────
   async function doLogin() {
     const btn   = document.getElementById('loginBtn');
     const email = document.getElementById('loginEmail').value.trim();
     const pw    = document.getElementById('loginPw').value;
-
-    if (!isEmail(email)) {
-      document.getElementById('loginEmailField').classList.add('has-error');
-      return;
-    }
-
+    if (!isEmail(email)) { document.getElementById('loginEmailField').classList.add('has-error'); return; }
     setLoading(btn, true);
-
     try {
-      const res  = await fetch('/api/signin', {
-        method:  'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body:    JSON.stringify({ email, password: pw }),
-      });
+      const res  = await fetch('/api/signin', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ email, password: pw }) });
       const data = await res.json();
-
       if (!res.ok || data.error) {
         setLoading(btn, false, 'Sign in →');
-        if (data.code === 'PASSWORD_NOT_SET') {
-          showAlert(data.message, 'error');
-        } else {
-          document.getElementById('loginPwField').classList.add('has-error');
-        }
+        if (data.code === 'PASSWORD_NOT_SET') { showAlert(data.message, 'error'); }
+        else { document.getElementById('loginPwField').classList.add('has-error'); }
         return;
       }
-
-      // Save session
-      RinqrAuth.save({
-        accountType:  data.accountType,
-        email:        data.email,
-        propertyId:   data.propertyId   || null,
-        propertyName: data.propertyName || null,
-        dashboardUrl: data.dashboardUrl,
-      });
-
-      const label = data.accountType === 'manager'
-        ? `✓ Welcome back! Redirecting to ${data.propertyName}…`
-        : '✓ Signed in! Redirecting…';
+      RinqrAuth.save({ accountType: data.accountType, email: data.email, propertyId: data.propertyId || null, propertyName: data.propertyName || null, dashboardUrl: data.dashboardUrl });
+      const label = data.accountType === 'manager' ? `✓ Redirecting to ${data.propertyName}…` : '✓ Signed in! Redirecting…';
       setLoading(btn, false, label);
       btn.style.background = '#1a7a46';
-
       setTimeout(() => RinqrAuth.redirectAfterLogin(data), 800);
-
     } catch {
       setLoading(btn, false, 'Sign in →');
-      showAlert('Network error — check your connection and try again.', 'error');
+      showAlert('Network error — check your connection.', 'error');
     }
   }
 
-  // ─────────────────────────────────────────────────────────
-  //  Signup — step 1
-  // ─────────────────────────────────────────────────────────
   async function doSignup() {
-    if (otpMode) { await doVerifyOtp(); return; }
-
     const btn       = document.getElementById('signupBtn');
     const firstName = document.getElementById('signupFirst').value.trim();
     const lastName  = document.getElementById('signupLast').value.trim();
     const email     = document.getElementById('signupEmail').value.trim();
     const phone     = document.getElementById('signupPhone').value;
     const pw        = document.getElementById('signupPw').value;
-
     if (!isEmail(email)) { document.getElementById('signupEmailField').classList.add('has-error'); return; }
     if (pw.length < 8)   { document.getElementById('signupPwField').classList.add('has-error');   return; }
     if (phone.replace(/\D/g,'').length < 10) { document.getElementById('signupPhoneField').classList.add('has-error'); return; }
-
     setLoading(btn, true);
-
     try {
-      const res  = await fetch('/api/signup', {
-        method:  'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body:    JSON.stringify({ firstName, lastName, email, phone, password: pw }),
-      });
+      const res  = await fetch('/api/signup', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ firstName, lastName, email, phone, password: pw }) });
       const data = await res.json();
-
-      if (!res.ok || data.error) {
-        setLoading(btn, false, 'Create account →');
-        showAlert(data.message || 'Something went wrong. Please try again.', 'error');
-        return;
-      }
-
-      pendingEmail = email;
-      otpMode      = true;
-      showOtpStep(email);
-
+      if (!res.ok || data.error) { setLoading(btn, false, 'Create account →'); showAlert(data.message || 'Something went wrong.', 'error'); return; }
+      // Save session immediately — skip OTP for now
+      RinqrAuth.save({ accountType: 'driver', email, propertyId: null, propertyName: null, dashboardUrl: '/activate.html' });
+      setLoading(btn, false, '✓ Account created! Setting up your tag…');
+      btn.style.background = '#1a7a46';
+      setTimeout(() => window.location.replace('/activate.html'), 900);
     } catch {
       setLoading(btn, false, 'Create account →');
-      showAlert('Network error — check your connection and try again.', 'error');
+      showAlert('Network error — check your connection.', 'error');
     }
   }
 
-  // ─────────────────────────────────────────────────────────
-  //  Signup — step 2: OTP screen
-  // ─────────────────────────────────────────────────────────
-  function showOtpStep(email) {
-    const masked = email.replace(/(.{2})(.*)(@.*)/, (_, a, b, c) => a + b.replace(/./g,'•') + c);
-
-    document.getElementById('formSignup').innerHTML = `
-      <div class="auth-heading" style="font-size:28px;line-height:1.1;margin-bottom:8px">
-        CHECK YOUR<br>PHONE
-      </div>
-      <p class="auth-sub">
-        We sent a 6-digit code to your number linked to
-        <strong style="color:var(--text)">${masked}</strong>.
-        It expires in 10 minutes.
-      </p>
-
-      <div class="field" id="otpField">
-        <label>Verification code</label>
-        <input type="text" id="otpInput" class="otp-input"
-          placeholder="000000" maxlength="6"
-          inputmode="numeric" autocomplete="one-time-code"
-          oninput="this.value=this.value.replace(/\\D/g,''); checkOtp()">
-        <span class="err">Invalid or expired code</span>
-      </div>
-
-      <button class="btn-auth" id="signupBtn" disabled onclick="doVerifyOtp()">
-        Verify →
-      </button>
-
-      <p style="font-size:11px;color:var(--muted2);text-align:center;margin-top:14px">
-        Didn't receive it?
-        <button id="resendBtn" onclick="resendOtp()"
-          style="background:none;border:none;color:var(--accent);cursor:pointer;font-size:11px;font-family:var(--font-m);padding:0">
-          Resend code
-        </button>
-        <span id="resendCooldown" style="display:none;color:var(--muted2)"></span>
-      </p>
-      <p style="font-size:11px;color:var(--muted2);text-align:center;margin-top:4px">
-        <button onclick="cancelOtp()"
-          style="background:none;border:none;color:var(--muted2);cursor:pointer;font-size:11px;font-family:var(--font-m);padding:0">
-          ← Go back
-        </button>
-      </p>
-    `;
-    setTimeout(() => document.getElementById('otpInput')?.focus(), 80);
-  }
-
-  function checkOtp() {
-    const val = document.getElementById('otpInput')?.value || '';
-    const btn = document.getElementById('signupBtn');
-    if (btn) btn.disabled = val.length < 6;
-  }
-
-  // ─────────────────────────────────────────────────────────
-  //  Signup — step 3: verify OTP
-  // ─────────────────────────────────────────────────────────
-  async function doVerifyOtp() {
-    const otp = document.getElementById('otpInput')?.value.trim();
-    const btn = document.getElementById('signupBtn');
-    if (!otp || otp.length < 6) return;
-
-    setLoading(btn, true);
-
-    try {
-      const res  = await fetch('/api/auth/verify-otp', {
-        method:  'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body:    JSON.stringify({ email: pendingEmail, otp }),
-      });
-      const data = await res.json();
-
-      if (!res.ok || data.error) {
-        document.getElementById('otpField').classList.add('has-error');
-        setLoading(btn, false, 'Verify →');
-        return;
-      }
-
-      // Save driver session
-      RinqrAuth.save({
-        accountType:  'driver',
-        email:        pendingEmail,
-        propertyId:   null,
-        propertyName: null,
-        dashboardUrl: '/activate.html',   // new users go to activate first
-      });
-
-      setLoading(btn, false, '✓ Verified! Setting up your tag…');
-      btn.style.background = '#1a7a46';
-
-      // New users always land on activate.html, not dashboard
-      setTimeout(() => { window.location.replace('/activate.html'); }, 900);
-
-    } catch {
-      setLoading(btn, false, 'Verify →');
-      document.getElementById('otpField').classList.add('has-error');
-    }
-  }
-
-  async function resendOtp() {
-    if (resendLocked) return;
-    resendLocked = true;
-    const resendBtn  = document.getElementById('resendBtn');
-    const cooldownEl = document.getElementById('resendCooldown');
-    resendBtn.style.display  = 'none';
-    cooldownEl.style.display = 'inline';
-    let secs = 30;
-    cooldownEl.textContent = `(wait ${secs}s)`;
-    const iv = setInterval(() => {
-      secs--;
-      if (secs <= 0) {
-        clearInterval(iv);
-        resendLocked             = false;
-        resendBtn.style.display  = 'inline';
-        cooldownEl.style.display = 'none';
-      } else {
-        cooldownEl.textContent = `(wait ${secs}s)`;
-      }
-    }, 1000);
-    showAlert('New verification code sent to your phone.', 'success');
-  }
-
-  function cancelOtp() {
-    otpMode      = false;
-    pendingEmail = '';
-    switchTab('signup');
-  }
-
-  // ─────────────────────────────────────────────────────────
-  //  Tab switching
-  // ─────────────────────────────────────────────────────────
   function switchTab(tab) {
-    if (tab === 'login' && otpMode) { otpMode = false; pendingEmail = ''; }
-    document.getElementById('tabLogin').classList.toggle('active',   tab === 'login');
-    document.getElementById('tabSignup').classList.toggle('active',  tab === 'signup');
-    document.getElementById('formLogin').classList.toggle('active',  tab === 'login');
-    document.getElementById('formSignup').classList.toggle('active', tab === 'signup');
+    document.getElementById('tabLogin').classList.toggle('active',  tab==='login');
+    document.getElementById('tabSignup').classList.toggle('active', tab==='signup');
+    document.getElementById('formLogin').classList.toggle('active', tab==='login');
+    document.getElementById('formSignup').classList.toggle('active',tab==='signup');
     hideAlert();
   }
 
-  // ─────────────────────────────────────────────────────────
-  //  Social (placeholder)
-  // ─────────────────────────────────────────────────────────
   function doSocial(provider) {
     const btn = event.currentTarget;
     btn.textContent = `⏳ Connecting to ${provider}…`;
-    btn.disabled    = true;
+    btn.disabled = true;
+    // Wire up real OAuth here; for now demo
     setTimeout(() => {
-      // Wire up real OAuth here; for now demo redirect
-      RinqrAuth.save({ accountType: 'driver', email: '', dashboardUrl: '/activate.html' });
+      RinqrAuth.save({ accountType:'driver', email:'', propertyId:null, propertyName:null, dashboardUrl:'/activate.html' });
       window.location.replace('/activate.html');
-    }, 1400);
+    }, 1200);
   }
 
-  // ─────────────────────────────────────────────────────────
-  //  Forgot password
-  // ─────────────────────────────────────────────────────────
   function showForgot() {
     const email = document.getElementById('loginEmail').value.trim();
-    if (!isEmail(email)) {
-      document.getElementById('loginEmailField').classList.add('has-error');
-      document.getElementById('loginEmail').focus();
-      return;
-    }
-    // POST /api/auth/reset-password in production
+    if (!isEmail(email)) { document.getElementById('loginEmailField').classList.add('has-error'); document.getElementById('loginEmail').focus(); return; }
     showAlert(`Password reset link sent to ${email}`, 'success');
   }
 
-  // ─────────────────────────────────────────────────────────
-  //  Helpers
-  // ─────────────────────────────────────────────────────────
   function setLoading(btn, loading, label) {
-    if (loading) {
-      btn.innerHTML = '<span class="loading-dot"></span><span class="loading-dot"></span><span class="loading-dot"></span>';
-      btn.disabled  = true;
-    } else {
-      btn.textContent = label || '';
-      btn.disabled    = false;
-    }
+    if (loading) { btn.innerHTML='<span class="loading-dot"></span><span class="loading-dot"></span><span class="loading-dot"></span>'; btn.disabled=true; }
+    else { btn.textContent=label||''; btn.disabled=false; }
   }
-
-  function showAlert(msg, type = 'success') {
-    const banner = document.getElementById('alertBanner');
-    document.getElementById('alertIcon').textContent = type === 'success' ? '✅' : '⚠️';
-    document.getElementById('alertText').textContent = msg;
-    banner.className = `alert-banner show ${type}`;
-    if (type === 'success') setTimeout(hideAlert, 4000);
+  function showAlert(msg, type='success') {
+    const b=document.getElementById('alertBanner');
+    document.getElementById('alertIcon').textContent=type==='success'?'✅':'⚠️';
+    document.getElementById('alertText').textContent=msg;
+    b.className=`alert-banner show ${type}`;
+    if(type==='success') setTimeout(hideAlert,4000);
   }
-
-  function hideAlert() {
-    document.getElementById('alertBanner').classList.remove('show');
-  }
-
-  function togglePw(id, btn) {
-    const inp = document.getElementById(id);
-    inp.type  = inp.type === 'password' ? 'text' : 'password';
-    btn.textContent = inp.type === 'password' ? '👁' : '🙈';
-  }
-
-  function clearErr(fieldId) {
-    document.getElementById(fieldId).classList.remove('has-error');
-  }
-
+  function hideAlert() { document.getElementById('alertBanner').classList.remove('show'); }
+  function togglePw(id, btn) { const inp=document.getElementById(id); inp.type=inp.type==='password'?'text':'password'; btn.textContent=inp.type==='password'?'👁':'🙈'; }
+  function clearErr(id) { document.getElementById(id).classList.remove('has-error'); }
   function isEmail(v) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v); }
-
   function checkLogin() {
-    const email = document.getElementById('loginEmail').value.trim();
-    const pw    = document.getElementById('loginPw').value;
-    document.getElementById('loginBtn').disabled = !(isEmail(email) && pw.length >= 6);
+    const e=document.getElementById('loginEmail').value.trim(), p=document.getElementById('loginPw').value;
+    document.getElementById('loginBtn').disabled=!(isEmail(e)&&p.length>=6);
   }
-
   function checkSignup() {
-    if (otpMode) return;
-    const first = document.getElementById('signupFirst').value.trim();
-    const email = document.getElementById('signupEmail').value.trim();
-    const phone = document.getElementById('signupPhone').value.replace(/\D/g,'');
-    const pw    = document.getElementById('signupPw').value;
-    document.getElementById('signupBtn').disabled =
-      !(first && isEmail(email) && phone.length >= 10 && pw.length >= 8);
+    const first=document.getElementById('signupFirst').value.trim(), email=document.getElementById('signupEmail').value.trim();
+    const phone=document.getElementById('signupPhone').value.replace(/\D/g,''), pw=document.getElementById('signupPw').value;
+    document.getElementById('signupBtn').disabled=!(first&&isEmail(email)&&phone.length>=10&&pw.length>=8);
   }
-
   function formatPhone(inp) {
-    let v = inp.value.replace(/\D/g,'');
-    if (v.length > 10) v = v.slice(0,10);
-    if (v.length >= 7)      v = '('+v.slice(0,3)+') '+v.slice(3,6)+'-'+v.slice(6);
-    else if (v.length >= 4) v = '('+v.slice(0,3)+') '+v.slice(3);
-    else if (v.length >= 1) v = '('+v;
-    inp.value = v;
+    let v=inp.value.replace(/\D/g,'');
+    if(v.length>10)v=v.slice(0,10);
+    if(v.length>=7)v='('+v.slice(0,3)+') '+v.slice(3,6)+'-'+v.slice(6);
+    else if(v.length>=4)v='('+v.slice(0,3)+') '+v.slice(3);
+    else if(v.length>=1)v='('+v;
+    inp.value=v;
   }
-
   function updateStrength(pw) {
-    const bar  = document.getElementById('strengthBar');
-    const fill = document.getElementById('strengthFill');
-    const text = document.getElementById('strengthText');
-    if (!pw) { bar.style.display = 'none'; return; }
-    bar.style.display = 'block';
-    let score = 0;
-    if (pw.length >= 8)           score++;
-    if (pw.length >= 12)          score++;
-    if (/[A-Z]/.test(pw))        score++;
-    if (/[0-9]/.test(pw))        score++;
-    if (/[^A-Za-z0-9]/.test(pw)) score++;
-    const levels = [
-      { w:'20%',  bg:'var(--accent)', label:'Weak',        color:'var(--accent)' },
-      { w:'40%',  bg:'var(--accent)', label:'Fair',        color:'var(--accent)' },
-      { w:'60%',  bg:'#a06010',       label:'Good',        color:'#a06010'       },
-      { w:'80%',  bg:'#1a7a46',       label:'Strong',      color:'#1a7a46'       },
-      { w:'100%', bg:'#1a7a46',       label:'Very strong', color:'#1a7a46'       },
-    ];
-    const l = levels[Math.min(score, levels.length - 1)];
-    fill.style.width      = l.w;
-    fill.style.background = l.bg;
-    text.textContent      = l.label;
-    text.style.color      = l.color;
+    const bar=document.getElementById('strengthBar'),fill=document.getElementById('strengthFill'),text=document.getElementById('strengthText');
+    if(!pw){bar.style.display='none';return;} bar.style.display='block';
+    let s=0;
+    if(pw.length>=8)s++;if(pw.length>=12)s++;if(/[A-Z]/.test(pw))s++;if(/[0-9]/.test(pw))s++;if(/[^A-Za-z0-9]/.test(pw))s++;
+    const lvls=[{w:'20%',bg:'var(--accent)',l:'Weak'},{w:'40%',bg:'var(--accent)',l:'Fair'},{w:'60%',bg:'#a06010',l:'Good'},{w:'80%',bg:'#1a7a46',l:'Strong'},{w:'100%',bg:'#1a7a46',l:'Very strong'}];
+    const lv=lvls[Math.min(s,4)];
+    fill.style.width=lv.w;fill.style.background=lv.bg;text.textContent=lv.l;text.style.color=lv.bg;
   }
 </script>
 </body>

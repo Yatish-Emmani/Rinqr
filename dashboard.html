@@ -5,177 +5,146 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Rinqr — Dashboard</title>
   <script src="auth.js"></script>
-  <script>
-    // Guard — redirect immediately if not a driver session
-    (function() {
-      var s = (function() {
-        try {
-          var raw = localStorage.getItem('rinqr_session');
-          if (!raw) return null;
-          var sess = JSON.parse(raw);
-          if (Date.now() - (sess.ts||0) > 7*24*60*60*1000) { localStorage.removeItem('rinqr_session'); return null; }
-          return sess;
-        } catch(e) { return null; }
-      })();
-      if (!s || s.accountType !== 'driver') {
-        var next = encodeURIComponent(window.location.pathname + window.location.search);
-        window.location.replace('/signin.html?next=' + next);
-      }
-    })();
-  </script>
+  <script>var __session = RinqrAuth.requireDriver();</script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <link rel="stylesheet" href="style.css">
   <style>
-    body { min-height: 100vh; background: var(--surface); }
-    .main { max-width: 1080px; margin: 0 auto; padding: 24px 20px 60px; }
-    .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 20px; }
-    .two-col { display: grid; grid-template-columns: 1fr 320px; gap: 14px; }
-    .col-left  { display: flex; flex-direction: column; gap: 14px; }
-    .col-right { display: flex; flex-direction: column; gap: 14px; }
-    .chart-outer { padding: 16px 18px 14px; background: #fff; }
-    .chart-bars { display: flex; align-items: flex-end; gap: 6px; height: 80px; margin-bottom: 6px; }
-    .bar-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; }
-    .bar { width: 100%; border-radius: 3px 3px 0 0; min-height: 4px; cursor: pointer; transition: opacity .15s; }
-    .bar:hover { opacity: .75; }
-    .bar-label { font-family: var(--font-m); font-size: 9px; color: var(--muted2); letter-spacing: .5px; }
-    .scan-list { padding: 0 18px; background: #fff; }
-    .tag-card { display: flex; align-items: center; gap: 14px; padding: 14px 16px; background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 10px; transition: border-color .15s; cursor: pointer; }
-    .tag-card:hover { border-color: var(--accent); }
-    .tag-qr { width: 50px; height: 50px; background: #fff; border-radius: 5px; padding: 4px; border: 1px solid var(--border); flex-shrink: 0; }
-    .tag-qr svg { width: 100%; height: 100%; display: block; }
-    .tag-info { flex: 1; min-width: 0; }
-    .tag-id   { font-family: var(--font-m); font-size: 11px; color: var(--accent); margin-bottom: 2px; }
-    .tag-name { font-size: 13px; font-weight: 500; color: var(--text); margin-bottom: 2px; }
-    .tag-meta { font-family: var(--font-m); font-size: 10px; color: var(--muted); }
-    .tag-status { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
-    .status-dot { width: 7px; height: 7px; border-radius: 50%; }
-    .status-dot.on  { background: var(--green); box-shadow: 0 0 0 3px rgba(26,122,70,.15); }
-    .status-dot.off { background: var(--muted2); }
-    .status-text { font-family: var(--font-m); font-size: 10px; color: var(--muted); }
-    .profile-row { display: flex; align-items: center; gap: 14px; padding: 16px 18px; border-bottom: 1px solid var(--border); background: #fff; }
-    .profile-avatar { width: 48px; height: 48px; border-radius: 50%; background: var(--accent); display: flex; align-items: center; justify-content: center; font-family: var(--font-d); font-size: 22px; color: #fff; flex-shrink: 0; }
-    .profile-name  { font-size: 15px; font-weight: 500; color: var(--text); }
-    .profile-email { font-family: var(--font-m); font-size: 11px; color: var(--muted); margin-top: 2px; }
-    .plan-badge { display: inline-block; font-family: var(--font-m); font-size: 10px; color: var(--amber); background: rgba(160,96,16,.08); border: 1px solid rgba(160,96,16,.2); padding: 2px 8px; border-radius: 4px; margin-top: 4px; }
-    .setting-row { display: flex; align-items: center; justify-content: space-between; padding: 13px 18px; border-bottom: 1px solid var(--border); background: #fff; }
-    .setting-row:last-child { border-bottom: none; }
-    .setting-label { font-size: 13px; font-weight: 500; color: var(--text); }
-    .setting-sub   { font-size: 11px; color: var(--muted); margin-top: 2px; }
-    .emergency-card { display: flex; align-items: center; gap: 12px; background: rgba(0,180,170,.05); border: 1px solid rgba(0,180,170,.18); border-radius: var(--radius-sm); padding: 14px; }
-    .ec-icon { font-size: 20px; flex-shrink: 0; }
-    .ec-name { font-size: 13px; font-weight: 500; color: var(--text); }
-    .ec-sub  { font-size: 11px; color: var(--muted); margin-top: 1px; }
-    .masked-chip { font-family: var(--font-m); font-size: 12px; color: var(--accent); background: rgba(0,180,170,.08); border: 1px solid rgba(0,180,170,.25); padding: 8px 14px; border-radius: 5px; display: inline-block; }
-    .sub-bar-wrap { background: var(--card2); border-radius: 3px; height: 5px; overflow: hidden; margin: 10px 0 6px; }
-    .sub-bar-fill { background: var(--accent); height: 100%; width: 40%; border-radius: 3px; }
-    .map-mock { margin: 14px; background: var(--card2); border: 1px solid var(--border); border-radius: var(--radius-sm); height: 130px; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 8px; }
-    .map-ping { width: 12px; height: 12px; border-radius: 50%; background: var(--accent); animation: mapPing 2s ease-in-out infinite; }
-    @keyframes mapPing { 0%,100%{box-shadow:0 0 0 0 rgba(0,180,170,.45)} 50%{box-shadow:0 0 0 14px rgba(0,180,170,0)} }
-    .map-label { font-family: var(--font-m); font-size: 10px; color: var(--muted); }
-    .filter-select { background: var(--card2); border: 1px solid var(--border); color: var(--muted); font-family: var(--font-m); font-size: 10px; padding: 6px 10px; border-radius: 5px; outline: none; cursor: pointer; }
-    .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px); background: #fff; border: 1px solid var(--accent); border-radius: var(--radius-sm); padding: 10px 18px; font-family: var(--font-m); font-size: 12px; color: var(--accent); display: flex; align-items: center; gap: 8px; white-space: nowrap; transition: transform .3s ease; z-index: 999; box-shadow: 0 4px 20px rgba(0,0,0,.1); }
-    .toast.show { transform: translateX(-50%) translateY(0); }
-    @media (max-width: 720px) { .stats-grid { grid-template-columns: repeat(2,1fr); } .two-col { grid-template-columns: 1fr; } }
+    body{min-height:100vh;background:var(--surface)}
+    .main{max-width:1080px;margin:0 auto;padding:24px 20px 60px}
+    .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px}
+    .two-col{display:grid;grid-template-columns:1fr 320px;gap:14px}
+    .col-left{display:flex;flex-direction:column;gap:14px}
+    .col-right{display:flex;flex-direction:column;gap:14px}
+    .chart-outer{padding:16px 18px 14px;background:#fff}
+    .chart-bars{display:flex;align-items:flex-end;gap:6px;height:80px;margin-bottom:6px}
+    .bar-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px}
+    .bar{width:100%;border-radius:3px 3px 0 0;min-height:4px;cursor:pointer;transition:opacity .15s}
+    .bar:hover{opacity:.75}
+    .bar-label{font-family:var(--font-m);font-size:9px;color:var(--muted2);letter-spacing:.5px}
+    .scan-list{padding:0 18px;background:#fff}
+    .tag-card{display:flex;align-items:center;gap:14px;padding:14px 16px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:10px;transition:border-color .15s}
+    .tag-card:hover{border-color:var(--accent)}
+    .tag-qr-box{width:56px;height:56px;background:#fff;border-radius:6px;padding:4px;border:1px solid var(--border);flex-shrink:0;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:transform .15s}
+    .tag-qr-box:hover{transform:scale(1.05)}
+    .tag-qr-box canvas,.tag-qr-box img{width:100%!important;height:100%!important}
+    .tag-info{flex:1;min-width:0}
+    .tag-id{font-family:var(--font-m);font-size:11px;color:var(--accent);margin-bottom:2px}
+    .tag-name{font-size:13px;font-weight:500;color:var(--text);margin-bottom:2px}
+    .tag-meta{font-family:var(--font-m);font-size:10px;color:var(--muted)}
+    .tag-status{display:flex;align-items:center;gap:6px;flex-shrink:0}
+    .status-dot{width:7px;height:7px;border-radius:50%}
+    .status-dot.on{background:var(--green);box-shadow:0 0 0 3px rgba(26,122,70,.15)}
+    .status-dot.off{background:var(--muted2)}
+    .status-text{font-family:var(--font-m);font-size:10px;color:var(--muted)}
+    .profile-row{display:flex;align-items:center;gap:14px;padding:16px 18px;border-bottom:1px solid var(--border);background:#fff}
+    .profile-avatar{width:48px;height:48px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-family:var(--font-d);font-size:22px;color:#fff;flex-shrink:0}
+    .setting-row{display:flex;align-items:center;justify-content:space-between;padding:13px 18px;border-bottom:1px solid var(--border);background:#fff}
+    .setting-row:last-child{border-bottom:none}
+    .setting-label{font-size:13px;font-weight:500;color:var(--text)}
+    .setting-sub{font-size:11px;color:var(--muted);margin-top:2px}
+    .masked-chip{font-family:var(--font-m);font-size:12px;color:var(--accent);background:rgba(0,180,170,.08);border:1px solid rgba(0,180,170,.25);padding:8px 14px;border-radius:5px;display:inline-block}
+    .filter-select{background:var(--card2);border:1px solid var(--border);color:var(--muted);font-family:var(--font-m);font-size:10px;padding:6px 10px;border-radius:5px;outline:none;cursor:pointer}
+    .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:#fff;border:1px solid var(--accent);border-radius:var(--radius-sm);padding:10px 18px;font-family:var(--font-m);font-size:12px;color:var(--accent);display:flex;align-items:center;gap:8px;white-space:nowrap;transition:transform .3s ease;z-index:999;box-shadow:0 4px 20px rgba(0,0,0,.1)}
+    .toast.show{transform:translateX(-50%) translateY(0)}
+    .empty-state{text-align:center;padding:32px 20px;color:var(--muted)}
+    .empty-icon{font-size:36px;margin-bottom:10px;display:block}
+    .loading-row{padding:24px;text-align:center;color:var(--muted);font-size:13px;font-family:var(--font-m)}
+
+    /* Avatar dropdown */
+    .avatar-wrap{position:relative}
+    .avatar-dropdown{position:absolute;top:calc(100% + 8px);right:0;background:#fff;border:1px solid var(--border);border-radius:var(--radius);box-shadow:0 8px 32px rgba(0,0,0,.12);min-width:220px;z-index:200;overflow:hidden;opacity:0;pointer-events:none;transform:translateY(-6px);transition:opacity .15s,transform .15s}
+    .avatar-dropdown.open{opacity:1;pointer-events:all;transform:translateY(0)}
+    .dropdown-header{padding:14px 16px;border-bottom:1px solid var(--border);background:var(--surface)}
+    .dropdown-name{font-size:13px;font-weight:500;color:var(--text);margin-bottom:2px}
+    .dropdown-email{font-family:var(--font-m);font-size:10px;color:var(--muted)}
+    .dropdown-item{display:flex;align-items:center;gap:10px;padding:11px 16px;font-size:13px;color:var(--text);cursor:pointer;border:none;background:transparent;width:100%;text-align:left;text-decoration:none;border-bottom:1px solid var(--border);transition:background .12s}
+    .dropdown-item:last-child{border-bottom:none}
+    .dropdown-item:hover{background:var(--surface)}
+    .dropdown-item .di-icon{font-size:16px;width:20px;text-align:center;flex-shrink:0}
+    .dropdown-item.danger{color:var(--accent)}
+
+    /* QR modal */
+    .qr-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:300;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .2s}
+    .qr-modal-overlay.open{opacity:1;pointer-events:all}
+    .qr-modal{background:#fff;border-radius:16px;padding:32px;text-align:center;max-width:280px;width:100%;transform:scale(.9);transition:transform .2s}
+    .qr-modal-overlay.open .qr-modal{transform:scale(1)}
+    .qr-modal-id{font-family:var(--font-m);font-size:13px;color:var(--accent);letter-spacing:2px;margin-bottom:16px}
+    .qr-modal-box{width:200px;height:200px;margin:0 auto 16px;background:#fff;padding:8px;border:1px solid var(--border);border-radius:8px}
+    .qr-modal-box canvas,.qr-modal-box img{width:100%!important;height:100%!important}
+    .qr-modal-sub{font-size:12px;color:var(--muted);font-family:var(--font-m);margin-bottom:16px;word-break:break-all;line-height:1.5}
+    .qr-dl-btn{display:block;background:var(--accent);color:#fff;font-family:var(--font-d);font-size:15px;padding:10px;border-radius:6px;text-decoration:none;cursor:pointer;border:none;width:100%;transition:opacity .15s}
+    .qr-dl-btn:hover{opacity:.88}
+
+    /* Edit profile modal */
+    .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:300;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .2s}
+    .modal-overlay.open{opacity:1;pointer-events:all}
+    .modal{background:#fff;border:1px solid var(--border2);border-radius:12px;padding:28px;width:100%;max-width:400px;transform:translateY(20px);transition:transform .2s;box-shadow:0 8px 40px rgba(0,0,0,.14)}
+    .modal-overlay.open .modal{transform:translateY(0)}
+
+    @media(max-width:720px){.stats-grid{grid-template-columns:repeat(2,1fr)}.two-col{grid-template-columns:1fr}}
   </style>
 </head>
 <body>
 
 <nav class="nav">
-  <a href="dashboard.html" class="logo-mark">
-    <img src="Rinqr_logo.png" alt="Rinqr" class="logo-img">
-  </a>
+  <a href="dashboard.html" class="logo-mark"><img src="Rinqr_logo.png" alt="Rinqr" class="logo-img"></a>
   <div class="nav-right">
-    <div class="nav-pill"><span class="pulse-dot"></span>2 tags active</div>
-    <a href="property.html" style="font-family:var(--font-m);font-size:10px;color:var(--muted);text-decoration:none;border:1px solid var(--border);padding:4px 10px;border-radius:4px;margin-right:4px">B2B Portal</a>
+    <div class="nav-pill"><span class="pulse-dot"></span><span id="navTagCount">loading…</span></div>
     <a href="activate.html" style="font-family:var(--font-m);font-size:10px;color:var(--accent);text-decoration:none;border:1px solid rgba(0,180,170,.35);padding:4px 10px;border-radius:4px;">+ Add tag</a>
-    <div class="nav-avatar" id="navAvatar" onclick="signOut()" title="Sign out" style="cursor:pointer">?</div>
+    <div class="avatar-wrap" id="avatarWrap">
+      <div class="nav-avatar" id="navAvatar" onclick="toggleDropdown()" title="Account" style="cursor:pointer">?</div>
+      <div class="avatar-dropdown" id="avatarDropdown">
+        <div class="dropdown-header">
+          <div class="dropdown-name"  id="dropdownName">Account</div>
+          <div class="dropdown-email" id="dropdownEmail">—</div>
+        </div>
+        <button class="dropdown-item" onclick="openEditProfile()"><span class="di-icon">✏️</span><span>Edit profile</span></button>
+        <button class="dropdown-item" onclick="showTab('settings',document.querySelectorAll('.tab')[3]);closeDropdown()"><span class="di-icon">⚙️</span><span>Settings</span></button>
+        <a class="dropdown-item" href="activate.html"><span class="di-icon">🏷️</span><span>Activate a tag</span></a>
+        <button class="dropdown-item danger" onclick="RinqrAuth.signOut()"><span class="di-icon">🚪</span><span>Sign out</span></button>
+      </div>
+    </div>
   </div>
 </nav>
 
 <div class="main">
   <div class="tabs">
-    <div class="tab active" onclick="showTab('overview', this)">Overview</div>
-    <div class="tab" onclick="showTab('tags', this)">My Tags</div>
-    <div class="tab" onclick="showTab('activity', this)">Activity</div>
-    <div class="tab" onclick="showTab('settings', this)">Settings</div>
+    <div class="tab active" onclick="showTab('overview',this)">Overview</div>
+    <div class="tab" onclick="showTab('tags',this)">My Tags</div>
+    <div class="tab" onclick="showTab('activity',this)">Activity</div>
+    <div class="tab" onclick="showTab('settings',this)">Settings</div>
   </div>
 
   <!-- OVERVIEW -->
   <div class="tab-panel active" id="tab-overview">
     <div class="stats-grid" style="margin-top:20px">
-      <div class="stat-card s-accent">
-        <div class="stat-label">Total scans</div>
-        <div class="stat-val" id="statScans">47</div>
-        <div class="stat-sub">All time</div>
-        <div class="stat-trend">↑ 3 this week</div>
-      </div>
-      <div class="stat-card s-green">
-        <div class="stat-label">Privacy rate</div>
-        <div class="stat-val">100%</div>
-        <div class="stat-sub">Numbers protected</div>
-        <div class="stat-trend">0 exposures ever</div>
-      </div>
-      <div class="stat-card s-blue">
-        <div class="stat-label">Calls relayed</div>
-        <div class="stat-val" id="statCalls">31</div>
-        <div class="stat-sub">Via masked line</div>
-        <div class="stat-trend">↑ 2 this week</div>
-      </div>
-      <div class="stat-card s-amber">
-        <div class="stat-label">Active tags</div>
-        <div class="stat-val">2</div>
-        <div class="stat-sub">of 3 registered</div>
-        <div class="stat-trend">Pro · $4.99/mo</div>
-      </div>
+      <div class="stat-card s-accent"><div class="stat-label">Total scans</div><div class="stat-val" id="statScans">—</div><div class="stat-sub">All time</div><div class="stat-trend" id="statScansTrend">loading…</div></div>
+      <div class="stat-card s-green"><div class="stat-label">Privacy rate</div><div class="stat-val">100%</div><div class="stat-sub">Numbers protected</div><div class="stat-trend">0 exposures ever</div></div>
+      <div class="stat-card s-blue"><div class="stat-label">Active tags</div><div class="stat-val" id="statActiveTags">—</div><div class="stat-sub" id="statActiveTagsSub">loading…</div><div class="stat-trend" id="statActiveTagsTrend"></div></div>
+      <div class="stat-card s-amber"><div class="stat-label">Masked relay</div><div class="stat-val">ON</div><div class="stat-sub">Via Twilio</div><div class="stat-trend">Number hidden</div></div>
     </div>
-
     <div class="two-col">
       <div class="col-left">
         <div class="card">
-          <div class="card-head">
-            <div class="card-title">Scan activity — last 7 days</div>
-            <div class="card-action">Export →</div>
-          </div>
+          <div class="card-head"><div class="card-title">Scan activity — last 7 days</div><div class="card-action">Export →</div></div>
           <div class="chart-outer"><div class="chart-bars" id="chartBars"></div></div>
         </div>
         <div class="card">
-          <div class="card-head">
-            <div class="card-title">Recent scans</div>
-            <div class="card-action" onclick="simulateScan()" style="cursor:pointer">+ Simulate scan</div>
-          </div>
-          <div class="scan-list" id="scanFeed" style="padding-bottom:4px"></div>
+          <div class="card-head"><div class="card-title">Recent scans</div></div>
+          <div class="scan-list" id="scanFeed" style="padding-bottom:4px"><div class="loading-row">Loading…</div></div>
         </div>
       </div>
       <div class="col-right">
         <div class="card">
-          <div class="card-head">
-            <div class="card-title">Active tags</div>
-            <div class="card-action" onclick="showTab('tags', document.querySelectorAll('.tab')[1])">Manage →</div>
-          </div>
-          <div class="card-body">
-            <div style="display:flex;flex-direction:column;gap:8px">
-              <div style="display:flex;align-items:center;gap:10px;padding:10px;background:var(--card2);border-radius:var(--radius-sm);border:1px solid var(--border)">
-                <div style="width:36px;height:36px;background:#fff;border-radius:4px;padding:3px;flex-shrink:0;border:1px solid var(--border)"><svg viewBox="0 0 9 9" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges" style="width:100%;height:100%;display:block"><rect width="9" height="9" fill="white"/><rect x="0" y="0" width="4" height="4" fill="#111"/><rect x="1" y="1" width="2" height="2" fill="white"/><rect x="5" y="0" width="4" height="4" fill="#111"/><rect x="6" y="1" width="2" height="2" fill="white"/><rect x="0" y="5" width="4" height="4" fill="#111"/><rect x="1" y="6" width="2" height="2" fill="white"/><rect x="5" y="5" width="2" height="2" fill="#111"/><rect x="7" y="7" width="2" height="2" fill="#111"/></svg></div>
-                <div style="flex:1"><div style="font-family:var(--font-m);font-size:10px;color:var(--accent)">PP-7X4K-9M2R</div><div style="font-size:12px;font-weight:500;margin-top:1px;color:var(--text)">Main Car</div></div>
-                <div style="display:flex;align-items:center;gap:5px"><span class="status-dot on"></span><span class="status-text">Active</span></div>
-              </div>
-              <div style="display:flex;align-items:center;gap:10px;padding:10px;background:var(--card2);border-radius:var(--radius-sm);border:1px solid var(--border)">
-                <div style="width:36px;height:36px;background:#fff;border-radius:4px;padding:3px;flex-shrink:0;border:1px solid var(--border)"><svg viewBox="0 0 9 9" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges" style="width:100%;height:100%;display:block"><rect width="9" height="9" fill="white"/><rect x="0" y="0" width="4" height="4" fill="#111"/><rect x="1" y="1" width="2" height="2" fill="white"/><rect x="5" y="0" width="4" height="4" fill="#111"/><rect x="6" y="1" width="2" height="2" fill="white"/><rect x="0" y="5" width="4" height="4" fill="#111"/><rect x="1" y="6" width="2" height="2" fill="white"/><rect x="5" y="5" width="2" height="2" fill="#111"/><rect x="7" y="7" width="2" height="2" fill="#111"/></svg></div>
-                <div style="flex:1"><div style="font-family:var(--font-m);font-size:10px;color:var(--accent)">PP-B3R8-2K7P</div><div style="font-size:12px;font-weight:500;margin-top:1px;color:var(--text)">Partner's Car</div></div>
-                <div style="display:flex;align-items:center;gap:5px"><span class="status-dot on"></span><span class="status-text">Active</span></div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="card">
-          <div class="card-head"><div class="card-title">Last scan location</div></div>
-          <div class="map-mock"><div class="map-ping"></div><div class="map-label">Oak St &amp; 3rd Ave</div><div style="font-size:11px;color:var(--muted2);font-family:var(--font-m)">2 min ago</div></div>
+          <div class="card-head"><div class="card-title">Your tags</div><div class="card-action" onclick="showTab('tags',document.querySelectorAll('.tab')[1])">Manage →</div></div>
+          <div class="card-body" id="overviewTagList"><div class="loading-row">Loading…</div></div>
         </div>
         <div class="card">
           <div class="card-head"><div class="card-title">Emergency contact</div></div>
           <div class="card-body">
-            <div class="emergency-card" style="flex-direction:column;align-items:flex-start;gap:8px">
-              <div style="display:flex;align-items:center;gap:10px"><div class="ec-icon">🆘</div><div><div class="ec-name" style="color:var(--muted)">No emergency contact set</div><div class="ec-sub">Add one to protect yourself if calls go unanswered</div></div></div>
-              <button class="btn btn-ghost" style="padding:8px 14px;font-size:14px;width:auto">+ Add emergency contact</button>
+            <div style="display:flex;flex-direction:column;align-items:flex-start;gap:8px;background:rgba(0,180,170,.05);border:1px solid rgba(0,180,170,.18);border-radius:var(--radius-sm);padding:14px">
+              <div style="display:flex;align-items:center;gap:10px"><span style="font-size:20px">🆘</span><div><div style="font-size:13px;font-weight:500;color:var(--muted)">No emergency contact set</div><div style="font-size:11px;color:var(--muted)">Add one to protect yourself</div></div></div>
+              <button class="btn btn-ghost" style="padding:8px 14px;font-size:14px;width:auto">+ Add contact</button>
             </div>
           </div>
         </div>
@@ -183,187 +152,446 @@
     </div>
   </div>
 
-  <!-- TAGS TAB -->
+  <!-- TAGS -->
   <div class="tab-panel" id="tab-tags">
-    <div style="margin-top:20px">
-      <div class="tag-card">
-        <div class="tag-qr"><svg viewBox="0 0 9 9" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges"><rect width="9" height="9" fill="white"/><rect x="0" y="0" width="4" height="4" fill="#111"/><rect x="1" y="1" width="2" height="2" fill="white"/><rect x="5" y="0" width="4" height="4" fill="#111"/><rect x="6" y="1" width="2" height="2" fill="white"/><rect x="0" y="5" width="4" height="4" fill="#111"/><rect x="1" y="6" width="2" height="2" fill="white"/><rect x="5" y="5" width="2" height="2" fill="#111"/><rect x="7" y="7" width="2" height="2" fill="#111"/></svg></div>
-        <div class="tag-info"><div class="tag-id">PP-7X4K-9M2R</div><div class="tag-name">Main Car</div><div class="tag-meta">32 scans · activated 3 months ago</div></div>
-        <div class="tag-status"><span class="status-dot on"></span><span class="status-text">Active</span><label class="toggle" style="margin-left:6px"><input type="checkbox" checked onchange="toggleTagStatus(this,0)"><span class="toggle-slider"></span></label></div>
-      </div>
-      <div class="tag-card">
-        <div class="tag-qr"><svg viewBox="0 0 9 9" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges"><rect width="9" height="9" fill="white"/><rect x="0" y="0" width="4" height="4" fill="#111"/><rect x="1" y="1" width="2" height="2" fill="white"/><rect x="5" y="0" width="4" height="4" fill="#111"/><rect x="6" y="1" width="2" height="2" fill="white"/><rect x="0" y="5" width="4" height="4" fill="#111"/><rect x="1" y="6" width="2" height="2" fill="white"/><rect x="5" y="5" width="2" height="2" fill="#111"/><rect x="7" y="7" width="2" height="2" fill="#111"/></svg></div>
-        <div class="tag-info"><div class="tag-id">PP-B3R8-2K7P</div><div class="tag-name">Partner's Car</div><div class="tag-meta">15 scans · activated 6 weeks ago</div></div>
-        <div class="tag-status"><span class="status-dot on"></span><span class="status-text">Active</span><label class="toggle" style="margin-left:6px"><input type="checkbox" checked onchange="toggleTagStatus(this,1)"><span class="toggle-slider"></span></label></div>
-      </div>
-      <div class="tag-card" style="opacity:.4">
-        <div class="tag-qr"><svg viewBox="0 0 9 9" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges"><rect width="9" height="9" fill="white"/><rect x="0" y="0" width="4" height="4" fill="#111"/><rect x="1" y="1" width="2" height="2" fill="white"/><rect x="5" y="0" width="4" height="4" fill="#111"/><rect x="6" y="1" width="2" height="2" fill="white"/><rect x="0" y="5" width="4" height="4" fill="#111"/><rect x="1" y="6" width="2" height="2" fill="white"/><rect x="5" y="5" width="2" height="2" fill="#111"/><rect x="7" y="7" width="2" height="2" fill="#111"/></svg></div>
-        <div class="tag-info"><div class="tag-id">PP-9QJ2-5N1X</div><div class="tag-name">Spare Tag</div><div class="tag-meta">0 scans · not activated yet</div></div>
-        <div class="tag-status"><span class="status-dot off"></span><span class="status-text">Inactive</span><label class="toggle" style="margin-left:6px"><input type="checkbox"><span class="toggle-slider"></span></label></div>
-      </div>
-      <a href="activate.html" class="btn btn-ghost" style="display:block;text-align:center;padding:14px;text-decoration:none;margin-top:4px">＋ Activate a new tag</a>
-    </div>
+    <div style="margin-top:20px" id="tagListFull"><div class="loading-row">Loading your tags…</div></div>
   </div>
 
-  <!-- ACTIVITY TAB -->
+  <!-- ACTIVITY -->
   <div class="tab-panel" id="tab-activity">
     <div class="card" style="margin-top:20px">
       <div class="card-head">
         <div class="card-title">All scan history</div>
         <div style="display:flex;gap:6px">
-          <select class="filter-select"><option>All tags</option><option>PP-7X4K</option><option>PP-B3R8</option></select>
-          <select class="filter-select"><option>Last 30 days</option><option>Last 7 days</option><option>All time</option></select>
+          <select class="filter-select" id="filterTag" onchange="filterScans()"><option value="">All tags</option></select>
+          <select class="filter-select" id="filterPeriod" onchange="filterScans()"><option value="50">Last 50</option><option value="100">Last 100</option><option value="200">All time</option></select>
         </div>
       </div>
-      <div id="fullActivityList" style="padding:0 18px 4px"></div>
+      <div id="fullActivityList" style="padding:0 18px 4px"><div class="loading-row">Loading activity…</div></div>
     </div>
   </div>
 
-  <!-- SETTINGS TAB -->
+  <!-- SETTINGS -->
   <div class="tab-panel" id="tab-settings">
     <div class="two-col" style="margin-top:20px">
       <div class="col-left">
         <div class="card">
           <div class="profile-row">
             <div class="profile-avatar" id="settingsAvatar">?</div>
-            <div>
-              <div class="profile-name">Account</div>
-              <div class="profile-email" id="settingsEmail">—</div>
-              <div class="plan-badge">Pro · $4.99/mo</div>
-            </div>
+            <div><div style="font-size:15px;font-weight:500;color:var(--text)">My Account</div><div style="font-family:var(--font-m);font-size:11px;color:var(--muted);margin-top:2px" id="settingsEmail">—</div><div style="display:inline-block;font-family:var(--font-m);font-size:10px;color:var(--amber);background:rgba(160,96,16,.08);border:1px solid rgba(160,96,16,.2);padding:2px 8px;border-radius:4px;margin-top:4px">Starter · Free</div></div>
           </div>
-          <div class="setting-row"><div class="setting-info"><div class="setting-label">SMS alerts</div><div class="setting-sub">Get a text every time your tag is scanned</div></div><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></div>
-          <div class="setting-row"><div class="setting-info"><div class="setting-label">Masked call relay</div><div class="setting-sub">Allow scanners to call you anonymously</div></div><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></div>
-          <div class="setting-row"><div class="setting-info"><div class="setting-label">Do Not Disturb</div><div class="setting-sub">Block calls 10pm – 7am</div></div><label class="toggle"><input type="checkbox"><span class="toggle-slider"></span></label></div>
-          <div class="setting-row"><div class="setting-info"><div class="setting-label">Scan location logging</div><div class="setting-sub">Save approximate scan location</div></div><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></div>
-          <div class="setting-row"><div class="setting-info"><div class="setting-label">Weekly digest email</div><div class="setting-sub">Summary of activity every Monday</div></div><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></div>
-          <div class="setting-row" style="border-bottom:none">
-            <div class="setting-info"><div class="setting-label" style="color:var(--accent)">Sign out</div><div class="setting-sub">Clears your session on this device</div></div>
-            <button onclick="signOut()" style="font-family:var(--font-m);font-size:10px;color:var(--accent);background:transparent;border:1px solid rgba(0,180,170,.35);padding:5px 12px;border-radius:4px;cursor:pointer;">Sign out →</button>
-          </div>
+          <div class="setting-row"><div><div class="setting-label">SMS alerts</div><div class="setting-sub">Get a text every time your tag is scanned</div></div><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></div>
+          <div class="setting-row"><div><div class="setting-label">Masked call relay</div><div class="setting-sub">Allow scanners to call you anonymously</div></div><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></div>
+          <div class="setting-row"><div><div class="setting-label">Do Not Disturb</div><div class="setting-sub">Block calls 10pm – 7am</div></div><label class="toggle"><input type="checkbox"><span class="toggle-slider"></span></label></div>
+          <div class="setting-row"><div><div class="setting-label">Weekly digest email</div><div class="setting-sub">Summary of activity every Monday</div></div><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></div>
+          <div class="setting-row" style="border-bottom:none"><div><div class="setting-label" style="color:var(--accent)">Sign out</div><div class="setting-sub">Clears your session on this device</div></div><button onclick="RinqrAuth.signOut()" style="font-family:var(--font-m);font-size:10px;color:var(--accent);background:transparent;border:1px solid rgba(0,180,170,.35);padding:5px 12px;border-radius:4px;cursor:pointer;">Sign out →</button></div>
         </div>
       </div>
       <div class="col-right">
         <div class="card">
           <div class="card-head"><div class="card-title">Your masked number</div></div>
-          <div class="card-body">
-            <p style="font-size:12px;color:var(--muted);margin-bottom:10px">This is the only number ever shown to a scanner.</p>
-            <div class="masked-chip">+1 (888) 555-0174</div>
-            <p style="font-family:var(--font-m);font-size:10px;color:var(--muted2);margin-top:8px">Powered by Twilio relay</p>
-          </div>
+          <div class="card-body"><p style="font-size:12px;color:var(--muted);margin-bottom:10px">This is the only number ever shown to a scanner.</p><div class="masked-chip">+1 (888) 555-0174</div><p style="font-family:var(--font-m);font-size:10px;color:var(--muted2);margin-top:8px">Powered by Twilio relay</p></div>
         </div>
         <div class="card">
           <div class="card-head"><div class="card-title">Subscription</div></div>
-          <div class="card-body">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-              <div><div style="font-size:14px;font-weight:500;color:var(--text)">Pro Plan</div><div style="font-size:11px;color:var(--muted);margin-top:2px">Up to 5 tags · full history</div></div>
-              <div style="font-family:var(--font-d);font-size:22px;color:var(--amber)">$4.99<span style="font-size:12px;color:var(--muted);font-family:var(--font-b)">/mo</span></div>
-            </div>
-            <div class="sub-bar-wrap"><div class="sub-bar-fill"></div></div>
-            <div style="font-family:var(--font-m);font-size:10px;color:var(--muted)">Renews annually</div>
-            <button class="btn btn-ghost mt-12" style="padding:10px">Manage subscription →</button>
-          </div>
+          <div class="card-body"><div style="font-size:14px;font-weight:500;color:var(--text);margin-bottom:4px">Starter Plan</div><div style="font-size:11px;color:var(--muted);margin-bottom:14px">1 tag · last 5 scans visible</div><a href="landing.html#pricing" class="btn btn-ghost" style="padding:10px;display:block;text-align:center;text-decoration:none">Upgrade to Pro →</a></div>
         </div>
       </div>
     </div>
   </div>
 </div>
 
-<div class="toast" id="toast"><span>🔔</span><span id="toastMsg">New scan on PP-7X4K</span></div>
+<!-- QR Modal -->
+<div class="qr-modal-overlay" id="qrOverlay" onclick="closeQrModal(event)">
+  <div class="qr-modal">
+    <div class="qr-modal-id" id="qrModalId"></div>
+    <div class="qr-modal-box" id="qrModalBox"></div>
+    <div class="qr-modal-sub" id="qrModalSub"></div>
+    <button class="qr-dl-btn" onclick="downloadQr()">⬇ Download QR</button>
+    <button onclick="closeQrModal()" style="display:block;width:100%;margin-top:8px;padding:10px;background:transparent;border:1px solid var(--border);border-radius:6px;cursor:pointer;font-family:var(--font-m);font-size:11px;color:var(--muted)">Close</button>
+  </div>
+</div>
+
+<!-- Edit Profile Modal -->
+<div class="modal-overlay" id="editProfileOverlay" onclick="closeEditProfile(event)">
+  <div class="modal">
+    <div style="font-family:var(--font-d);font-size:22px;letter-spacing:1px;margin-bottom:4px;color:var(--text)">EDIT PROFILE</div>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:20px">Update your account details</p>
+    <div class="field"><label style="font-family:var(--font-m);font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--muted)">Email address</label><input type="email" id="editEmail" placeholder="you@example.com" autocomplete="email" style="width:100%;background:#fff;border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 14px;color:var(--text);font-family:var(--font-b);font-size:15px;outline:none;transition:border-color .15s" onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border)'"></div>
+    <div class="field" style="margin-top:12px"><label style="font-family:var(--font-m);font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--muted)">Phone number</label><input type="tel" id="editPhone" placeholder="(555) 000-0000" maxlength="14" autocomplete="tel" style="width:100%;background:#fff;border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 14px;color:var(--text);font-family:var(--font-b);font-size:15px;outline:none;transition:border-color .15s" oninput="let v=this.value.replace(/\D/g,'').slice(0,10);if(v.length>=7)v='('+v.slice(0,3)+') '+v.slice(3,6)+'-'+v.slice(6);else if(v.length>=4)v='('+v.slice(0,3)+') '+v.slice(3);else if(v.length)v='('+v;this.value=v;" onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border)'"></div>
+    <p style="font-size:11px;color:var(--muted);margin:12px 0">⚠️ Changing your phone re-links all your tags to the new number.</p>
+    <div style="display:flex;gap:8px;margin-top:4px">
+      <button onclick="saveProfile()" style="flex:1;padding:13px;background:var(--accent);color:#fff;font-family:var(--font-d);font-size:16px;letter-spacing:1px;border:none;border-radius:var(--radius-sm);cursor:pointer;" id="saveProfileBtn">Save changes →</button>
+      <button onclick="closeEditProfile()" style="padding:13px 18px;background:transparent;color:var(--muted);border:1px solid var(--border);border-radius:var(--radius-sm);cursor:pointer;font-family:var(--font-m);font-size:11px;">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"><span>🔔</span><span id="toastMsg">Done</span></div>
 
 <script>
-  // ── Session ───────────────────────────────────────────────
-  const session = RinqrAuth.get();
+const session   = RinqrAuth.get();
+let userTags    = [];
+let allScans    = [];
+let currentQrId = '';
 
-  function signOut() {
-    RinqrAuth.clear();
-    window.location.replace('/signin.html');
-  }
+// ── Apply session ─────────────────────────────────────────
+(function applySession() {
+  if (!session) return;
+  const initials = session.email ? session.email.slice(0,2).toUpperCase() : '?';
+  document.getElementById('navAvatar').textContent      = initials;
+  document.getElementById('settingsAvatar').textContent = initials;
+  document.getElementById('settingsEmail').textContent  = session.email || '—';
+  document.getElementById('dropdownEmail').textContent  = session.email || '—';
+  document.getElementById('dropdownName').textContent   = session.email?.split('@')[0] || 'Account';
+})();
 
-  // Populate email / initials from session
-  (function applySession() {
-    if (!session) return;
-    const email    = session.email || '';
-    const initials = email ? email.slice(0,2).toUpperCase() : '?';
-    const nav      = document.getElementById('navAvatar');
-    const sAvatar  = document.getElementById('settingsAvatar');
-    const sEmail   = document.getElementById('settingsEmail');
-    if (nav)     nav.textContent     = initials;
-    if (sAvatar) sAvatar.textContent = initials;
-    if (sEmail)  sEmail.textContent  = email || '—';
-  })();
+// ── Load everything on start ──────────────────────────────
+async function loadDashboard() {
+  if (!session?.email) return;
+  await Promise.all([loadTags(), loadScans()]);
+}
 
-  // ── Scan feed ─────────────────────────────────────────────
-  const scanData = [
-    { emoji:'🚗', cls:'ic-red',   reason:'Blocking driveway',    meta:'2 min ago · PP-7X4K',          badge:'masked call', bc:'badge-accent' },
-    { emoji:'💡', cls:'ic-blue',  reason:'Left lights on',        meta:'1 hr ago · PP-7X4K',           badge:'sms',         bc:'badge-blue'  },
-    { emoji:'⚠️', cls:'ic-amber', reason:'Minor accident nearby', meta:'Yesterday 4:12 PM · PP-B3R8',  badge:'missed',      bc:'badge-amber' },
-    { emoji:'💬', cls:'ic-green', reason:'Other message',         meta:'Yesterday 11:03 AM · PP-7X4K', badge:'masked call', bc:'badge-accent' },
-    { emoji:'💡', cls:'ic-blue',  reason:'Left lights on',        meta:'Mon 9:41 AM · PP-B3R8',        badge:'sms',         bc:'badge-blue'  },
-    { emoji:'🚗', cls:'ic-red',   reason:'Blocking driveway',     meta:'Sun 2:30 PM · PP-7X4K',        badge:'masked call', bc:'badge-accent' },
-    { emoji:'🔔', cls:'ic-amber', reason:'Alarm going off',       meta:'Sat 7:22 PM · PP-7X4K',        badge:'sms',         bc:'badge-blue'  },
-    { emoji:'💬', cls:'ic-green', reason:'Other message',         meta:'Fri 6:48 PM · PP-B3R8',        badge:'masked call', bc:'badge-accent' },
-  ];
-  let scanCount = 47, callCount = 31;
+// ── Load tags ─────────────────────────────────────────────
+async function loadTags() {
+  try {
+    const res  = await fetch(`/api/tags?email=${encodeURIComponent(session.email)}`);
+    const data = await res.json();
+    if (!res.ok || data.error) return;
+    userTags = data.tags || [];
+    renderStats();
+    renderOverviewTags();
+    renderTagList();
+    populateTagFilter();
+    buildChart();
+  } catch(e) { console.error('loadTags:', e); }
+}
 
-  function scanItemHTML(s, isNew) {
-    return `<div class="scan-item${isNew?' slide-in':''}">
-      <div class="scan-icon ${s.cls}">${s.emoji}</div>
-      <div class="scan-body"><div class="scan-reason">${s.reason}</div><div class="scan-meta">${s.meta}</div></div>
-      <span class="badge ${s.bc}">${s.badge}</span>
+// ── Load scans ────────────────────────────────────────────
+async function loadScans() {
+  try {
+    const res  = await fetch(`/api/scans?email=${encodeURIComponent(session.email)}&limit=200`);
+    const data = await res.json();
+    if (!res.ok || data.error) return;
+    allScans = data.scans || [];
+    renderScanFeed(allScans.slice(0,5));
+    renderActivity(allScans);
+  } catch(e) { console.error('loadScans:', e); }
+}
+
+// ── Stats ─────────────────────────────────────────────────
+function renderStats() {
+  const totalScans = allScans.length;
+  const active     = userTags.filter(t => t.active).length;
+  const total      = userTags.length;
+  document.getElementById('statScans').textContent         = totalScans;
+  document.getElementById('statScansTrend').textContent    = `Across ${total} tag${total !== 1 ? 's' : ''}`;
+  document.getElementById('statActiveTags').textContent    = active;
+  document.getElementById('statActiveTagsSub').textContent = `of ${total} registered`;
+  document.getElementById('statActiveTagsTrend').textContent = active === total && total > 0 ? 'All active ✓' : `${total - active} paused`;
+  document.getElementById('navTagCount').textContent       = `${active} tag${active !== 1 ? 's' : ''} active`;
+}
+
+// ── Overview tag sidebar ──────────────────────────────────
+function renderOverviewTags() {
+  const el = document.getElementById('overviewTagList');
+  if (userTags.length === 0) {
+    el.innerHTML = `<div style="text-align:center;padding:24px">
+      <div style="font-size:32px;margin-bottom:10px">🏷️</div>
+      <div style="font-size:13px;font-weight:500;color:var(--text);margin-bottom:6px">No tags yet</div>
+      <a href="activate.html" class="btn btn-primary" style="display:inline-block;text-decoration:none;padding:10px 20px;font-size:15px">Activate a tag →</a>
     </div>`;
+    return;
   }
+  el.innerHTML = userTags.slice(0,3).map(t => `
+    <div style="display:flex;align-items:center;gap:10px;padding:10px;background:var(--card2);border-radius:var(--radius-sm);border:1px solid var(--border);margin-bottom:8px">
+      <div style="width:36px;height:36px;background:#fff;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:18px;border:1px solid var(--border);flex-shrink:0;cursor:pointer" onclick="openQrModal('${t.tag_id}')">${vehicleEmoji(t.vehicle_type)}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-family:var(--font-m);font-size:10px;color:var(--accent)">${t.tag_id}</div>
+        <div style="font-size:12px;font-weight:500;margin-top:1px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${t.vehicle_desc || t.owner_name || 'My vehicle'}</div>
+        <div style="font-family:var(--font-m);font-size:10px;color:var(--muted)">${t.scan_count || 0} scans</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:5px">
+        <span class="status-dot ${t.active ? 'on' : 'off'}"></span>
+        <span class="status-text">${t.active ? 'Active' : 'Paused'}</span>
+      </div>
+    </div>
+  `).join('');
+}
 
-  function renderFeed() {
-    document.getElementById('scanFeed').innerHTML = scanData.slice(0,5).map((s,i) => scanItemHTML(s,i===0)).join('');
+// ── Full tag list ─────────────────────────────────────────
+function renderTagList() {
+  const el = document.getElementById('tagListFull');
+  if (userTags.length === 0) {
+    el.innerHTML = `<div style="text-align:center;padding:48px 20px">
+      <div style="font-size:40px;margin-bottom:12px">🏷️</div>
+      <div style="font-size:15px;font-weight:500;color:var(--text);margin-bottom:6px">No tags activated yet</div>
+      <div style="font-size:13px;color:var(--muted);margin-bottom:20px">Get your first Rinqr sticker and activate it below</div>
+      <a href="activate.html" class="btn btn-primary" style="display:inline-block;text-decoration:none;padding:12px 28px;font-size:16px">Activate a tag →</a>
+    </div>`;
+    return;
   }
-  function renderActivity() {
-    document.getElementById('fullActivityList').innerHTML = scanData.map(s => scanItemHTML(s,false)).join('');
-  }
-  function buildChart() {
-    const days=['M','T','W','T','F','S','S'], vals=[3,7,2,9,5,12,4], max=Math.max(...vals);
-    const el=document.getElementById('chartBars'); el.innerHTML='';
-    days.forEach((d,i) => {
-      const pct=Math.round((vals[i]/max)*100);
-      el.innerHTML+=`<div class="bar-col"><div class="bar" style="height:${pct}%;background:${i===5?'var(--accent)':'var(--border2)'}" title="${vals[i]} scans"></div><div class="bar-label">${d}</div></div>`;
+  el.innerHTML = userTags.map(t => `
+    <div class="tag-card">
+      <div class="tag-qr-box" onclick="openQrModal('${t.tag_id}')" title="Click to view/download QR">
+        <div id="mini-qr-${t.tag_id.replace(/-/g,'_')}"></div>
+      </div>
+      <div class="tag-info">
+        <div class="tag-id">${t.tag_id}</div>
+        <div class="tag-name">${t.vehicle_desc || t.owner_name || 'My vehicle'}</div>
+        <div class="tag-meta">${t.scan_count || 0} scans · activated ${timeAgo(t.created_at)}</div>
+      </div>
+      <div class="tag-status">
+        <span class="status-dot ${t.active ? 'on' : 'off'}" id="dot-${t.tag_id.replace(/-/g,'_')}"></span>
+        <span class="status-text" id="txt-${t.tag_id.replace(/-/g,'_')}">${t.active ? 'Active' : 'Paused'}</span>
+        <label class="toggle" style="margin-left:6px">
+          <input type="checkbox" ${t.active ? 'checked' : ''} onchange="toggleTag('${t.tag_id}', this)">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+    </div>
+  `).join('') + `<a href="activate.html" class="btn btn-ghost" style="display:block;text-align:center;padding:14px;text-decoration:none;margin-top:4px">＋ Activate another tag</a>`;
+
+  // Generate mini QR codes
+  userTags.forEach(t => {
+    const elId = `mini-qr-${t.tag_id.replace(/-/g,'_')}`;
+    const el   = document.getElementById(elId);
+    if (el) {
+      el.innerHTML = '';
+      new QRCode(el, {
+        text:         `https://rinqr.com/index.html?tag=${t.tag_id}`,
+        width:        48, height: 48,
+        colorDark:    '#000000', colorLight: '#ffffff',
+        correctLevel: QRCode.CorrectLevel.H,
+      });
+    }
+  });
+}
+
+// ── Toggle tag active/paused ──────────────────────────────
+async function toggleTag(tagId, checkbox) {
+  const isOn  = checkbox.checked;
+  const safeId = tagId.replace(/-/g,'_');
+
+  // Optimistic UI update
+  const dot  = document.getElementById(`dot-${safeId}`);
+  const txt  = document.getElementById(`txt-${safeId}`);
+  if (dot) dot.className = `status-dot ${isOn ? 'on' : 'off'}`;
+  if (txt) txt.textContent = isOn ? 'Active' : 'Paused';
+
+  try {
+    const res  = await fetch('/api/tags/toggle', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({ tagId, active: isOn, email: session.email }),
     });
+    const data = await res.json();
+    if (!res.ok || data.error) {
+      // Revert on failure
+      checkbox.checked = !isOn;
+      if (dot) dot.className = `status-dot ${!isOn ? 'on' : 'off'}`;
+      if (txt) txt.textContent = !isOn ? 'Active' : 'Paused';
+      showToast('Failed to update tag status');
+      return;
+    }
+    // Update local state
+    const tag = userTags.find(t => t.tag_id === tagId);
+    if (tag) tag.active = isOn ? 1 : 0;
+    renderOverviewTags();
+    renderStats();
+    showToast(isOn ? 'Tag reactivated ✓' : 'Tag paused — no scans will connect');
+  } catch {
+    showToast('Network error — try again');
+    checkbox.checked = !isOn;
   }
-  const simReasons=[
-    {emoji:'🚗',cls:'ic-red',  reason:'Blocking driveway',badge:'masked call',bc:'badge-accent'},
-    {emoji:'💡',cls:'ic-blue', reason:'Left lights on',   badge:'sms',        bc:'badge-blue' },
-    {emoji:'⚠️',cls:'ic-amber',reason:'Minor accident',   badge:'missed',     bc:'badge-amber'},
-    {emoji:'💬',cls:'ic-green',reason:'Other message',    badge:'masked call',bc:'badge-accent'},
-    {emoji:'🔔',cls:'ic-amber',reason:'Alarm going off',  badge:'sms',        bc:'badge-blue' },
-  ];
-  function simulateScan() {
-    const r=simReasons[Math.floor(Math.random()*simReasons.length)];
-    scanData.unshift({...r, meta:'Just now · PP-7X4K · live scan'});
-    scanCount++; callCount++;
-    document.getElementById('statScans').textContent=scanCount;
-    document.getElementById('statCalls').textContent=callCount;
-    renderFeed(); renderActivity();
-    showToast(`New scan on PP-7X4K — ${r.reason}`);
+}
+
+// ── QR Modal ─────────────────────────────────────────────
+function openQrModal(tagId) {
+  currentQrId = tagId;
+  const url   = `https://rinqr.com/index.html?tag=${tagId}`;
+  document.getElementById('qrModalId').textContent = tagId;
+  document.getElementById('qrModalSub').textContent = url;
+  const box = document.getElementById('qrModalBox');
+  box.innerHTML = '';
+  new QRCode(box, {
+    text: url, width: 184, height: 184,
+    colorDark: '#000000', colorLight: '#ffffff',
+    correctLevel: QRCode.CorrectLevel.H,
+  });
+  document.getElementById('qrOverlay').classList.add('open');
+}
+function closeQrModal(e) {
+  if (e && e.target !== document.getElementById('qrOverlay')) return;
+  document.getElementById('qrOverlay').classList.remove('open');
+}
+function downloadQr() {
+  const canvas = document.querySelector('#qrModalBox canvas');
+  if (!canvas) return;
+  const a = document.createElement('a');
+  a.href     = canvas.toDataURL('image/png');
+  a.download = `rinqr-${currentQrId}.png`;
+  a.click();
+}
+
+// ── Scan feed ─────────────────────────────────────────────
+function scanItemHTML(s) {
+  const reasonMap = {
+    'Blocking driveway':  { emoji:'🚗', cls:'ic-red'   },
+    'Left lights on':     { emoji:'💡', cls:'ic-blue'  },
+    'Minor accident':     { emoji:'⚠️', cls:'ic-amber' },
+    'Alarm going off':    { emoji:'🔔', cls:'ic-amber' },
+    'Wrong parking spot': { emoji:'🅿️', cls:'ic-red'   },
+    'Other message':      { emoji:'💬', cls:'ic-green' },
+  };
+  const r = reasonMap[s.reason] || { emoji:'📋', cls:'ic-blue' };
+  return `<div class="scan-item">
+    <div class="scan-icon ${r.cls}">${r.emoji}</div>
+    <div class="scan-body">
+      <div class="scan-reason">${s.reason}</div>
+      <div class="scan-meta">${timeAgo(s.created_at)} · ${s.tag_id}${s.location_city ? ' · ' + s.location_city : ''}</div>
+    </div>
+    <span class="badge badge-accent">sms</span>
+  </div>`;
+}
+
+function renderScanFeed(scans) {
+  const el = document.getElementById('scanFeed');
+  if (!scans || scans.length === 0) {
+    el.innerHTML = `<div style="padding:24px;text-align:center;color:var(--muted);font-size:13px">No scans yet — place your tag on your vehicle to start receiving alerts</div>`;
+    return;
   }
-  function showToast(msg) {
-    const t=document.getElementById('toast');
-    document.getElementById('toastMsg').textContent=msg;
-    t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),3000);
+  el.innerHTML = scans.map(s => scanItemHTML(s)).join('');
+}
+
+function renderActivity(scans) {
+  const el = document.getElementById('fullActivityList');
+  if (!scans || scans.length === 0) {
+    el.innerHTML = `<div style="padding:24px;text-align:center;color:var(--muted);font-size:13px">No scan history yet</div>`;
+    return;
   }
-  function showTab(id, el) {
-    document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
-    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
-    document.getElementById('tab-'+id).classList.add('active');
-    el.classList.add('active');
+  el.innerHTML = scans.map(s => scanItemHTML(s)).join('');
+}
+
+function populateTagFilter() {
+  const sel = document.getElementById('filterTag');
+  userTags.forEach(t => {
+    const opt = document.createElement('option');
+    opt.value = t.tag_id;
+    opt.textContent = t.tag_id + (t.vehicle_desc ? ` · ${t.vehicle_desc}` : '');
+    sel.appendChild(opt);
+  });
+}
+
+async function filterScans() {
+  const tagId  = document.getElementById('filterTag').value;
+  const limit  = document.getElementById('filterPeriod').value;
+  const params = new URLSearchParams({ email: session.email, limit });
+  if (tagId) params.set('tagId', tagId);
+  try {
+    const res  = await fetch(`/api/scans?${params}`);
+    const data = await res.json();
+    if (res.ok && !data.error) renderActivity(data.scans);
+  } catch { /* ignore */ }
+}
+
+// ── Chart ─────────────────────────────────────────────────
+function buildChart() {
+  const days = [];
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date(); d.setDate(d.getDate() - i);
+    days.push({ label: ['S','M','T','W','T','F','S'][d.getDay()], date: d.toISOString().slice(0,10), count: 0 });
   }
-  function toggleTagStatus(checkbox, idx) {
-    const card=checkbox.closest('.tag-card');
-    const dot=card.querySelector('.status-dot'), text=card.querySelector('.status-text');
-    const isOn=checkbox.checked;
-    dot.className='status-dot '+(isOn?'on':'off');
-    text.textContent=isOn?'Active':'Paused';
-    showToast(isOn?'Tag reactivated':'Tag paused — no scans will connect');
-  }
-  renderFeed(); renderActivity(); buildChart();
+  allScans.forEach(s => {
+    const date = s.created_at?.slice(0,10);
+    const day  = days.find(d => d.date === date);
+    if (day) day.count++;
+  });
+  const max = Math.max(...days.map(d => d.count), 1);
+  const el  = document.getElementById('chartBars');
+  el.innerHTML = '';
+  days.forEach((d, i) => {
+    const pct = Math.round((d.count / max) * 100);
+    el.innerHTML += `<div class="bar-col">
+      <div class="bar" style="height:${Math.max(pct,4)}%;background:${i===6?'var(--accent)':'var(--border2)'}" title="${d.count} scans"></div>
+      <div class="bar-label">${d.label}</div>
+    </div>`;
+  });
+}
+
+// ── Avatar dropdown ───────────────────────────────────────
+function toggleDropdown() { document.getElementById('avatarDropdown').classList.toggle('open'); }
+function closeDropdown()  { document.getElementById('avatarDropdown').classList.remove('open'); }
+document.addEventListener('click', e => {
+  const wrap = document.getElementById('avatarWrap');
+  if (wrap && !wrap.contains(e.target)) closeDropdown();
+});
+
+// ── Edit profile ──────────────────────────────────────────
+function openEditProfile() {
+  closeDropdown();
+  if (session?.email) document.getElementById('editEmail').value = session.email;
+  const overlay = document.getElementById('editProfileOverlay');
+  overlay.style.opacity = '1'; overlay.style.pointerEvents = 'all';
+  overlay.querySelector('.modal').style.transform = 'translateY(0)';
+}
+function closeEditProfile(e) {
+  if (e && e.target !== document.getElementById('editProfileOverlay')) return;
+  const overlay = document.getElementById('editProfileOverlay');
+  overlay.style.opacity = '0'; overlay.style.pointerEvents = 'none';
+}
+async function saveProfile() {
+  const btn      = document.getElementById('saveProfileBtn');
+  const newEmail = document.getElementById('editEmail').value.trim();
+  const phone    = document.getElementById('editPhone').value.trim();
+  if (!newEmail) return;
+  btn.textContent = 'Saving…'; btn.disabled = true;
+  try {
+    const res  = await fetch('/api/profile', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({ currentEmail: session.email, newEmail, phone }),
+    });
+    const data = await res.json();
+    if (!res.ok || data.error) { showToast(data.message || 'Update failed'); btn.textContent = 'Save changes →'; btn.disabled = false; return; }
+    // Update session
+    RinqrAuth.save({ ...session, email: data.email });
+    const initials = data.email.slice(0,2).toUpperCase();
+    ['navAvatar','settingsAvatar'].forEach(id => { document.getElementById(id).textContent = initials; });
+    ['settingsEmail','dropdownEmail'].forEach(id => { document.getElementById(id).textContent = data.email; });
+    document.getElementById('dropdownName').textContent = data.email.split('@')[0];
+    btn.textContent = 'Save changes →'; btn.disabled = false;
+    closeEditProfile();
+    showToast('Profile updated ✓');
+  } catch { btn.textContent = 'Save changes →'; btn.disabled = false; showToast('Network error'); }
+}
+
+// ── Helpers ───────────────────────────────────────────────
+function vehicleEmoji(type) {
+  return {'Car':'🚗','SUV / Truck':'🚙','Motorcycle':'🏍️','Van':'🚐','Bus':'🚌','Truck':'🚛'}[type] || '🚗';
+}
+function timeAgo(dateStr) {
+  if (!dateStr) return 'just now';
+  const diff = Math.floor((Date.now() - new Date(dateStr)) / 1000);
+  if (diff < 60)    return 'just now';
+  if (diff < 3600)  return Math.floor(diff/60) + ' min ago';
+  if (diff < 86400) return Math.floor(diff/3600) + ' hr ago';
+  if (diff < 604800) return Math.floor(diff/86400) + ' days ago';
+  return new Date(dateStr).toLocaleDateString();
+}
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  document.getElementById('toastMsg').textContent = msg;
+  t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 3000);
+}
+function showTab(id, el) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
+  el.classList.add('active');
+}
+
+loadDashboard();
 </script>
 </body>
 </html>
