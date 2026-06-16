@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rinqr — Sticker Generator</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{background:#0d0d0d;color:#e8edf2;font-family:'Plus Jakarta Sans',sans-serif;-webkit-font-smoothing:antialiased}
+:root{
+  --cyan:#00b4aa;--cyan2:#00d4c8;
+  --border:rgba(255,255,255,0.08);--border2:rgba(0,180,170,0.25);
+  --muted:rgba(232,237,242,0.5);--muted2:rgba(232,237,242,0.3);
+  --mono:'DM Mono',monospace;
+}
+
+/* NAV */
+.nav{background:rgba(13,13,13,.95);border-bottom:1px solid var(--border);padding:0 32px;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.nav-logo img{height:32px;width:auto}
+.nav-badge{font-family:var(--mono);font-size:10px;letter-spacing:2px;color:var(--cyan);background:rgba(0,180,170,.1);border:1px solid var(--border2);padding:4px 10px;border-radius:100px}
+.nav-back{font-family:var(--mono);font-size:11px;color:var(--muted);text-decoration:none;border:1px solid var(--border);padding:5px 12px;border-radius:6px}
+.nav-back:hover{border-color:var(--border2);color:var(--cyan)}
+
+/* PAGE */
+.page{max-width:1100px;margin:0 auto;padding:36px 32px 80px}
+.page-title{font-size:30px;font-weight:800;letter-spacing:-1px;margin-bottom:4px}
+.page-title span{color:var(--cyan)}
+.page-sub{font-size:13px;color:var(--muted);margin-bottom:28px;font-family:var(--mono)}
+
+/* CONTROL PANEL */
+.control-panel{background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:14px;padding:24px;margin-bottom:24px}
+.panel-label{font-family:var(--mono);font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--muted2);margin-bottom:16px}
+.controls{display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:12px;align-items:end}
+.field{display:flex;flex-direction:column;gap:7px}
+.field label{font-family:var(--mono);font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--muted2)}
+.field input,.field select{background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:8px;padding:10px 14px;color:#e8edf2;font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;outline:none;transition:border-color .15s;width:100%}
+.field input:focus,.field select:focus{border-color:var(--border2)}
+.field select option{background:#1a1a1a}
+.gen-btn{background:var(--cyan);color:#0d0d0d;font-size:14px;font-weight:700;padding:10px 22px;border-radius:8px;border:none;cursor:pointer;white-space:nowrap;font-family:'Plus Jakarta Sans',sans-serif;transition:background .15s}
+.gen-btn:hover{background:var(--cyan2)}
+.gen-btn:disabled{opacity:.4;cursor:not-allowed}
+.auth-row{margin-top:16px;padding-top:16px;border-top:1px solid var(--border);display:flex;align-items:center;gap:12px}
+.auth-row label{font-family:var(--mono);font-size:10px;letter-spacing:2px;color:var(--muted2);white-space:nowrap}
+.auth-row input{background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:8px;padding:9px 14px;color:#e8edf2;font-family:var(--mono);font-size:13px;outline:none;flex:1;transition:border-color .15s}
+.auth-row input:focus{border-color:var(--border2)}
+
+/* ALERT */
+.alert{padding:12px 16px;border-radius:9px;margin-bottom:18px;font-size:14px;display:none}
+.alert.show{display:block}
+.alert.error{background:rgba(185,28,28,.1);border:1px solid rgba(185,28,28,.3);color:#f87171}
+.alert.success{background:rgba(26,122,70,.1);border:1px solid rgba(26,122,70,.3);color:#4ade80}
+
+/* TOOLBAR */
+.toolbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px}
+.toolbar-info{font-family:var(--mono);font-size:13px;color:var(--muted)}
+.toolbar-info strong{color:var(--cyan)}
+.toolbar-btns{display:flex;gap:10px;flex-wrap:wrap}
+.tool-btn{font-family:var(--mono);font-size:11px;letter-spacing:1px;padding:8px 16px;border-radius:7px;cursor:pointer;border:1px solid var(--border);background:transparent;color:var(--muted);transition:border-color .15s,color .15s}
+.tool-btn:hover{border-color:var(--border2);color:#e8edf2}
+.tool-btn.primary{background:var(--cyan);color:#0d0d0d;border-color:var(--cyan)}
+.tool-btn.primary:hover{background:var(--cyan2)}
+.tool-btn:disabled{opacity:.4;cursor:not-allowed}
+
+/* STICKER GRID */
+.sticker-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(520px,1fr));gap:32px}
+
+/* PAIR */
+.sticker-pair{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:14px;padding:24px;display:flex;flex-direction:column;gap:16px}
+.pair-label{font-family:var(--mono);font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--cyan);margin-bottom:4px}
+.pair-sides{display:flex;gap:28px;align-items:flex-start;justify-content:center;flex-wrap:wrap}
+.side-label{font-family:var(--mono);font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted2);text-align:center;margin-bottom:10px}
+
+/* ══════════════════════════════
+   FRONT STICKER
+   Matches reference exactly:
+   white bg · thin cyan outer border
+   green frame tight around QR
+   SCAN ME on 4 sides of green frame
+   logo + text below
+   ══════════════════════════════ */
+.front-card{
+  width:220px;
+  background:#ffffff;
+  border-radius:18px;
+  border:3px solid #00b4aa;
+  padding:14px 14px 12px;
+  display:flex;flex-direction:column;align-items:center;
+  gap:10px;
+  box-shadow:0 4px 20px rgba(0,0,0,.35);
+}
+
+/* Green frame — tight around QR, SCAN ME on edges */
+.qr-frame{
+  position:relative;
+  width:156px;height:156px;
+  border:5px solid #4a7c3f;
+  border-radius:6px;
+  display:flex;align-items:center;justify-content:center;
+  background:#fff;
+  padding:0;
+}
+.scan-me{
+  position:absolute;
+  font-family:'Plus Jakarta Sans',sans-serif;
+  font-size:6px;font-weight:800;
+  letter-spacing:2.5px;color:#4a7c3f;
+  white-space:nowrap;text-transform:uppercase;
+  background:#fff;
+  padding:0 2px;
+}
+.scan-me.t{top:-8px;left:50%;transform:translateX(-50%)}
+.scan-me.b{bottom:-8px;left:50%;transform:translateX(-50%)}
+.scan-me.l{left:-8px;top:50%;transform:translateX(-50%) rotate(-90deg)}
+.scan-me.r{right:-8px;top:50%;transform:translateX(50%) rotate(90deg)}
+
+/* QR fills the frame */
+.qr-inner{width:146px;height:146px;display:flex;align-items:center;justify-content:center}
+.qr-inner canvas,.qr-inner img{width:146px!important;height:146px!important}
+
+/* Logo + tagline below frame */
+.front-bottom{display:flex;flex-direction:column;align-items:center;gap:3px}
+.front-logo{height:38px;width:auto}
+.front-text-scan{font-size:10px;font-weight:800;color:#1a1a1a;letter-spacing:.5px;text-align:center;margin-top:2px}
+.front-text-reach{font-size:10px;font-weight:800;color:#00b4aa;letter-spacing:.5px;text-align:center}
+
+/* ══════════════════════════════
+   BACK STICKER
+   white bg · thin cyan border
+   logo · thick black dividers
+   large black tag ID · green url
+   ══════════════════════════════ */
+.back-card{
+  width:220px;
+  background:#ffffff;
+  border-radius:18px;
+  border:3px solid #00b4aa;
+  padding:18px 14px;
+  display:flex;flex-direction:column;align-items:center;
+  gap:10px;
+  box-shadow:0 4px 20px rgba(0,0,0,.35);
+  min-height:220px;justify-content:center;
+}
+.back-logo{height:44px;width:auto}
+.back-divider{width:90%;height:3px;background:#1a1a1a;border-radius:2px;flex-shrink:0}
+.back-tag-id{font-family:'DM Mono',monospace;font-size:17px;font-weight:500;color:#1a1a1a;letter-spacing:2px;text-align:center;padding:2px 0}
+.back-url{font-family:'Plus Jakarta Sans',sans-serif;font-size:11px;font-weight:600;color:#2e7d32;letter-spacing:.5px;text-align:center}
+
+/* Downloads */
+.pair-actions{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.dl-btn{font-family:var(--mono);font-size:10px;letter-spacing:1px;padding:7px 14px;border-radius:6px;cursor:pointer;border:1px solid var(--border2);background:transparent;color:var(--cyan);transition:background .15s}
+.dl-btn:hover{background:rgba(0,180,170,.08)}
+
+/* EMPTY */
+.empty{text-align:center;padding:80px 20px;border:1px dashed var(--border);border-radius:14px}
+.empty-icon{font-size:48px;margin-bottom:14px;display:block}
+.empty-title{font-size:18px;font-weight:700;color:var(--muted);margin-bottom:6px}
+.empty-sub{font-size:13px;color:var(--muted2);font-family:var(--mono)}
+
+/* PRINT */
+@media print{
+  *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  body{background:#fff!important}
+  .nav,.control-panel,.toolbar,.dl-btn,.pair-actions,.no-print{display:none!important}
+  .page{padding:8px;max-width:100%}
+  .sticker-grid{grid-template-columns:repeat(2,1fr);gap:20px}
+  .sticker-pair{background:#fff!important;border:1px solid #eee!important;padding:16px}
+  .front-card,.back-card{box-shadow:none!important}
+}
+@media(max-width:700px){
+  .controls{grid-template-columns:1fr 1fr}
+  .gen-btn{grid-column:span 2}
+  .sticker-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div style="display:flex;align-items:center;gap:14px">
+    <a href="landing.html" class="nav-logo"><img src="Rinqr_logo.png" alt="Rinqr"></a>
+    <span class="nav-badge">STICKER GENERATOR</span>
+  </div>
+  <a href="admin-tags.html" class="nav-back">← Tag Generator</a>
+</nav>
+
+<div class="page">
+  <div class="page-title">Sticker <span>Generator</span></div>
+  <div class="page-sub">2-sided · Front: QR + "SCAN THE QR CODE / REACH THE DRIVER" · Back: tag ID + www.rinqr.com</div>
+
+  <div class="control-panel">
+    <div class="panel-label">Generate stickers</div>
+    <div class="controls">
+      <div class="field">
+        <label>Prefix</label>
+        <input type="text" id="prefixInput" value="PP" maxlength="4"
+          oninput="this.value=this.value.toUpperCase().replace(/[^A-Z]/g,'')">
+      </div>
+      <div class="field">
+        <label>Quantity</label>
+        <select id="countSelect">
+          <option value="3">3 stickers</option>
+          <option value="6" selected>6 stickers</option>
+          <option value="9">9 stickers</option>
+          <option value="12">12 stickers</option>
+          <option value="24">24 stickers</option>
+          <option value="48">48 stickers</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Scan URL</label>
+        <input type="text" id="baseUrl" value="https://rinqr.com/index.html">
+      </div>
+      <button class="gen-btn" id="genBtn" onclick="generateStickers()">Generate →</button>
+    </div>
+    <div class="auth-row">
+      <label>ADMIN KEY</label>
+      <input type="password" id="adminKey" placeholder="Your admin key…"
+        onkeydown="if(event.key==='Enter')generateStickers()">
+    </div>
+  </div>
+
+  <div class="alert" id="alert"></div>
+
+  <div class="toolbar" id="toolbar" style="display:none">
+    <div class="toolbar-info" id="toolbarInfo"></div>
+    <div class="toolbar-btns no-print">
+      <button class="tool-btn" onclick="copyTagIds()">📋 Copy tag IDs</button>
+      <button class="tool-btn" id="btnAllFronts" onclick="downloadAllFronts()">⬇ All fronts (PNG)</button>
+      <button class="tool-btn" id="btnAllBacks"  onclick="downloadAllBacks()">⬇ All backs (PNG)</button>
+      <button class="tool-btn primary" onclick="window.print()">🖨 Print sheet</button>
+    </div>
+  </div>
+
+  <div id="stickerGrid">
+    <div class="empty">
+      <span class="empty-icon">🏷️</span>
+      <div class="empty-title">No stickers yet</div>
+      <div class="empty-sub">Enter your admin key and click Generate →</div>
+    </div>
+  </div>
+</div>
+
+<img id="logoImg" src="Rinqr_logo.png" style="display:none" crossorigin="anonymous">
+
+<script>
+let generatedTags = [];
+let scanBaseUrl   = 'https://rinqr.com/index.html';
+
+async function generateStickers() {
+  const btn      = document.getElementById('genBtn');
+  const prefix   = document.getElementById('prefixInput').value.trim() || 'PP';
+  const count    = parseInt(document.getElementById('countSelect').value);
+  const adminKey = document.getElementById('adminKey').value.trim();
+  scanBaseUrl    = document.getElementById('baseUrl').value.trim() || 'https://rinqr.com/index.html';
+
+  if (!adminKey) { showAlert('Enter your admin key first.', 'error'); return; }
+  btn.textContent = 'Generating…'; btn.disabled = true;
+  hideAlert();
+
+  try {
+    const res  = await fetch('/api/admin/generate-tags', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json', 'x-admin-key': adminKey },
+      body:    JSON.stringify({ count, prefix }),
+    });
+    const data = await res.json();
+    if (!res.ok || data.error) { showAlert(data.error || 'Failed.', 'error'); btn.textContent='Generate →'; btn.disabled=false; return; }
+
+    generatedTags = data.tags;
+    renderStickers(data.tags);
+    showAlert(`✓ ${data.generated} stickers generated and saved.`, 'success');
+    document.getElementById('toolbar').style.display = 'flex';
+    document.getElementById('toolbarInfo').innerHTML = `<strong>${data.generated}</strong> stickers ready · 2 sides each`;
+  } catch(e) { showAlert('Network error.', 'error'); }
+  btn.textContent = 'Generate →'; btn.disabled = false;
+}
+
+function renderStickers(tags) {
+  const grid = document.getElementById('stickerGrid');
+  grid.className = 'sticker-grid';
+  grid.innerHTML = '';
+
+  tags.forEach((tagId, i) => {
+    const url  = `${scanBaseUrl}?tag=${encodeURIComponent(tagId)}`;
+    const pair = document.createElement('div');
+    pair.className = 'sticker-pair';
+    pair.innerHTML = `
+      <div class="pair-label">${tagId}</div>
+      <div class="pair-sides">
+
+        <!-- FRONT -->
+        <div>
+          <div class="side-label">Front — Scan side</div>
+          <div class="front-card" id="front-card-${i}">
+            <div class="qr-frame">
+              <span class="scan-me t">SCAN ME</span>
+              <span class="scan-me b">SCAN ME</span>
+              <span class="scan-me l">SCAN ME</span>
+              <span class="scan-me r">SCAN ME</span>
+              <div class="qr-inner" id="qr-${i}"></div>
+            </div>
+            <div class="front-bottom">
+              <img src="Rinqr_logo.png" alt="Rinqr" class="front-logo">
+              <div class="front-text-scan">SCAN THE QR CODE</div>
+              <div class="front-text-reach">REACH THE DRIVER</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="font-size:24px;color:var(--muted2);align-self:center">⟷</div>
+
+        <!-- BACK -->
+        <div>
+          <div class="side-label">Back — Info side</div>
+          <div class="back-card" id="back-card-${i}">
+            <img src="Rinqr_logo.png" alt="Rinqr" class="back-logo">
+            <div class="back-divider"></div>
+            <div class="back-tag-id">${tagId}</div>
+            <div class="back-divider"></div>
+            <div class="back-url">www.rinqr.com</div>
+          </div>
+        </div>
+
+      </div>
+      <div class="pair-actions no-print">
+        <button class="dl-btn" onclick="downloadFront(${i},'${tagId}')">⬇ Front PNG</button>
+        <button class="dl-btn" onclick="downloadBack(${i},'${tagId}')">⬇ Back PNG</button>
+        <button class="dl-btn" onclick="downloadBoth(${i},'${tagId}')">⬇ Both sides</button>
+      </div>
+    `;
+    grid.appendChild(pair);
+
+    setTimeout(() => {
+      const qrEl = document.getElementById(`qr-${i}`);
+      if (!qrEl) return;
+      qrEl.innerHTML = '';
+      new QRCode(qrEl, {
+        text: url, width: 146, height: 146,
+        colorDark: '#000000', colorLight: '#ffffff',
+        correctLevel: QRCode.CorrectLevel.H,
+      });
+    }, i * 50);
+  });
+}
+
+// ── Canvas: FRONT ─────────────────────────────────────────
+async function makeFrontCanvas(tagId, idx) {
+  const W = 660, H = 660;
+  const canvas = document.createElement('canvas');
+  canvas.width = W; canvas.height = H;
+  const ctx = canvas.getContext('2d');
+
+  // White background
+  ctx.fillStyle = '#ffffff';
+  roundFill(ctx, 0, 0, W, H, 44);
+
+  // Thin cyan outer border
+  ctx.strokeStyle = '#00b4aa';
+  ctx.lineWidth = 8;
+  ctx.beginPath(); roundPath(ctx, 4, 4, W-8, H-8, 42); ctx.stroke();
+
+  // Green QR frame — tight box
+  const frameSize = 380;
+  const frameX    = (W - frameSize) / 2;
+  const frameY    = 50;
+  const frameBW   = 14;
+  ctx.strokeStyle = '#4a7c3f';
+  ctx.lineWidth   = frameBW;
+  ctx.beginPath(); roundPath(ctx, frameX, frameY, frameSize, frameSize, 16); ctx.stroke();
+
+  // SCAN ME text on 4 edges of green frame — white bg strip so it sits on the border
+  ctx.font         = 'bold 20px "Plus Jakarta Sans", sans-serif';
+  ctx.textAlign    = 'center';
+  ctx.textBaseline = 'middle';
+  const fCx = frameX + frameSize / 2;
+  const fCy = frameY + frameSize / 2;
+
+  function drawScanMe(x, y, rotate) {
+    ctx.save();
+    ctx.translate(x, y);
+    if (rotate) ctx.rotate(rotate);
+    const tw = ctx.measureText('SCAN ME').width;
+    // white strip behind text
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(-tw/2 - 4, -12, tw + 8, 24);
+    ctx.fillStyle = '#4a7c3f';
+    ctx.fillText('SCAN ME', 0, 0);
+    ctx.restore();
+  }
+  drawScanMe(fCx,              frameY,              0);
+  drawScanMe(fCx,              frameY + frameSize,  0);
+  drawScanMe(frameX,           fCy,                 -Math.PI/2);
+  drawScanMe(frameX + frameSize, fCy,               Math.PI/2);
+
+  // QR code inside green frame
+  const qrEl     = document.getElementById(`qr-${idx}`);
+  const qrCanvas = qrEl?.querySelector('canvas');
+  if (qrCanvas) {
+    const pad = 36;
+    ctx.drawImage(qrCanvas,
+      frameX + pad, frameY + pad,
+      frameSize - pad*8, frameSize - pad*8
+    );
+  }
+
+  // Rinqr logo below frame
+  const logoImg = document.getElementById('logoImg');
+  const logoY   = frameY + frameSize + 44;
+  if (logoImg.complete && logoImg.naturalWidth > 0) {
+    const lh = 72, lw = (logoImg.naturalWidth / logoImg.naturalHeight) * lh;
+    ctx.drawImage(logoImg, (W - lw) / 2, logoY, lw, lh);
+  }
+
+  // SCAN THE QR CODE
+  ctx.fillStyle    = '#1a1a1a';
+  ctx.font         = 'bold 34px "Plus Jakarta Sans", sans-serif';
+  ctx.textAlign    = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('SCAN THE QR CODE', W / 2, logoY + 96);
+
+  // REACH THE DRIVER
+  ctx.fillStyle = '#00b4aa';
+  ctx.font      = 'bold 34px "Plus Jakarta Sans", sans-serif';
+  ctx.fillText('REACH THE DRIVER', W / 2, logoY + 140);
+
+  return canvas;
+}
+
+// ── Canvas: BACK ──────────────────────────────────────────
+async function makeBackCanvas(tagId) {
+  const W = 660, H = 660;
+  const canvas = document.createElement('canvas');
+  canvas.width = W; canvas.height = H;
+  const ctx = canvas.getContext('2d');
+
+  // White background
+  ctx.fillStyle = '#ffffff';
+  roundFill(ctx, 0, 0, W, H, 44);
+
+  // Thin cyan outer border
+  ctx.strokeStyle = '#00b4aa';
+  ctx.lineWidth = 8;
+  ctx.beginPath(); roundPath(ctx, 4, 4, W-8, H-8, 42); ctx.stroke();
+
+  // Logo
+  const logoImg = document.getElementById('logoImg');
+  if (logoImg.complete && logoImg.naturalWidth > 0) {
+    const lh = 92, lw = (logoImg.naturalWidth / logoImg.naturalHeight) * lh;
+    ctx.drawImage(logoImg, (W - lw) / 2, 56, lw, lh);
+  }
+
+  // Top thick black divider
+  ctx.fillStyle = '#1a1a1a';
+  ctx.fillRect(48, 202, W - 96, 9);
+
+  // Tag ID
+  ctx.fillStyle    = '#1a1a1a';
+  ctx.font         = 'bold 66px "DM Mono", monospace';
+  ctx.textAlign    = 'center';
+  ctx.textBaseline = 'middle';
+  const m = ctx.measureText(tagId);
+  if (m.width > W - 80) ctx.font = 'bold 50px "DM Mono", monospace';
+  ctx.fillText(tagId, W / 2, 348);
+
+  // Bottom thick black divider
+  ctx.fillStyle = '#1a1a1a';
+  ctx.fillRect(48, 466, W - 96, 9);
+
+  // www.rinqr.com
+  ctx.fillStyle    = '#2e7d32';
+  ctx.font         = 'bold 38px "Plus Jakarta Sans", sans-serif';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('www.rinqr.com', W / 2, 566);
+
+  return canvas;
+}
+
+// ── Helpers ───────────────────────────────────────────────
+function roundFill(ctx, x, y, w, h, r) {
+  ctx.beginPath(); roundPath(ctx, x, y, w, h, r); ctx.closePath(); ctx.fill();
+}
+function roundPath(ctx, x, y, w, h, r) {
+  ctx.moveTo(x+r, y);
+  ctx.lineTo(x+w-r, y);   ctx.arcTo(x+w, y,   x+w, y+r,   r);
+  ctx.lineTo(x+w, y+h-r); ctx.arcTo(x+w, y+h, x+w-r, y+h, r);
+  ctx.lineTo(x+r, y+h);   ctx.arcTo(x,   y+h, x,   y+h-r, r);
+  ctx.lineTo(x,   y+r);   ctx.arcTo(x,   y,   x+r, y,     r);
+  ctx.closePath();
+}
+function triggerDownload(canvas, filename) {
+  const a = document.createElement('a');
+  a.href = canvas.toDataURL('image/png'); a.download = filename; a.click();
+}
+
+async function downloadFront(idx, tagId) { triggerDownload(await makeFrontCanvas(tagId, idx), `rinqr-front-${tagId}.png`); }
+async function downloadBack(idx, tagId)  { triggerDownload(await makeBackCanvas(tagId), `rinqr-back-${tagId}.png`); }
+async function downloadBoth(idx, tagId) {
+  await downloadFront(idx, tagId);
+  await new Promise(r => setTimeout(r, 350));
+  await downloadBack(idx, tagId);
+}
+async function downloadAllFronts() {
+  const btn = document.getElementById('btnAllFronts');
+  btn.textContent = 'Downloading…'; btn.disabled = true;
+  for (let i = 0; i < generatedTags.length; i++) { await downloadFront(i, generatedTags[i]); await new Promise(r=>setTimeout(r,450)); }
+  btn.textContent = '⬇ All fronts (PNG)'; btn.disabled = false;
+}
+async function downloadAllBacks() {
+  const btn = document.getElementById('btnAllBacks');
+  btn.textContent = 'Downloading…'; btn.disabled = true;
+  for (let i = 0; i < generatedTags.length; i++) { await downloadBack(i, generatedTags[i]); await new Promise(r=>setTimeout(r,450)); }
+  btn.textContent = '⬇ All backs (PNG)'; btn.disabled = false;
+}
+function copyTagIds() {
+  navigator.clipboard.writeText(generatedTags.join('\n')).then(() => showAlert(`✓ ${generatedTags.length} tag IDs copied.`, 'success'));
+}
+function showAlert(msg, type) {
+  const el = document.getElementById('alert');
+  el.textContent = msg; el.className = `alert show ${type}`;
+  if (type === 'success') setTimeout(() => el.classList.remove('show'), 4000);
+}
+function hideAlert() { document.getElementById('alert').classList.remove('show'); }
+</script>
+</body>
+</html>
