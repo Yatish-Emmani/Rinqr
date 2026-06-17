@@ -1,676 +1,808 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-  <title>Rinqr — Contact Vehicle Owner</title>
-  <link rel="stylesheet" href="style.css">
-  <style>
-    body {
-      max-width: 420px;
-      margin: 0 auto;
-      padding: 32px 20px 60px;
-      min-height: 100vh;
-      background: var(--bg);
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rinqr — Anonymous Vehicle Contact</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:#0d0d0d;color:#e8edf2;font-family:'Plus Jakarta Sans',sans-serif;-webkit-font-smoothing:antialiased;overflow-x:hidden}
 
-    .page-logo { margin-bottom: 6px; }
-    .page-tagline { font-size: 13px; color: var(--muted); margin-bottom: 28px; }
+:root{
+  --cyan:#00b4aa;--cyan2:#00d4c8;
+  --bg:#0d0d0d;--bg2:#141414;--bg3:#1a1a1a;
+  --border:rgba(255,255,255,0.08);--border2:rgba(0,180,170,0.25);
+  --text:#e8edf2;--muted:rgba(232,237,242,0.5);--muted2:rgba(232,237,242,0.3);
+  --mono:'DM Mono',monospace;
+}
 
-    .step { display: none; }
-    .step.active { display: block; }
+/* ── NAV ── */
+.nav{
+  position:sticky;top:0;z-index:100;
+  background:rgba(13,13,13,0.85);backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border);
+  padding:0 48px;height:64px;
+  display:flex;align-items:center;justify-content:space-between;
+  transition:background .3s;
+}
+.nav.scrolled{background:rgba(13,13,13,0.97)}
+.nav-logo{display:flex;align-items:center;text-decoration:none}
+.nav-logo img{height:36px;width:auto}
+.nav-links{display:flex;align-items:center;gap:32px}
+.nav-link{
+  font-size:14px;font-weight:500;color:var(--muted);
+  text-decoration:none;transition:color .2s;
+  position:relative;padding-bottom:2px;
+}
+.nav-link::after{content:'';position:absolute;bottom:-2px;left:0;width:0;height:1px;background:var(--cyan);transition:width .2s}
+.nav-link:hover{color:var(--text)}
+.nav-link:hover::after,.nav-link.active::after{width:100%}
+.nav-link.active{color:var(--text)}
+.nav-cta{
+  background:var(--cyan);color:#0d0d0d;
+  font-size:14px;font-weight:700;
+  padding:9px 22px;border-radius:8px;
+  text-decoration:none;transition:background .2s,transform .15s;
+}
+.nav-cta:hover{background:var(--cyan2);transform:translateY(-1px)}
 
-    .step-title {
-      font-family: var(--font-m);
-      font-size: 10px;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      color: var(--muted);
-      margin-bottom: 12px;
-    }
-    .reason-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
-      margin-bottom: 20px;
-    }
-    .reason-btn {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 16px 12px;
-      text-align: left;
-      cursor: pointer;
-      transition: border-color .15s, background .15s;
-      color: var(--text);
-      width: 100%;
-    }
-    .reason-btn:hover { border-color: var(--border2); }
-    .reason-btn.selected {
-      border-color: var(--accent);
-      background: rgba(0, 180, 170, .06);
-    }
-    .reason-emoji { font-size: 22px; display: block; margin-bottom: 6px; }
-    .reason-text  { font-size: 13px; font-weight: 500; display: block; color: var(--text); }
+/* ── HERO ── */
+.hero{
+  min-height:100vh;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  text-align:center;padding:80px 24px 60px;
+  position:relative;overflow:hidden;
+}
+.hero-glow{
+  position:absolute;top:-200px;left:50%;transform:translateX(-50%);
+  width:900px;height:700px;
+  background:radial-gradient(ellipse at center,rgba(0,180,170,0.35) 0%,rgba(0,180,170,0.15) 30%,rgba(0,212,200,0.05) 60%,transparent 75%);
+  pointer-events:none;animation:glowPulse 4s ease-in-out infinite;
+}
+.hero-glow2{
+  position:absolute;top:-80px;left:50%;transform:translateX(-50%);
+  width:400px;height:400px;
+  background:radial-gradient(ellipse at center,rgba(0,212,200,0.25) 0%,rgba(0,180,170,0.08) 45%,transparent 70%);
+  pointer-events:none;animation:glowPulse 3s ease-in-out infinite reverse;
+}
+@keyframes glowPulse{
+  0%,100%{opacity:.7;transform:translateX(-50%) scale(1)}
+  50%{opacity:1;transform:translateX(-50%) scale(1.08)}
+}
+.hero-grid{
+  position:absolute;inset:0;
+  background-image:linear-gradient(rgba(0,180,170,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,180,170,0.03) 1px,transparent 1px);
+  background-size:60px 60px;pointer-events:none;
+}
+.hero-badge{
+  display:inline-flex;align-items:center;gap:8px;
+  background:rgba(255,255,255,0.05);border:1px solid var(--border);
+  border-radius:100px;padding:6px 16px 6px 10px;
+  font-size:13px;color:var(--muted);margin-bottom:28px;position:relative;
+}
+.hero-badge-dot{
+  width:7px;height:7px;border-radius:50%;background:var(--cyan);
+  animation:badgePulse 2s ease-in-out infinite;
+}
+@keyframes badgePulse{0%,100%{box-shadow:0 0 0 0 rgba(0,180,170,.5)}50%{box-shadow:0 0 0 6px rgba(0,180,170,0)}}
+.hero-title{
+  font-size:clamp(44px,7vw,84px);font-weight:900;
+  line-height:1.02;letter-spacing:-3px;
+  margin-bottom:22px;position:relative;
+}
+.hero-title .accent{color:var(--cyan)}
+.hero-title .dim{color:rgba(232,237,242,0.35)}
+.hero-sub{
+  font-size:clamp(16px,2vw,20px);color:var(--muted);
+  max-width:500px;line-height:1.65;margin-bottom:40px;position:relative;
+}
+.hero-sub strong{color:var(--text);font-weight:600}
 
-    .phone-wrap {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 18px;
-      margin-bottom: 14px;
-    }
-    .phone-label {
-      font-family: var(--font-m);
-      font-size: 10px;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      color: var(--muted);
-      margin-bottom: 10px;
-      display: block;
-    }
-    #phoneInput {
-      background: transparent;
-      border: none;
-      padding: 0;
-      font-size: 22px;
-      font-family: var(--font-m);
-      letter-spacing: 2px;
-      color: var(--text);
-      border-radius: 0;
-    }
-    #phoneInput:focus { border: none; outline: none; }
-    #phoneInput::placeholder { color: var(--border2); }
+/* ── SCANNER DEMO WIDGET ── */
+.demo-widget{
+  background:rgba(255,255,255,0.04);border:1px solid var(--border);
+  border-radius:14px;max-width:560px;width:100%;
+  margin:0 auto 36px;position:relative;overflow:hidden;
+}
+.demo-widget-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:12px 16px;border-bottom:1px solid var(--border);
+  background:rgba(255,255,255,0.03);
+}
+.demo-widget-title{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:500;color:var(--muted);font-family:var(--mono)}
+.demo-widget-title .dw-icon{color:var(--cyan)}
+.demo-status{font-family:var(--mono);font-size:11px;color:var(--cyan);background:rgba(0,180,170,.1);border:1px solid var(--border2);padding:3px 10px;border-radius:100px}
+.demo-widget-body{padding:20px 16px}
+.demo-reasons{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+.demo-reason{
+  background:rgba(255,255,255,0.04);border:1px solid var(--border);
+  border-radius:8px;padding:10px 12px;font-size:13px;color:var(--muted);
+  cursor:pointer;transition:border-color .15s,background .15s,color .15s;
+  text-align:left;display:flex;align-items:center;gap:8px;
+}
+.demo-reason:hover{border-color:var(--border2);background:rgba(0,180,170,.05);color:var(--text)}
+.demo-reason.sel{border-color:var(--cyan);background:rgba(0,180,170,.10);color:var(--cyan2)}
+.demo-phone-row{
+  display:flex;align-items:center;gap:10px;
+  background:rgba(255,255,255,0.04);border:1px solid var(--border);
+  border-radius:8px;padding:10px 14px;margin-bottom:12px;
+}
+.demo-phone-row input{
+  flex:1;background:transparent;border:none;outline:none;
+  font-size:15px;color:var(--text);font-family:var(--mono);letter-spacing:1px;
+}
+.demo-phone-row input::placeholder{color:var(--muted2)}
+.demo-send-btn{
+  background:var(--cyan);color:#0d0d0d;border:none;border-radius:7px;
+  width:34px;height:34px;display:flex;align-items:center;justify-content:center;
+  cursor:pointer;font-size:16px;transition:background .15s,transform .1s;flex-shrink:0;
+}
+.demo-send-btn:hover{background:var(--cyan2);transform:scale(1.05)}
+.demo-privacy{font-size:11px;color:var(--muted2);font-family:var(--mono);text-align:center}
+.demo-success{display:none;text-align:center;padding:20px;animation:fadeIn .4s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.demo-success .ds-icon{font-size:36px;margin-bottom:10px;display:block}
+.demo-success .ds-title{font-size:15px;font-weight:600;color:var(--cyan2);margin-bottom:4px}
+.demo-success .ds-sub{font-size:12px;color:var(--muted);font-family:var(--mono)}
 
-    .selected-reason-chip {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      background: rgba(0, 180, 170, .10);
-      border: 1px solid rgba(0, 180, 170, .25);
-      border-radius: 5px;
-      padding: 5px 12px;
-      font-size: 12px;
-      color: var(--accent);
-      margin-bottom: 16px;
-      cursor: pointer;
-    }
+.hero-cta-row{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;position:relative}
+.btn-primary-hero{
+  background:var(--cyan);color:#0d0d0d;font-size:16px;font-weight:700;
+  padding:14px 32px;border-radius:9px;text-decoration:none;
+  transition:background .2s,transform .15s,box-shadow .2s;
+}
+.btn-primary-hero:hover{background:var(--cyan2);transform:translateY(-2px);box-shadow:0 8px 32px rgba(0,180,170,.3)}
+.btn-ghost-hero{
+  background:transparent;color:var(--muted);font-size:16px;font-weight:500;
+  padding:14px 32px;border-radius:9px;text-decoration:none;
+  border:1px solid var(--border);transition:border-color .2s,color .2s,transform .15s;
+}
+.btn-ghost-hero:hover{border-color:var(--border2);color:var(--text);transform:translateY(-2px)}
 
-    .connecting-card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 36px 20px;
-      text-align: center;
-      margin-bottom: 16px;
-    }
-    .connecting-title {
-      font-family: var(--font-d);
-      font-size: 24px;
-      letter-spacing: 2px;
-      margin: 16px 0 6px;
-      color: var(--text);
-    }
-    .connecting-sub { font-family: var(--font-m); font-size: 11px; color: var(--muted); }
-    .connecting-privacy {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      font-family: var(--font-m);
-      font-size: 11px;
-      color: var(--green);
-      margin-top: 16px;
-    }
+/* ── STATS BAR ── */
+.stats-bar{
+  border-top:1px solid var(--border);border-bottom:1px solid var(--border);
+  background:rgba(255,255,255,.02);padding:36px 48px;
+  display:grid;grid-template-columns:repeat(4,1fr);gap:24px;text-align:center;
+}
+.stat-val{font-size:36px;font-weight:800;color:var(--text);letter-spacing:-1px;margin-bottom:4px}
+.stat-val span{color:var(--cyan)}
+.stat-label{font-size:13px;color:var(--muted);font-family:var(--mono)}
 
-    .success-card {
-      background: var(--card);
-      border: 1px solid rgba(26,122,70,.25);
-      border-radius: var(--radius);
-      padding: 36px 20px;
-      text-align: center;
-      margin-bottom: 16px;
-    }
-    .success-icon-wrap {
-      width: 56px; height: 56px;
-      border-radius: 50%;
-      background: rgba(26,122,70,.10);
-      border: 1px solid rgba(26,122,70,.25);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 24px;
-      margin: 0 auto 16px;
-      color: var(--green);
-    }
-    .success-title {
-      font-family: var(--font-d);
-      font-size: 28px;
-      letter-spacing: 2px;
-      color: var(--green);
-      margin-bottom: 6px;
-    }
-    .success-sub { font-size: 13px; color: var(--muted); }
-    .relay-number {
-      font-family: var(--font-m);
-      font-size: 13px;
-      color: var(--accent);
-      background: rgba(0, 180, 170, .08);
-      border: 1px solid rgba(0, 180, 170, .25);
-      padding: 8px 16px;
-      border-radius: 5px;
-      display: inline-block;
-      margin-top: 12px;
-    }
+/* ── SECTIONS ── */
+.section{padding:96px 48px;max-width:1140px;margin:0 auto}
+.section-eyebrow{
+  font-family:var(--mono);font-size:11px;letter-spacing:3px;
+  text-transform:uppercase;color:var(--cyan);margin-bottom:14px;
+  display:flex;align-items:center;gap:10px;
+}
+.section-eyebrow::before{content:'';width:24px;height:1px;background:var(--cyan);opacity:.5}
+.section-title{
+  font-size:clamp(32px,4vw,52px);font-weight:800;letter-spacing:-2px;
+  line-height:1.05;margin-bottom:16px;color:var(--text);
+}
+.section-title .accent{color:var(--cyan)}
+.section-sub{font-size:16px;color:var(--muted);max-width:480px;line-height:1.7;margin-bottom:52px}
+.full-divider{border:none;border-top:1px solid var(--border);margin:0}
 
-    .privacy-breakdown {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 16px;
-    }
-    .pb-title {
-      font-family: var(--font-m);
-      font-size: 10px;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      color: var(--muted);
-      margin-bottom: 12px;
-    }
-    .pb-row {
-      display: flex;
-      align-items: flex-start;
-      gap: 10px;
-      padding: 6px 0;
-      font-size: 12px;
-      border-bottom: 1px solid var(--border);
-      color: var(--text);
-    }
-    .pb-row:last-child { border-bottom: none; }
-    .pb-check { color: var(--green); flex-shrink: 0; font-weight: 500; }
+/* ── HOW IT WORKS ── */
+.how-layout{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:start}
+.how-steps{display:flex;flex-direction:column}
+.how-step{
+  display:flex;gap:20px;padding:24px 0;
+  border-bottom:1px solid var(--border);cursor:pointer;transition:all .2s;
+}
+.how-step:last-child{border-bottom:none}
+.how-step-num{font-family:var(--mono);font-size:12px;letter-spacing:1px;color:var(--muted2);min-width:28px;padding-top:3px;transition:color .2s}
+.how-step-content{flex:1}
+.how-step-title{font-size:17px;font-weight:600;color:var(--muted);transition:color .2s}
+.how-step-desc{font-size:14px;color:var(--muted2);line-height:1.65;max-height:0;overflow:hidden;transition:max-height .3s ease,opacity .3s,margin .3s;opacity:0;margin-top:0}
+.how-step.active .how-step-num{color:var(--cyan)}
+.how-step.active .how-step-title{color:var(--text)}
+.how-step.active .how-step-desc{max-height:100px;opacity:1;margin-top:8px}
+.how-step-arrow{color:var(--muted2);transition:color .2s,transform .2s;font-size:18px;padding-top:2px}
+.how-step.active .how-step-arrow{color:var(--cyan);transform:rotate(90deg)}
+.how-visual{
+  position:sticky;top:100px;
+  background:rgba(255,255,255,0.03);border:1px solid var(--border);
+  border-radius:16px;padding:32px;min-height:360px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;overflow:hidden;
+}
+.how-visual-glow{position:absolute;width:200px;height:200px;background:radial-gradient(circle,rgba(0,180,170,0.15) 0%,transparent 70%);border-radius:50%;pointer-events:none}
+.how-visual-content{animation:fadeIn .4s ease}
+.how-visual-icon{font-size:56px;margin-bottom:18px;display:block}
+.how-visual-title{font-size:20px;font-weight:700;color:var(--text);margin-bottom:8px}
+.how-visual-desc{font-size:14px;color:var(--muted);line-height:1.65}
 
-    .step-indicator { display: flex; gap: 6px; margin-bottom: 24px; }
-    .step-dot {
-      height: 3px;
-      border-radius: 2px;
-      background: var(--border2);
-      flex: 1;
-      transition: background .3s;
-    }
-    .step-dot.done   { background: var(--green);  }
-    .step-dot.active { background: var(--accent); }
+/* ── BENTO ── */
+.bento-grid{display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:auto auto;gap:14px}
+.bento-card{
+  background:rgba(255,255,255,0.03);border:1px solid var(--border);
+  border-radius:14px;padding:28px;transition:border-color .25s,background .25s;
+  position:relative;overflow:hidden;
+}
+.bento-card:hover{border-color:var(--border2);background:rgba(0,180,170,.04)}
+.bento-card.featured{grid-column:span 2;border-color:rgba(0,180,170,.2);background:rgba(0,180,170,.05)}
+.bento-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--cyan),var(--cyan2));opacity:0;transition:opacity .25s}
+.bento-card:hover::before,.bento-card.featured::before{opacity:1}
+.bento-icon{font-size:28px;margin-bottom:14px;display:block}
+.bento-title{font-size:17px;font-weight:700;color:var(--text);margin-bottom:8px}
+.bento-desc{font-size:14px;color:var(--muted);line-height:1.65}
+.bento-tag{display:inline-block;font-family:var(--mono);font-size:10px;letter-spacing:1px;padding:4px 10px;border-radius:100px;margin-top:12px;background:rgba(0,180,170,.12);color:var(--cyan2);border:1px solid var(--border2);text-transform:uppercase}
 
-    .back-link {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      font-family: var(--font-m);
-      font-size: 11px;
-      color: var(--muted);
-      cursor: pointer;
-      margin-bottom: 20px;
-      background: none;
-      border: none;
-      padding: 0;
-    }
-    .back-link:hover { color: var(--accent); }
+/* ── TESTIMONIALS ── */
+.testimonials-section{background:rgba(255,255,255,.015)}
+.testi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.testi-card{background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:14px;padding:24px;transition:border-color .2s,transform .2s}
+.testi-card:hover{border-color:var(--border2);transform:translateY(-3px)}
+.testi-stars{color:var(--cyan);font-size:14px;letter-spacing:2px;margin-bottom:14px}
+.testi-text{font-size:14px;color:var(--muted);line-height:1.7;margin-bottom:18px;font-style:italic}
+.testi-author{display:flex;align-items:center;gap:10px}
+.testi-avatar{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--cyan),#006b66);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;color:#fff;flex-shrink:0}
+.testi-name{font-size:14px;font-weight:600;color:var(--text)}
+.testi-role{font-size:12px;color:var(--muted2);font-family:var(--mono)}
 
-    /* Message step */
-    .message-wrap {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 18px;
-      margin-bottom: 14px;
-    }
-    .message-label {
-      font-family: var(--font-m);
-      font-size: 10px;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      color: var(--muted);
-      margin-bottom: 10px;
-      display: block;
-    }
-    #messageInput {
-      background: transparent;
-      border: none;
-      padding: 0;
-      font-size: 15px;
-      color: var(--text);
-      border-radius: 0;
-      resize: none;
-      width: 100%;
-      min-height: 80px;
-      font-family: inherit;
-      line-height: 1.5;
-    }
-    #messageInput:focus { border: none; outline: none; }
-    #messageInput::placeholder { color: var(--border2); }
-    .char-count {
-      font-size: 11px;
-      color: var(--muted);
-      text-align: right;
-      margin-top: 6px;
-    }
-    .char-count.warn { color: var(--accent); }
+/* ── PRICING ── */
+.pricing-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.price-card{background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:14px;overflow:hidden;display:flex;flex-direction:column;transition:border-color .25s,transform .25s}
+.price-card:hover{transform:translateY(-4px);border-color:rgba(255,255,255,.15)}
+.price-card.featured{border-color:var(--cyan);position:relative}
+.price-card.featured::before{content:'MOST POPULAR';position:absolute;top:0;left:0;right:0;background:var(--cyan);color:#0d0d0d;font-family:var(--mono);font-size:10px;letter-spacing:2px;text-align:center;padding:6px;font-weight:600}
+.price-head{padding:24px 20px 18px;border-bottom:1px solid var(--border);background:rgba(255,255,255,.02)}
+.price-card.featured .price-head{padding-top:38px}
+.price-name{font-family:var(--mono);font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--muted2);margin-bottom:10px}
+.price-amount{font-size:42px;font-weight:800;letter-spacing:-1px;color:var(--text);line-height:1}
+.price-amount sup{font-size:20px;vertical-align:top;margin-top:8px;display:inline-block}
+.price-amount sub{font-size:13px;color:var(--muted);font-weight:400;letter-spacing:0}
+.price-save{font-family:var(--mono);font-size:10px;color:#1a9e7a;margin-top:5px}
+.price-desc{font-size:12px;color:var(--muted2);margin-top:6px}
+.price-body{padding:20px;flex:1;display:flex;flex-direction:column}
+.price-features{list-style:none;display:flex;flex-direction:column;gap:9px;margin-bottom:20px;flex:1}
+.price-features li{display:flex;gap:8px;align-items:flex-start;font-size:13px;color:var(--muted)}
+.pf-check{color:var(--cyan);flex-shrink:0}
+.pf-x{color:rgba(232,237,242,.2);flex-shrink:0}
+.price-btn{display:block;width:100%;padding:12px;border-radius:8px;text-align:center;font-size:14px;font-weight:600;text-decoration:none;transition:opacity .15s,transform .1s;border:none;cursor:pointer}
+.price-btn:hover{opacity:.88;transform:translateY(-1px)}
+.price-btn.primary{background:var(--cyan);color:#0d0d0d}
+.price-btn.secondary{background:rgba(255,255,255,.06);color:var(--muted);border:1px solid var(--border)}
 
-    /* Demo banner */
-    .demo-banner {
-      background: rgba(0, 180, 170, .08);
-      border: 1px solid rgba(0, 180, 170, .25);
-      border-radius: var(--radius-sm);
-      padding: 8px 12px;
-      font-size: 12px;
-      color: var(--accent);
-      margin-bottom: 16px;
-      text-align: center;
-    }
+/* ── FAQ ── */
+.faq-list{display:flex;flex-direction:column;max-width:760px;margin:0 auto}
+.faq-item{border-bottom:1px solid var(--border);overflow:hidden}
+.faq-item:first-child{border-top:1px solid var(--border)}
+.faq-q{width:100%;text-align:left;background:none;border:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;padding:20px 0;font-size:16px;font-weight:500;color:var(--text);gap:16px;transition:color .15s;font-family:'Plus Jakarta Sans',sans-serif}
+.faq-q:hover{color:var(--cyan)}
+.faq-plus{width:28px;height:28px;border-radius:7px;background:rgba(255,255,255,.06);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:18px;color:var(--muted);flex-shrink:0;transition:background .15s,color .15s,transform .25s}
+.faq-item.open .faq-plus{background:rgba(0,180,170,.12);color:var(--cyan);transform:rotate(45deg);border-color:var(--border2)}
+.faq-a{font-size:14px;color:var(--muted);line-height:1.7;max-height:0;overflow:hidden;transition:max-height .35s ease,padding .35s;padding-bottom:0}
+.faq-item.open .faq-a{max-height:200px;padding-bottom:20px}
 
-    .page-footer { margin-top: 32px; text-align: center; }
-    .powered-by { font-family: var(--font-m); font-size: 10px; letter-spacing: 1px; color: var(--muted2); }
-    .powered-by span { color: var(--accent); }
-  </style>
+/* ── FOOTER ── */
+footer{background:#0d0d0d;border-top:1px solid var(--border)}
+.footer-top{max-width:1140px;margin:0 auto;padding:72px 48px 48px;display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:60px;border-bottom:1px solid var(--border)}
+.footer-logo{display:inline-flex;align-items:center;text-decoration:none;margin-bottom:20px}
+.footer-logo img{height:90px;width:auto}
+.footer-tagline{font-size:15px;font-weight:700;color:var(--text);margin-bottom:6px;letter-spacing:-0.3px}
+.footer-sub{font-size:14px;color:var(--muted);line-height:1.65;margin-bottom:20px}
+.footer-checklist{display:flex;flex-direction:column;gap:8px}
+.footer-checklist span{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted)}
+.footer-checklist .ck{color:var(--cyan)}
+.footer-col-label{font-family:var(--mono);font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--muted2);margin-bottom:20px}
+.footer-col-links{display:flex;flex-direction:column;gap:14px}
+.footer-col-link{font-size:15px;color:var(--muted);text-decoration:none;transition:color .15s}
+.footer-col-link:hover{color:var(--text)}
+.footer-bottom{max-width:1140px;margin:0 auto;padding:24px 48px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.footer-note{font-family:var(--mono);font-size:11px;color:rgba(232,237,242,.2)}
+.footer-bottom-links{display:flex;gap:24px;flex-wrap:wrap}
+.footer-bottom-link{font-family:var(--mono);font-size:11px;letter-spacing:1px;text-transform:uppercase;color:rgba(232,237,242,.3);text-decoration:none;transition:color .15s}
+.footer-bottom-link:hover{color:var(--cyan)}
+
+/* ── SCROLL REVEAL ── */
+.reveal{opacity:0;transform:translateY(28px);transition:opacity .6s ease,transform .6s ease}
+.reveal.visible{opacity:1;transform:translateY(0)}
+.reveal-delay-1{transition-delay:.1s}
+.reveal-delay-2{transition-delay:.2s}
+.reveal-delay-3{transition-delay:.3s}
+.reveal-delay-4{transition-delay:.4s}
+
+/* ── RESPONSIVE ── */
+@media(max-width:900px){
+  .pricing-grid{grid-template-columns:repeat(2,1fr)}
+  .how-layout{grid-template-columns:1fr}
+  .how-visual{display:none}
+  .stats-bar{grid-template-columns:repeat(2,1fr)}
+  .testi-grid{grid-template-columns:1fr}
+  .bento-grid{grid-template-columns:1fr}
+  .bento-card.featured{grid-column:span 1}
+  .footer-top{grid-template-columns:1fr;gap:40px;padding:48px 20px}
+  .footer-bottom{padding:20px;flex-direction:column;align-items:flex-start}
+}
+@media(max-width:600px){
+  .nav{padding:0 20px}
+  .nav-links{display:none}
+  .section{padding:60px 20px}
+  .stats-bar{padding:32px 20px;grid-template-columns:1fr 1fr}
+  .pricing-grid{grid-template-columns:1fr}
+}
+</style>
 </head>
 <body>
 
-  <a href="landing.html" class="logo-mark page-logo">
-    <img src="Rinqr_logo.png" alt="Rinqr" class="logo-img">
+<nav class="nav" id="mainNav">
+  <!-- LEFT: Logo -->
+  <a href="index.html" class="nav-logo">
+    <img src="Rinqr_logo.png" alt="Rinqr">
   </a>
-  <p class="page-tagline">Reach this vehicle's owner — privately</p>
 
-  <div id="demoBanner" class="demo-banner" style="display:none">
-    ⚠️ Demo mode — no tag ID in URL. Real scans use <code>?tag=PP-XXXX-XXXX</code>
+  <!-- CENTER: Links -->
+  <div class="nav-links">
+    <a href="#how"      class="nav-link" data-section="how">How It Works</a>
+    <a href="#features" class="nav-link" data-section="features">Features</a>
+    <a href="#pricing"  class="nav-link" data-section="pricing">Pricing</a>
+    <a href="#business" class="nav-link" data-section="business">For Business</a>
   </div>
 
-  <div class="step-indicator" id="stepIndicator">
-    <div class="step-dot active" id="dot0"></div>
-    <div class="step-dot" id="dot1"></div>
-    <div class="step-dot" id="dot2"></div>
-    <div class="step-dot" id="dot3"></div>
-    <div class="step-dot" id="dot4"></div>
+  <!-- RIGHT: Buttons -->
+  <div style="display:flex;align-items:center;gap:10px">
+    <a href="signin.html" class="nav-link">Sign In</a>
+    <a href="signin.html?tab=signup" class="nav-cta">Get Your Tag</a>
+  </div>
+</nav>
+
+
+<!-- HERO -->
+<section class="hero" id="hero">
+  <div class="hero-glow"></div>
+  <div class="hero-glow2"></div>
+  <div class="hero-grid"></div>
+
+  <div class="hero-badge reveal">
+    <span class="hero-badge-dot"></span>
+    Privacy-first · No app required for scanners
   </div>
 
-  <!-- STEP 0: ERROR STATE -->
-  <div class="step" id="step0">
-    <div class="success-card" style="border-color:rgba(0, 180, 170, .30);background:rgba(0, 180, 170, .03)">
-      <div class="success-icon-wrap" style="background:rgba(0, 180, 170, .12);border-color:rgba(0, 180, 170, .30);color:var(--accent)">✕</div>
-      <div class="success-title" style="color:var(--accent)">TAG INACTIVE</div>
-      <div class="success-sub">This tag has been deactivated by its owner. If you need to reach this vehicle, leave a note on the windshield.</div>
+  <h1 class="hero-title reveal reveal-delay-1">
+    Someone needs to<br>
+    reach <span class="accent">your car.</span><br>
+    <span class="dim">Not your number.</span>
+  </h1>
+
+  <p class="hero-sub reveal reveal-delay-2">
+    Rinqr lets anyone contact you when your car needs attention —
+    <strong>without ever seeing your phone number.</strong>
+    One scan. Instant masked connection.
+  </p>
+
+  <div class="demo-widget reveal reveal-delay-3" id="demoWidget">
+    <div class="demo-widget-header">
+      <div class="demo-widget-title">
+        <span class="dw-icon">🔒</span> Scanner view — what they see
+      </div>
+      <div class="demo-status">Live demo</div>
     </div>
-    <div class="privacy-breakdown" style="margin-top:14px">
-      <div class="pb-title">What this means</div>
-      <div class="pb-row"><span class="pb-check" style="color:var(--accent)">✕</span><span>Owner has paused this tag</span></div>
-      <div class="pb-row"><span class="pb-check" style="color:var(--accent)">✕</span><span>No calls or messages can be sent</span></div>
-      <div class="pb-row"><span class="pb-check">✓</span><span>Tag can be reactivated by the owner at any time</span></div>
+    <div class="demo-widget-body" id="demoBody">
+      <div class="demo-reasons">
+        <button class="demo-reason" onclick="selectReason(this,'🚗','Blocking driveway')">🚗 Blocking driveway</button>
+        <button class="demo-reason" onclick="selectReason(this,'💡','Left lights on')">💡 Left lights on</button>
+        <button class="demo-reason" onclick="selectReason(this,'⚠️','Minor accident')">⚠️ Minor accident</button>
+        <button class="demo-reason" onclick="selectReason(this,'🔔','Alarm going off')">🔔 Alarm going off</button>
+      </div>
+      <div class="demo-phone-row">
+        <input type="tel" id="demoPhone" placeholder="(555) 000-0000" maxlength="14"
+          oninput="let v=this.value.replace(/\D/g,'').slice(0,10);if(v.length>=7)v='('+v.slice(0,3)+') '+v.slice(3,6)+'-'+v.slice(6);else if(v.length>=4)v='('+v.slice(0,3)+') '+v.slice(3);else if(v.length)v='('+v;this.value=v;">
+        <button class="demo-send-btn" onclick="sendDemo()">→</button>
+      </div>
+      <div class="demo-privacy">🔒 Your number is never shared with the vehicle owner</div>
     </div>
-    <button class="btn btn-secondary mt-16" onclick="showActiveFlow()">← Try another tag</button>
+    <div class="demo-success" id="demoSuccess">
+      <span class="ds-icon">✅</span>
+      <div class="ds-title">Message sent anonymously</div>
+      <div class="ds-sub">Owner notified via SMS · Neither number revealed · 0 exposures</div>
+    </div>
   </div>
 
-  <!-- STEP 1: REASON -->
-  <div class="step active" id="step1">
-    <p class="step-title">Why are you reaching out?</p>
-    <div class="reason-grid">
-      <button class="reason-btn" onclick="selectReason(this, '🚗', 'Blocking driveway')">
-        <span class="reason-emoji">🚗</span>
-        <span class="reason-text">Blocking driveway</span>
-      </button>
-      <button class="reason-btn" onclick="selectReason(this, '💡', 'Left lights on')">
-        <span class="reason-emoji">💡</span>
-        <span class="reason-text">Left lights on</span>
-      </button>
-      <button class="reason-btn" onclick="selectReason(this, '⚠️', 'Minor accident')">
-        <span class="reason-emoji">⚠️</span>
-        <span class="reason-text">Minor accident</span>
-      </button>
-      <button class="reason-btn" onclick="selectReason(this, '🔔', 'Alarm going off')">
-        <span class="reason-emoji">🔔</span>
-        <span class="reason-text">Alarm going off</span>
-      </button>
-      <button class="reason-btn" onclick="selectReason(this, '🅿️', 'Wrong parking spot')">
-        <span class="reason-emoji">🅿️</span>
-        <span class="reason-text">Wrong parking spot</span>
-      </button>
-      <button class="reason-btn" onclick="selectReason(this, '💬', 'Other message')">
-        <span class="reason-emoji">💬</span>
-        <span class="reason-text">Other message</span>
-      </button>
-    </div>
-    <button class="btn btn-primary" id="reasonNextBtn" disabled onclick="goStep(2)">
-      Continue →
-    </button>
+  <div class="hero-cta-row reveal reveal-delay-4">
+    <a href="signin.html?tab=signup" class="btn-primary-hero">Get your tag — $9.99</a>
+    <a href="scan.html" class="btn-ghost-hero">See scanner demo</a>
   </div>
+</section>
 
-  <!-- STEP 2: MESSAGE (new) -->
-  <div class="step" id="step2">
-    <button class="back-link" onclick="goStep(1)">← Back</button>
+<!-- STATS BAR -->
+<div class="stats-bar">
+  <div class="reveal"><div class="stat-val">100<span>%</span></div><div class="stat-label">Privacy guaranteed</div></div>
+  <div class="reveal reveal-delay-1"><div class="stat-val">0</div><div class="stat-label">Apps to install</div></div>
+  <div class="reveal reveal-delay-2"><div class="stat-val">60<span>s</span></div><div class="stat-label">To activate</div></div>
+  <div class="reveal reveal-delay-3"><div class="stat-val"><span>∞</span></div><div class="stat-label">Scans included</div></div>
+</div>
 
-    <div class="selected-reason-chip" id="selectedChip2" onclick="goStep(1)">
-      <span id="chipEmoji2">🚗</span>
-      <span id="chipText2">Blocking driveway</span>
-      <span style="color:var(--muted)">· change</span>
+<hr class="full-divider">
+
+<!-- HOW IT WORKS -->
+<div id="how">
+<div class="section">
+  <div class="section-eyebrow reveal">How it works</div>
+  <h2 class="section-title reveal">Four steps.<br><span class="accent">Zero awkward.</span></h2>
+  <p class="section-sub reveal">From sticker to solved in under 60 seconds. No apps. No accounts for the scanner.</p>
+  <div class="how-layout">
+    <div class="how-steps">
+      <div class="how-step active" onclick="setHowStep(0,this)">
+        <div class="how-step-num">01</div>
+        <div class="how-step-content">
+          <div class="how-step-title">Buy &amp; activate your tag</div>
+          <div class="how-step-desc">Order online, activate in 60 seconds. Enter your phone number — it's encrypted immediately and never shown to anyone.</div>
+        </div>
+        <div class="how-step-arrow">›</div>
+      </div>
+      <div class="how-step" onclick="setHowStep(1,this)">
+        <div class="how-step-num">02</div>
+        <div class="how-step-content">
+          <div class="how-step-title">Stick it on your vehicle</div>
+          <div class="how-step-desc">Weatherproof BOPP vinyl. UV-resistant, car-wash safe. QR error correction level H — still scans even if 30% is damaged.</div>
+        </div>
+        <div class="how-step-arrow">›</div>
+      </div>
+      <div class="how-step" onclick="setHowStep(2,this)">
+        <div class="how-step-num">03</div>
+        <div class="how-step-content">
+          <div class="how-step-title">Someone scans your tag</div>
+          <div class="how-step-desc">Any smartphone camera works — no app install, no account, no friction. They pick a reason and enter their number.</div>
+        </div>
+        <div class="how-step-arrow">›</div>
+      </div>
+      <div class="how-step" onclick="setHowStep(3,this)">
+        <div class="how-step-num">04</div>
+        <div class="how-step-content">
+          <div class="how-step-title">You connect anonymously</div>
+          <div class="how-step-desc">Twilio relay bridges the connection. You get an SMS with the reason. Neither side ever sees the other's real number — ever.</div>
+        </div>
+        <div class="how-step-arrow">›</div>
+      </div>
     </div>
-
-    <div class="message-wrap">
-      <label class="message-label" for="messageInput">Add a message <span style="color:var(--muted2)">(optional)</span></label>
-      <textarea
-        id="messageInput"
-        placeholder="E.g. You're blocking spot 14, can you move ASAP?"
-        maxlength="160"
-        oninput="updateCharCount()"
-      ></textarea>
-      <div class="char-count" id="charCount">160 characters remaining</div>
-    </div>
-
-    <div class="privacy-note mb-16">
-      🔒 Your message is sent anonymously — the owner won't see your number
-    </div>
-
-    <button class="btn btn-primary" onclick="goStep(3)">
-      Continue →
-    </button>
-    <button class="btn btn-secondary mt-8" onclick="skipMessage()">
-      Skip — send without a message
-    </button>
-  </div>
-
-  <!-- STEP 3: PHONE -->
-  <div class="step" id="step3">
-    <button class="back-link" onclick="goStep(2)">← Back</button>
-
-    <div class="selected-reason-chip" id="selectedChip" onclick="goStep(1)">
-      <span id="chipEmoji">🚗</span>
-      <span id="chipText">Blocking driveway</span>
-      <span style="color:var(--muted)">· change</span>
-    </div>
-
-    <div class="phone-wrap">
-      <label class="phone-label" for="phoneInput">Your phone number</label>
-      <input
-        type="tel"
-        id="phoneInput"
-        placeholder="(555) 000-0000"
-        maxlength="14"
-        autocomplete="tel"
-        oninput="formatPhone(this); checkPhoneReady()"
-      >
-    </div>
-
-    <div class="privacy-note mb-16">
-      🔒 Your number is never shared with the vehicle owner
-    </div>
-
-    <button class="btn btn-primary" id="phoneNextBtn" disabled onclick="sendSMS()">
-      Send message anonymously →
-    </button>
-
-    <p class="tcpa mt-8">
-      By continuing you consent to receive an anonymous SMS reply from the vehicle owner. Standard rates may apply.
-    </p>
-  </div>
-
-  <!-- STEP 4: SENDING -->
-  <div class="step" id="step4">
-    <button class="back-link" onclick="goStep(3)" id="cancelBtn">← Cancel</button>
-    <div class="connecting-card">
-      <div class="spinner" id="connectSpinner"></div>
-      <div class="connecting-title" id="connectTitle">SENDING…</div>
-      <div class="connecting-sub" id="connectSub">Routing through secure relay</div>
-      <div class="connecting-privacy">
-        🔒 Both numbers masked from each other
+    <div class="how-visual" id="howVisual">
+      <div class="how-visual-glow"></div>
+      <div class="how-visual-content" id="howVisualContent">
+        <span class="how-visual-icon">📦</span>
+        <div class="how-visual-title">Buy &amp; activate your tag</div>
+        <div class="how-visual-desc">Order online. Scan the activation QR on packaging. Enter your phone. Done in 60 seconds.</div>
       </div>
     </div>
   </div>
+</div>
+</div>
 
-  <!-- STEP 5: SUCCESS -->
-  <div class="step" id="step5">
-    <div class="success-card">
-      <div class="success-icon-wrap">✓</div>
-      <div class="success-title">MESSAGE SENT</div>
-      <div class="success-sub">The vehicle owner has been notified by SMS and can reply anonymously</div>
+<hr class="full-divider">
+
+<!-- FEATURES -->
+<div id="features">
+<div class="section">
+  <div class="section-eyebrow reveal">Features</div>
+  <h2 class="section-title reveal">Built for the<br><span class="accent">real world.</span></h2>
+  <p class="section-sub reveal">Every feature designed around one principle: protect your privacy while staying reachable.</p>
+  <div class="bento-grid">
+    <div class="bento-card featured reveal">
+      <span class="bento-icon">🔒</span>
+      <div class="bento-title">Complete number masking — both ways</div>
+      <p class="bento-desc">Your real number is AES-256 encrypted and never revealed to anyone who scans your tag. The scanner's number is equally hidden from you. Both parties communicate through a Twilio relay number. Neither party can identify the other from the call alone.</p>
+      <span class="bento-tag">Core technology</span>
     </div>
-
-    <div class="privacy-breakdown">
-      <div class="pb-title">What just happened</div>
-      <div class="pb-row"><span class="pb-check">✓</span><span>Your real number — <strong>hidden from owner</strong></span></div>
-      <div class="pb-row"><span class="pb-check">✓</span><span>Owner's real number — <strong>hidden from you</strong></span></div>
-      <div class="pb-row"><span class="pb-check">✓</span><span>SMS sent for reason: <strong id="successReason">—</strong></span></div>
-      <div class="pb-row"><span class="pb-check">✓</span><span>If they reply, you'll get an anonymous SMS back</span></div>
-      <div class="pb-row"><span class="pb-check">✓</span><span>Scan logged in owner's private dashboard</span></div>
+    <div class="bento-card reveal reveal-delay-1">
+      <span class="bento-icon">📱</span>
+      <div class="bento-title">No app for scanners</div>
+      <p class="bento-desc">Zero install friction. Opens in browser instantly. More people actually use it when you need them to.</p>
     </div>
-
-    <button class="btn btn-secondary mt-16" onclick="resetFlow()">
-      ↺ Start over
-    </button>
+    <div class="bento-card reveal reveal-delay-2">
+      <span class="bento-icon">💬</span>
+      <div class="bento-title">Instant SMS alerts</div>
+      <p class="bento-desc">The moment someone scans your tag you get a text with the reason. You decide if and when to call back.</p>
+    </div>
+    <div class="bento-card reveal">
+      <span class="bento-icon">🆘</span>
+      <div class="bento-title">Emergency escalation</div>
+      <p class="bento-desc">Set an emergency contact. If you miss two consecutive calls from the same scan event, they're automatically notified.</p>
+    </div>
+    <div class="bento-card reveal reveal-delay-1">
+      <span class="bento-icon">🌧️</span>
+      <div class="bento-title">Built to survive anything</div>
+      <p class="bento-desc">BOPP vinyl with gloss laminate. UV-resistant, waterproof, car-wash safe. QR level H — reads even when damaged.</p>
+    </div>
+    <div class="bento-card reveal reveal-delay-2">
+      <span class="bento-icon">📊</span>
+      <div class="bento-title">Full scan history</div>
+      <p class="bento-desc">Every scan logged with timestamp, reason, and approximate location. See patterns, export your data.</p>
+    </div>
   </div>
+</div>
+</div>
 
-  <div class="page-footer">
-    <div class="powered-by">Powered by <span>Rinqr</span> · <a href="privacy.html" style="color:var(--muted2);text-decoration:none">Privacy Policy</a> · <a href="terms.html" style="color:var(--muted2);text-decoration:none">Terms</a></div>
+<hr class="full-divider">
+
+<!-- PRICING -->
+<div id="pricing">
+<div class="section">
+  <div class="section-eyebrow reveal">Pricing</div>
+  <h2 class="section-title reveal">Simple.<br><span class="accent">No surprises.</span></h2>
+  <p class="section-sub reveal">Start free. Upgrade when you need more. No hidden fees, ever.</p>
+  <div class="pricing-grid">
+    <div class="price-card reveal">
+      <div class="price-head">
+        <div class="price-name">Starter</div>
+        <div class="price-amount"><sup>$</sup>0</div>
+        <div class="price-save" style="color:var(--muted2)">+ $9.99 one-time for physical tag</div>
+        <div class="price-desc">For drivers who just need to be reachable.</div>
+      </div>
+      <div class="price-body">
+        <ul class="price-features">
+          <li><span class="pf-check">✓</span>1 Rinqr tag</li>
+          <li><span class="pf-check">✓</span>Masked call relay</li>
+          <li><span class="pf-check">✓</span>SMS alerts</li>
+          <li><span class="pf-check">✓</span>Unlimited scans</li>
+          <li><span class="pf-check">✓</span>Last 5 scans visible</li>
+          <li><span class="pf-x">–</span><span style="color:var(--muted2)">Full scan history</span></li>
+          <li><span class="pf-x">–</span><span style="color:var(--muted2)">Emergency contact</span></li>
+        </ul>
+        <a href="signin.html?tab=signup" class="price-btn secondary">Get started →</a>
+      </div>
+    </div>
+    <div class="price-card featured reveal reveal-delay-1">
+      <div class="price-head">
+        <div class="price-name">Driver</div>
+        <div class="price-amount"><sup>$</sup>4<sub>.99/mo</sub></div>
+        <div class="price-save">or $39/yr — save 35%</div>
+        <div class="price-desc">For drivers who want full control.</div>
+      </div>
+      <div class="price-body">
+        <ul class="price-features">
+          <li><span class="pf-check">✓</span>Up to 3 tags</li>
+          <li><span class="pf-check">✓</span>Masked call relay</li>
+          <li><span class="pf-check">✓</span>SMS alerts</li>
+          <li><span class="pf-check">✓</span>Unlimited scans</li>
+          <li><span class="pf-check">✓</span>Full scan history + export</li>
+          <li><span class="pf-check">✓</span>Emergency contact</li>
+          <li><span class="pf-check">✓</span>Scan location logging</li>
+        </ul>
+        <a href="signin.html?tab=signup" class="price-btn primary">Get Driver →</a>
+      </div>
+    </div>
+    <div class="price-card reveal reveal-delay-2">
+      <div class="price-head">
+        <div class="price-name">Fleet</div>
+        <div class="price-amount"><sup>$</sup>19<sub>.99/mo</sub></div>
+        <div class="price-save">or $179/yr — save 25%</div>
+        <div class="price-desc">For families, small businesses &amp; fleets.</div>
+      </div>
+      <div class="price-body">
+        <ul class="price-features">
+          <li><span class="pf-check">✓</span>Up to 10 tags</li>
+          <li><span class="pf-check">✓</span>Everything in Driver</li>
+          <li><span class="pf-check">✓</span>Shared team dashboard</li>
+          <li><span class="pf-check">✓</span>Bulk tag management</li>
+          <li><span class="pf-check">✓</span>Custom alert messages</li>
+          <li><span class="pf-check">✓</span>CSV data export</li>
+          <li><span class="pf-check">✓</span>Priority SMS delivery</li>
+        </ul>
+        <a href="property.html#contact" class="price-btn secondary">Get Fleet →</a>
+      </div>
+    </div>
+    <div class="price-card reveal reveal-delay-3">
+      <div class="price-head">
+        <div class="price-name">Property</div>
+        <div class="price-amount"><sup>$</sup>299<sub>/yr</sub></div>
+        <div class="price-save">per property · billed annually</div>
+        <div class="price-desc">For apartment complexes &amp; offices.</div>
+      </div>
+      <div class="price-body">
+        <ul class="price-features">
+          <li><span class="pf-check">✓</span>Unlimited tags</li>
+          <li><span class="pf-check">✓</span>Property manager portal</li>
+          <li><span class="pf-check">✓</span>Resident self-activation</li>
+          <li><span class="pf-check">✓</span>Analytics dashboard</li>
+          <li><span class="pf-check">✓</span>Tow-prevention reports</li>
+          <li><span class="pf-check">✓</span>Dedicated onboarding</li>
+          <li><span class="pf-check">✓</span>White-label option</li>
+        </ul>
+        <a href="property.html#contact" class="price-btn secondary">Request pilot →</a>
+      </div>
+    </div>
   </div>
+</div>
+</div>
+
+<hr class="full-divider">
+
+<!-- B2B -->
+<div id="business">
+<div class="section">
+  <div class="section-eyebrow reveal">For business</div>
+  <h2 class="section-title reveal">Your parking<br><span class="accent">problems. Solved.</span></h2>
+  <p class="section-sub reveal">From office parks to dealership fleets — Rinqr scales to any size property.</p>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px" class="reveal">
+    <div class="bento-card">
+      <span class="bento-icon">🏢</span>
+      <div class="bento-title">Office Parks</div>
+      <p class="bento-desc">Eliminate parking complaints. Let employees resolve blocked spots instantly without calling the front desk.</p>
+      <span class="bento-tag">From $299 / property / yr</span>
+    </div>
+    <div class="bento-card">
+      <span class="bento-icon">🚘</span>
+      <div class="bento-title">Auto Dealerships</div>
+      <p class="bento-desc">Tag every loaner, demo, and service vehicle. Know exactly who to call when a car needs to move.</p>
+      <span class="bento-tag">From $299 / fleet / yr</span>
+    </div>
+    <div class="bento-card">
+      <span class="bento-icon">🏘️</span>
+      <div class="bento-title">Residential Properties</div>
+      <p class="bento-desc">Perfect for visitor lots and large complexes. Reduce towing incidents and midnight calls to management.</p>
+      <span class="bento-tag">From $299 / property / yr</span>
+    </div>
+  </div>
+  <div style="text-align:center;margin-top:32px" class="reveal">
+    <a href="property.html" class="btn-primary-hero">See property manager portal →</a>
+  </div>
+</div>
+</div>
+
+<hr class="full-divider">
+
+<!-- FAQ -->
+<div id="faq">
+<div class="section">
+  <div class="section-eyebrow reveal" style="justify-content:center">FAQs</div>
+  <h2 class="section-title reveal" style="text-align:center">Common <span class="accent">questions</span></h2>
+  <div class="faq-list reveal">
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)">Can the person scanning see my real phone number?<span class="faq-plus">+</span></button>
+      <div class="faq-a">Never. Your real number is AES-256 encrypted and stored separately from your tag ID. The scanner only ever sees a Twilio relay number. Your identity is never exposed, regardless of how many times your tag is scanned.</div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)">Does the scanner need to download an app?<span class="faq-plus">+</span></button>
+      <div class="faq-a">No app required. The scanner page opens directly in any smartphone camera — iPhone or Android. No account, no download, no friction. This is by design: more people will actually use it when they need to reach you.</div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)">What happens if my sticker gets damaged?<span class="faq-plus">+</span></button>
+      <div class="faq-a">Your sticker uses QR error correction level H, which means it still scans even if up to 30% of the surface is damaged or obscured. The weatherproof BOPP vinyl with UV laminate is also built to last outdoors for years.</div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)">How quickly do I get notified when my tag is scanned?<span class="faq-plus">+</span></button>
+      <div class="faq-a">Instantly. The moment someone completes the scanner flow, you receive an SMS alert via Twilio with the reason they scanned your tag. Typical delivery is under 5 seconds.</div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)">Can I pause my tag if I don't want to be reached?<span class="faq-plus">+</span></button>
+      <div class="faq-a">Yes. You can pause any tag from your dashboard with a single toggle. While paused, scanners will see a "tag inactive" message. You can reactivate at any time — instantly.</div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)">Is Rinqr available for property managers?<span class="faq-plus">+</span></button>
+      <div class="faq-a">Yes. Rinqr has a dedicated B2B property plan starting at $299/year per property. It includes unlimited tags, a property manager portal with analytics, resident self-activation, and dedicated onboarding. We offer a free 60-day pilot — no contracts, no upfront cost.</div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-top">
+    <div>
+      <a href="index.html" class="footer-logo">
+        <img src="Rinqr_logo.png" alt="Rinqr" style="height:90px;width:auto">
+      </a>
+      <div class="footer-tagline">Ready to protect your number?</div>
+      <p class="footer-sub">Join drivers staying reachable without sacrificing privacy. Setup takes 60 seconds.</p>
+      <div class="footer-checklist">
+        <span><span class="ck">✓</span> 100% privacy guaranteed</span>
+        <span><span class="ck">✓</span> No app for scanners</span>
+        <span><span class="ck">✓</span> Instant SMS alerts</span>
+        <span><span class="ck">✓</span> Cancel anytime</span>
+      </div>
+    </div>
+    <div>
+      <div class="footer-col-label">Explore</div>
+      <div class="footer-col-links">
+        <a href="#how"         class="footer-col-link">How it works</a>
+        <a href="#features"    class="footer-col-link">Features</a>
+        <a href="#pricing"     class="footer-col-link">Pricing</a>
+        <a href="#business"    class="footer-col-link">For Business</a>
+        <a href="#faq"         class="footer-col-link">FAQs</a>
+        <a href="contact.html" class="footer-col-link">Contact us</a>
+      </div>
+    </div>
+    <div>
+      <div class="footer-col-label">Account</div>
+      <div class="footer-col-links">
+        <a href="signin.html?tab=signup" class="footer-col-link">Create account</a>
+        <a href="signin.html"            class="footer-col-link">Sign in</a>
+        <a href="activate.html"          class="footer-col-link">Activate a tag</a>
+        <a href="dashboard.html"         class="footer-col-link">Dashboard</a>
+        <a href="property.html"          class="footer-col-link">Business portal</a>
+      </div>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <div class="footer-note">© 2026 Rinqr · Privacy-first vehicle contact</div>
+    <div class="footer-bottom-links">
+      <a href="property.html" class="footer-bottom-link">Business</a>
+      <a href="privacy.html"  class="footer-bottom-link">Privacy</a>
+      <a href="terms.html"    class="footer-bottom-link">Terms</a>
+      <a href="contact.html"  class="footer-bottom-link">Contact</a>
+    </div>
+  </div>
+</footer>
 
 <script>
-  // ── State ─────────────────────────────────────────────────
-  let selectedEmoji  = '';
-  let selectedReason = '';
-  let scannerMessage = '';   // typed message (optional)
-  let currentStep    = 1;
-
-  // Read tag ID from URL: index.html?tag=PP-7X4K-9M2R
-  const tagId = new URLSearchParams(location.search).get('tag') || '';
-
-  // ── Init ──────────────────────────────────────────────────
-  document.addEventListener('DOMContentLoaded', () => {
-    if (!tagId) {
-      document.getElementById('demoBanner').style.display = 'block';
-    }
+// ── Scroll-aware nav ──────────────────────────────────────
+const nav = document.getElementById('mainNav');
+window.addEventListener('scroll', () => {
+  nav.classList.toggle('scrolled', window.scrollY > 40);
+  const sections = ['how','features','pricing','business'];
+  let active = '';
+  sections.forEach(id => {
+    const el = document.getElementById(id);
+    if (el && window.scrollY >= el.offsetTop - 120) active = id;
   });
+  document.querySelectorAll('.nav-link[data-section]').forEach(l => {
+    l.classList.toggle('active', l.dataset.section === active);
+  });
+});
 
-  // ── Step navigation ───────────────────────────────────────
-  // Steps: 0=error, 1=reason, 2=message, 3=phone, 4=sending, 5=success
-  function goStep(n) {
-    // Sync chips on step 2 and 3
-    if (n === 2 || n === 3) {
-      ['chipEmoji','chipEmoji2'].forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.textContent = selectedEmoji;
-      });
-      ['chipText','chipText2'].forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.textContent = selectedReason;
-      });
-    }
+// ── Scroll reveal ─────────────────────────────────────────
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); } });
+}, { threshold: 0.12 });
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 
-    // Show correct step div (steps are id="step0"…"step5")
-    document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
-    const target = document.getElementById('step' + n);
-    if (target) target.classList.add('active');
-
-    // Update progress dots (5 dots for steps 1–5)
-    ['dot0','dot1','dot2','dot3','dot4'].forEach((id, i) => {
-      const dot = document.getElementById(id);
-      if (!dot) return;
-      dot.classList.remove('active','done');
-      if (i + 1 < n)  dot.classList.add('done');
-      if (i + 1 === n) dot.classList.add('active');
-    });
-
-    currentStep = n;
-    window.scrollTo(0, 0);
+// ── Demo widget ───────────────────────────────────────────
+let selectedReason = '';
+function selectReason(btn, emoji, reason) {
+  document.querySelectorAll('.demo-reason').forEach(b => b.classList.remove('sel'));
+  btn.classList.add('sel');
+  selectedReason = reason;
+}
+function sendDemo() {
+  const phone = document.getElementById('demoPhone').value;
+  if (phone.replace(/\D/g,'').length < 10) {
+    document.getElementById('demoPhone').style.borderColor = 'var(--cyan)';
+    document.getElementById('demoPhone').focus();
+    return;
   }
-
-  // ── Reason selection ──────────────────────────────────────
-  function selectReason(btn, emoji, reason) {
-    document.querySelectorAll('.reason-btn').forEach(b => b.classList.remove('selected'));
-    btn.classList.add('selected');
-    selectedEmoji  = emoji;
-    selectedReason = reason;
-    document.getElementById('reasonNextBtn').disabled = false;
-  }
-
-  // ── Message step ──────────────────────────────────────────
-  function updateCharCount() {
-    const input = document.getElementById('messageInput');
-    const remaining = 160 - input.value.length;
-    const el = document.getElementById('charCount');
-    el.textContent = remaining + ' characters remaining';
-    el.classList.toggle('warn', remaining < 20);
-  }
-
-  function skipMessage() {
-    scannerMessage = '';
-    document.getElementById('messageInput').value = '';
-    goStep(3);
-  }
-
-  // ── Phone formatting ──────────────────────────────────────
-  function formatPhone(input) {
-    let v = input.value.replace(/\D/g, '');
-    if (v.length > 10) v = v.slice(0, 10);
-    if (v.length >= 7)      v = '(' + v.slice(0,3) + ') ' + v.slice(3,6) + '-' + v.slice(6);
-    else if (v.length >= 4) v = '(' + v.slice(0,3) + ') ' + v.slice(3);
-    else if (v.length >= 1) v = '(' + v;
-    input.value = v;
-  }
-
-  function checkPhoneReady() {
-    const digits = document.getElementById('phoneInput').value.replace(/\D/g,'');
-    document.getElementById('phoneNextBtn').disabled = digits.length < 10;
-  }
-
-  // ── Core: send SMS via API ────────────────────────────────
-  async function sendSMS() {
-    // Grab message text (may be empty if skipped)
-    scannerMessage = document.getElementById('messageInput').value.trim();
-    const scannerPhone = document.getElementById('phoneInput').value;
-
-    // Move to sending step immediately (show spinner)
-    goStep(4);
-    animateSendingText();
-
-    // Demo mode — no real API call
-    if (!tagId) {
-      setTimeout(() => {
-        document.getElementById('successReason').textContent = selectedReason;
-        document.getElementById('cancelBtn').style.display = 'none';
-        goStep(5);
-      }, 3000);
-      return;
-    }
-
-    try {
-      const res = await fetch('/api/send-message', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          tagId,
-          reason:       selectedReason,
-          message:      scannerMessage || null,
-          scannerPhone
-        })
-      });
-
-      const data = await res.json();
-
-      if (!res.ok || data.error) {
-        // Handle known error codes
-        if (data.error === 'TAG_INACTIVE') {
-          showErrorState();
-          return;
-        }
-        if (data.error === 'TAG_NOT_FOUND') {
-          showErrorState('TAG_NOT_FOUND');
-          return;
-        }
-        // Generic error
-        showSendError(data.message || 'Something went wrong. Please try again.');
-        return;
-      }
-
-      // Success
-      document.getElementById('successReason').textContent = selectedReason;
-      document.getElementById('cancelBtn').style.display = 'none';
-      goStep(5);
-
-    } catch (err) {
-      // Network error
-      console.error('sendSMS error:', err);
-      showSendError('Network error. Check your connection and try again.');
-    }
-  }
-
-  // ── Sending animation ─────────────────────────────────────
-  function animateSendingText() {
-    const steps = [
-      'Locating vehicle owner…',
-      'Encrypting your number…',
-      'Routing through Twilio relay…',
-      'Sending SMS to owner…',
-      'Logging scan securely…',
-    ];
-    const subEl = document.getElementById('connectSub');
-    let i = 0;
-    const iv = setInterval(() => {
-      if (i < steps.length) {
-        subEl.textContent = steps[i++];
-      } else {
-        clearInterval(iv);
-      }
-    }, 600);
-  }
-
-  // ── Error handling ────────────────────────────────────────
-  function showErrorState(code) {
-    document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
-    document.getElementById('step0').classList.add('active');
-    document.getElementById('stepIndicator').style.display = 'none';
-    document.querySelector('.page-tagline').style.display = 'none';
-
-    // Customise message for not-found vs inactive
-    if (code === 'TAG_NOT_FOUND') {
-      document.querySelector('#step0 .success-title').textContent = 'TAG NOT FOUND';
-      document.querySelector('#step0 .success-sub').textContent =
-        'This tag ID is not registered with Rinqr. Check the sticker and try again.';
-    }
-  }
-
-  function showSendError(msg) {
-    // Go back to phone step and show inline error
-    goStep(3);
-    let errEl = document.getElementById('sendError');
-    if (!errEl) {
-      errEl = document.createElement('p');
-      errEl.id = 'sendError';
-      errEl.style.cssText = 'color:var(--accent);font-size:13px;margin-top:10px;text-align:center';
-      document.getElementById('phoneNextBtn').after(errEl);
-    }
-    errEl.textContent = '⚠ ' + msg;
-    document.getElementById('phoneNextBtn').disabled = false;
-  }
-
-  function showActiveFlow() {
-    document.getElementById('step0').classList.remove('active');
-    document.getElementById('step1').classList.add('active');
-    document.getElementById('stepIndicator').style.display = 'flex';
-    document.querySelector('.page-tagline').style.display = 'block';
-  }
-
-  // ── Reset ─────────────────────────────────────────────────
-  function resetFlow() {
-    selectedEmoji  = '';
+  document.getElementById('demoBody').style.display = 'none';
+  document.getElementById('demoSuccess').style.display = 'block';
+  setTimeout(() => {
+    document.getElementById('demoBody').style.display = 'block';
+    document.getElementById('demoSuccess').style.display = 'none';
+    document.getElementById('demoPhone').value = '';
+    document.querySelectorAll('.demo-reason').forEach(b => b.classList.remove('sel'));
     selectedReason = '';
-    scannerMessage = '';
-    document.querySelectorAll('.reason-btn').forEach(b => b.classList.remove('selected'));
-    document.getElementById('reasonNextBtn').disabled  = true;
-    document.getElementById('phoneInput').value        = '';
-    document.getElementById('messageInput').value      = '';
-    document.getElementById('phoneNextBtn').disabled   = true;
-    document.getElementById('connectSub').textContent  = 'Routing through secure relay';
-    document.getElementById('cancelBtn').style.display = '';
-    const errEl = document.getElementById('sendError');
-    if (errEl) errEl.remove();
-    goStep(1);
-  }
-</script>
+  }, 4000);
+}
 
+// ── How it works ──────────────────────────────────────────
+const howData = [
+  { icon:'📦', title:'Buy & activate your tag',   desc:'Order online. Scan the activation QR on packaging. Enter your phone. Encrypted immediately. Done in 60 seconds.' },
+  { icon:'🚗', title:'Stick it on your vehicle',  desc:'Windshield, bumper, or rear window — anywhere visible. Weatherproof vinyl. Car-wash safe. Built to last years outdoors.' },
+  { icon:'📱', title:'Someone scans your tag',    desc:'No app needed. Works on any smartphone camera. They pick a reason and enter their number. Under 30 seconds.' },
+  { icon:'🔒', title:'You connect anonymously',   desc:"Twilio relay bridges the call. You get an SMS alert instantly. Neither side ever sees the other's real number — ever." },
+];
+function setHowStep(idx, el) {
+  document.querySelectorAll('.how-step').forEach(s => s.classList.remove('active'));
+  el.classList.add('active');
+  const d = howData[idx];
+  document.getElementById('howVisualContent').innerHTML = `
+    <span class="how-visual-icon" style="animation:fadeIn .3s ease">${d.icon}</span>
+    <div class="how-visual-title">${d.title}</div>
+    <div class="how-visual-desc">${d.desc}</div>
+  `;
+}
+
+// ── FAQ ───────────────────────────────────────────────────
+function toggleFaq(btn) {
+  const item = btn.closest('.faq-item');
+  const wasOpen = item.classList.contains('open');
+  document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+  if (!wasOpen) item.classList.add('open');
+}
+</script>
 </body>
 </html>
