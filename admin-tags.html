@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
   <title>Rinqr — Tag Generator</title>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
@@ -17,7 +18,6 @@
       --card:rgba(255,255,255,0.04);
     }
 
-    /* NAV */
     .nav{
       background:rgba(13,13,13,0.95);border-bottom:1px solid var(--border);
       padding:0 32px;height:60px;
@@ -30,13 +30,11 @@
     .nav-back{font-family:var(--mono);font-size:11px;color:var(--muted);text-decoration:none;border:1px solid var(--border);padding:5px 12px;border-radius:6px;transition:border-color .15s,color .15s}
     .nav-back:hover{border-color:var(--border2);color:var(--cyan)}
 
-    /* LAYOUT */
     .page{max-width:1100px;margin:0 auto;padding:40px 32px 80px}
     .page-title{font-size:32px;font-weight:800;letter-spacing:-1px;margin-bottom:6px}
     .page-title span{color:var(--cyan)}
     .page-sub{font-size:14px;color:var(--muted);margin-bottom:36px;font-family:var(--mono)}
 
-    /* CONTROL PANEL */
     .control-panel{
       background:var(--card);border:1px solid var(--border);
       border-radius:14px;padding:28px;margin-bottom:28px;
@@ -64,7 +62,6 @@
     .generate-btn:hover{background:var(--cyan2);transform:translateY(-1px)}
     .generate-btn:disabled{opacity:.4;cursor:not-allowed;transform:none}
 
-    /* AUTH */
     .auth-row{margin-top:18px;padding-top:18px;border-top:1px solid var(--border);display:flex;align-items:center;gap:12px}
     .auth-row label{font-family:var(--mono);font-size:10px;letter-spacing:2px;color:var(--muted2);white-space:nowrap}
     .auth-row input{
@@ -75,7 +72,6 @@
     }
     .auth-row input:focus{border-color:var(--border2)}
 
-    /* STATUS BAR */
     .status-bar{
       display:flex;align-items:center;justify-content:space-between;
       margin-bottom:20px;flex-wrap:wrap;gap:12px;
@@ -93,7 +89,6 @@
     .action-btn.primary{background:var(--cyan);color:#0d0d0d;border-color:var(--cyan)}
     .action-btn.primary:hover{background:var(--cyan2);border-color:var(--cyan2)}
 
-    /* TAG GRID */
     .tag-grid{
       display:grid;
       grid-template-columns:repeat(auto-fill,minmax(200px,1fr));
@@ -126,7 +121,6 @@
     .tag-status.unactivated{background:rgba(160,96,16,.1);color:#a06010;border:1px solid rgba(160,96,16,.25)}
     .tag-status.active{background:rgba(26,122,70,.1);color:#1a7a46;border:1px solid rgba(26,122,70,.25)}
 
-    /* EMPTY STATE */
     .empty-state{
       text-align:center;padding:80px 20px;
       border:1px dashed var(--border);border-radius:14px;
@@ -135,7 +129,6 @@
     .empty-title{font-size:20px;font-weight:700;color:var(--muted);margin-bottom:8px}
     .empty-sub{font-size:14px;color:var(--muted2);font-family:var(--mono)}
 
-    /* ALERT */
     .alert{
       padding:14px 18px;border-radius:10px;margin-bottom:20px;
       font-size:14px;display:none;align-items:center;gap:10px;
@@ -144,11 +137,9 @@
     .alert.error{background:rgba(185,28,28,.1);border:1px solid rgba(185,28,28,.3);color:#f87171}
     .alert.success{background:rgba(26,122,70,.1);border:1px solid rgba(26,122,70,.3);color:#4ade80}
 
-    /* LOADING */
     .spinner{width:18px;height:18px;border:2px solid rgba(13,13,13,.3);border-top-color:#0d0d0d;border-radius:50%;animation:spin 1s linear infinite;display:inline-block}
     @keyframes spin{to{transform:rotate(360deg)}}
 
-    /* PRINT STYLES */
     @media print{
       body{background:#fff!important;color:#000!important}
       .nav,.control-panel,.status-bar,.action-btns,.no-print{display:none!important}
@@ -179,10 +170,9 @@
 </nav>
 
 <div class="page">
-  <div class="page-title">Tag <span>Generator</span></div>
+  <h1 class="page-title">Tag <span>Generator</span></h1>
   <div class="page-sub">Generate batch tag IDs, preview QR codes, and print sticker sheets</div>
 
-  <!-- CONTROL PANEL -->
   <div class="control-panel">
     <div class="panel-title">Generate new tags</div>
     <div class="controls">
@@ -204,7 +194,7 @@
       </div>
       <div class="field">
         <label>Base URL</label>
-        <input type="text" id="baseUrl" value="https://rinqr.com/index.html" placeholder="https://rinqr.com/index.html">
+        <input type="text" id="baseUrl" value="https://rinqr.com/scan.html" placeholder="https://rinqr.com/scan.html">
       </div>
       <button class="generate-btn" id="generateBtn" onclick="generateTags()">
         Generate →
@@ -216,10 +206,8 @@
     </div>
   </div>
 
-  <!-- ALERT -->
   <div class="alert" id="alert"></div>
 
-  <!-- STATUS + ACTIONS -->
   <div class="status-bar" id="statusBar" style="display:none">
     <div class="status-info" id="statusInfo"></div>
     <div class="action-btns no-print">
@@ -229,7 +217,6 @@
     </div>
   </div>
 
-  <!-- TAG GRID -->
   <div id="tagGrid">
     <div class="empty-state">
       <span class="empty-icon">🏷️</span>
@@ -247,7 +234,7 @@
     const prefix   = document.getElementById('prefixInput').value.trim() || 'PP';
     const count    = parseInt(document.getElementById('countSelect').value);
     const adminKey = document.getElementById('adminKey').value.trim();
-    const baseUrl  = document.getElementById('baseUrl').value.trim() || 'https://rinqr.com/index.html';
+    const baseUrl  = document.getElementById('baseUrl').value.trim() || 'https://rinqr.com/scan.html';
 
     if (!adminKey) { showAlert('Enter your admin key first.', 'error'); return; }
 
@@ -300,7 +287,6 @@
       `;
       grid.appendChild(card);
 
-      // Generate QR code
       new QRCode(document.getElementById(`qr-${tagId}`), {
         text:           url,
         width:          104,
@@ -320,7 +306,7 @@
   }
 
   function downloadCSV() {
-    const baseUrl = document.getElementById('baseUrl').value.trim() || 'https://rinqr.com/index.html';
+    const baseUrl = document.getElementById('baseUrl').value.trim() || 'https://rinqr.com/scan.html';
     const header  = 'Tag ID,Activation URL,Status\n';
     const rows    = generatedTags.map(t =>
       `${t},${baseUrl}?tag=${encodeURIComponent(t)},Unactivated`
@@ -341,7 +327,6 @@
     document.getElementById('alert').classList.remove('show');
   }
 
-  // Allow Enter key on admin key field to trigger generate
   document.getElementById('adminKey').addEventListener('keydown', e => {
     if (e.key === 'Enter') generateTags();
   });

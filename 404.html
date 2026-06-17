@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Page Not Found — Rinqr</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    body{
+      background:#0d0d0d;color:#e8edf2;font-family:'Plus Jakarta Sans',sans-serif;
+      -webkit-font-smoothing:antialiased;min-height:100vh;
+      display:flex;flex-direction:column;align-items:center;justify-content:center;
+      padding:24px;text-align:center;position:relative;overflow:hidden;
+    }
+    :root{
+      --cyan:#00b4aa;--cyan2:#00d4c8;
+      --border:rgba(255,255,255,0.08);--border2:rgba(0,180,170,0.25);
+      --muted:rgba(232,237,242,0.5);--muted2:rgba(232,237,242,0.3);
+      --mono:'DM Mono',monospace;
+    }
+    .glow{
+      position:absolute;top:-200px;left:50%;transform:translateX(-50%);
+      width:700px;height:600px;
+      background:radial-gradient(ellipse at center,rgba(0,180,170,0.25) 0%,rgba(0,180,170,0.08) 40%,transparent 70%);
+      pointer-events:none;
+    }
+    .logo{position:relative;z-index:1;margin-bottom:40px}
+    .logo img{height:44px;width:auto}
+    .code{
+      font-family:var(--mono);font-size:13px;letter-spacing:4px;
+      color:var(--cyan);margin-bottom:20px;position:relative;z-index:1;
+    }
+    h1{
+      font-size:clamp(32px,5vw,52px);font-weight:900;letter-spacing:-2px;
+      line-height:1.1;margin-bottom:16px;position:relative;z-index:1;
+    }
+    h1 span{color:var(--cyan)}
+    p{
+      font-size:16px;color:var(--muted);line-height:1.65;max-width:420px;
+      margin-bottom:36px;position:relative;z-index:1;
+    }
+    .btn-row{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;position:relative;z-index:1}
+    .btn-primary{
+      background:var(--cyan);color:#0d0d0d;font-size:15px;font-weight:700;
+      padding:13px 28px;border-radius:9px;text-decoration:none;
+      transition:background .2s,transform .15s;
+    }
+    .btn-primary:hover{background:var(--cyan2);transform:translateY(-2px)}
+    .btn-ghost{
+      background:transparent;color:var(--muted);font-size:15px;font-weight:500;
+      padding:13px 28px;border-radius:9px;text-decoration:none;
+      border:1px solid var(--border);transition:border-color .2s,color .2s,transform .15s;
+    }
+    .btn-ghost:hover{border-color:var(--border2);color:var(--text);transform:translateY(-2px)}
+  </style>
+</head>
+<body>
+  <div class="glow"></div>
+
+  <a href="index.html" class="logo"><img src="Rinqr_logo.png" alt="Rinqr"></a>
+
+  <div class="code">ERROR 404</div>
+  <h1>This tag doesn't <span>exist.</span></h1>
+  <p>The page you're looking for has moved, been renamed, or never existed. Let's get you back on track.</p>
+
+  <div class="btn-row">
+    <a href="index.html" class="btn-primary">Back to home →</a>
+    <a href="contact.html" class="btn-ghost">Contact support</a>
+  </div>
+</body>
+</html>

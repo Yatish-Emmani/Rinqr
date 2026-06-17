@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
   <title>Rinqr — Dashboard</title>
   <script src="auth.js"></script>
   <script>var __session = RinqrAuth.requireDriver();</script>
@@ -359,7 +360,7 @@ function renderTagList() {
     if (el) {
       el.innerHTML = '';
       new QRCode(el, {
-        text:         `https://rinqr.com/index.html?tag=${t.tag_id}`,
+        text:         `https://rinqr.com/scan.html?tag=${t.tag_id}`,
         width:        48, height: 48,
         colorDark:    '#000000', colorLight: '#ffffff',
         correctLevel: QRCode.CorrectLevel.H,
@@ -409,7 +410,7 @@ async function toggleTag(tagId, checkbox) {
 // ── QR Modal ─────────────────────────────────────────────
 function openQrModal(tagId) {
   currentQrId = tagId;
-  const url   = `https://rinqr.com/index.html?tag=${tagId}`;
+  const url   = `https://rinqr.com/scan.html?tag=${tagId}`;
   document.getElementById('qrModalId').textContent = tagId;
   document.getElementById('qrModalSub').textContent = url;
   const box = document.getElementById('qrModalBox');

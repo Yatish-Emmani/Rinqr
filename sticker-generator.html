@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
 <title>Rinqr — Sticker Generator</title>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
@@ -114,7 +115,7 @@ body{background:#0d0d0d;color:#e8edf2;font-family:'Plus Jakarta Sans',sans-serif
 </nav>
 
 <div class="page">
-  <div class="page-title">Sticker <span>Generator</span></div>
+  <h1 class="page-title">Sticker <span>Generator</span></h1>
   <div class="page-sub">2-sided · Front: QR + logo · Back: tag ID + www.rinqr.com · Both download at 900×900px</div>
 
   <div class="control-panel">
@@ -138,7 +139,7 @@ body{background:#0d0d0d;color:#e8edf2;font-family:'Plus Jakarta Sans',sans-serif
       </div>
       <div class="field">
         <label>Scan URL</label>
-        <input type="text" id="baseUrl" value="https://rinqr.com/index.html">
+        <input type="text" id="baseUrl" value="https://rinqr.com/scan.html">
       </div>
       <button class="gen-btn" id="genBtn" onclick="generateStickers()">Generate →</button>
     </div>
@@ -174,7 +175,7 @@ body{background:#0d0d0d;color:#e8edf2;font-family:'Plus Jakarta Sans',sans-serif
 
 <script>
 let generatedTags = [];
-let scanBaseUrl   = 'https://rinqr.com/index.html';
+let scanBaseUrl   = 'https://rinqr.com/scan.html';
 
 // Both canvases use the SAME dimensions: 900×900px
 const S = 900; // square size for both front and back
@@ -184,7 +185,7 @@ async function generateStickers() {
   const prefix   = document.getElementById('prefixInput').value.trim() || 'PP';
   const count    = parseInt(document.getElementById('countSelect').value);
   const adminKey = document.getElementById('adminKey').value.trim();
-  scanBaseUrl    = document.getElementById('baseUrl').value.trim() || 'https://rinqr.com/index.html';
+  scanBaseUrl    = document.getElementById('baseUrl').value.trim() || 'https://rinqr.com/scan.html';
 
   if (!adminKey) { showAlert('Enter your admin key first.', 'error'); return; }
   btn.textContent = 'Generating…'; btn.disabled = true;
