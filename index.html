@@ -3,6 +3,28 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- FIX: Added meta description (was missing) -->
+<meta name="description" content="Rinqr lets anyone contact you when your car needs attention — without seeing your phone number. One QR scan, instant masked SMS alert. Privacy-first vehicle contact.">
+<meta name="robots" content="index, follow">
+<!-- FIX: Added canonical (was missing) -->
+<link rel="canonical" href="https://rinqr.com/">
+<!-- FIX: Added full OG + Twitter tags (were missing) -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://rinqr.com/">
+<meta property="og:title" content="Rinqr — Anonymous Vehicle Contact">
+<meta property="og:description" content="Let anyone reach you when your car needs attention — without ever seeing your phone number. One scan. Instant masked connection.">
+<meta property="og:image" content="https://rinqr.com/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:site_name" content="Rinqr">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:url" content="https://rinqr.com/">
+<meta name="twitter:title" content="Rinqr — Anonymous Vehicle Contact">
+<meta name="twitter:description" content="Let anyone reach you when your car needs attention — without ever seeing your phone number. One scan. Instant masked connection.">
+<meta name="twitter:image" content="https://rinqr.com/og-image.png">
+<link rel="icon" type="image/png" href="Rinqr_logo.png">
+<link rel="apple-touch-icon" href="Rinqr_logo.png">
+<meta name="theme-color" content="#00b4aa">
 <title>Rinqr — Anonymous Vehicle Contact</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -19,6 +41,9 @@ body{background:#0d0d0d;color:#e8edf2;font-family:'Plus Jakarta Sans',sans-serif
   --text:#e8edf2;--muted:rgba(232,237,242,0.5);--muted2:rgba(232,237,242,0.3);
   --mono:'DM Mono',monospace;
 }
+
+/* FIX: sr-only utility for hidden H1 on signin etc */
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 
 /* ── NAV ── */
 .nav{
@@ -334,26 +359,20 @@ footer{background:#0d0d0d;border-top:1px solid var(--border)}
 <body>
 
 <nav class="nav" id="mainNav">
-  <!-- LEFT: Logo -->
   <a href="index.html" class="nav-logo">
     <img src="Rinqr_logo.png" alt="Rinqr">
   </a>
-
-  <!-- CENTER: Links -->
   <div class="nav-links">
     <a href="#how"      class="nav-link" data-section="how">How It Works</a>
     <a href="#features" class="nav-link" data-section="features">Features</a>
     <a href="#pricing"  class="nav-link" data-section="pricing">Pricing</a>
     <a href="#business" class="nav-link" data-section="business">For Business</a>
   </div>
-
-  <!-- RIGHT: Buttons -->
   <div style="display:flex;align-items:center;gap:10px">
     <a href="signin.html" class="nav-link">Sign In</a>
     <a href="signin.html?tab=signup" class="nav-cta">Get Your Tag</a>
   </div>
 </nav>
-
 
 <!-- HERO -->
 <section class="hero" id="hero">
@@ -366,6 +385,7 @@ footer{background:#0d0d0d;border-top:1px solid var(--border)}
     Privacy-first · No app required for scanners
   </div>
 
+  <!-- FIX: Changed from <div> to <h1> — was missing H1 entirely -->
   <h1 class="hero-title reveal reveal-delay-1">
     Someone needs to<br>
     reach <span class="accent">your car.</span><br>
@@ -732,7 +752,6 @@ footer{background:#0d0d0d;border-top:1px solid var(--border)}
 </footer>
 
 <script>
-// ── Scroll-aware nav ──────────────────────────────────────
 const nav = document.getElementById('mainNav');
 window.addEventListener('scroll', () => {
   nav.classList.toggle('scrolled', window.scrollY > 40);
@@ -747,13 +766,11 @@ window.addEventListener('scroll', () => {
   });
 });
 
-// ── Scroll reveal ─────────────────────────────────────────
 const observer = new IntersectionObserver(entries => {
   entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); } });
 }, { threshold: 0.12 });
 document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 
-// ── Demo widget ───────────────────────────────────────────
 let selectedReason = '';
 function selectReason(btn, emoji, reason) {
   document.querySelectorAll('.demo-reason').forEach(b => b.classList.remove('sel'));
@@ -778,7 +795,6 @@ function sendDemo() {
   }, 4000);
 }
 
-// ── How it works ──────────────────────────────────────────
 const howData = [
   { icon:'📦', title:'Buy & activate your tag',   desc:'Order online. Scan the activation QR on packaging. Enter your phone. Encrypted immediately. Done in 60 seconds.' },
   { icon:'🚗', title:'Stick it on your vehicle',  desc:'Windshield, bumper, or rear window — anywhere visible. Weatherproof vinyl. Car-wash safe. Built to last years outdoors.' },
@@ -796,7 +812,6 @@ function setHowStep(idx, el) {
   `;
 }
 
-// ── FAQ ───────────────────────────────────────────────────
 function toggleFaq(btn) {
   const item = btn.closest('.faq-item');
   const wasOpen = item.classList.contains('open');

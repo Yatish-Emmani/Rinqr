@@ -9,7 +9,9 @@
   <meta property="og:url" content="https://rinqr.com/scan.html">
   <meta property="og:title" content="Rinqr — Contact a Vehicle Owner Privately">
   <meta property="og:description" content="Scan a Rinqr tag to reach a vehicle owner anonymously. No app, no phone numbers exchanged.">
+  <meta property="og:image" content="https://rinqr.com/og-image.png">
   <meta name="twitter:card" content="summary">
+  <meta name="twitter:image" content="https://rinqr.com/og-image.png">
   <link rel="icon" type="image/png" href="Rinqr_logo.png">
   <title>Rinqr — Contact Vehicle Owner</title>
   <link rel="stylesheet" href="style.css">
@@ -223,7 +225,6 @@
     }
     .back-link:hover { color: var(--accent); }
 
-    /* Message step */
     .message-wrap {
       background: var(--card);
       border: 1px solid var(--border);
@@ -263,7 +264,6 @@
     }
     .char-count.warn { color: var(--accent); }
 
-    /* Demo banner */
     .demo-banner {
       background: rgba(0, 180, 170, .08);
       border: 1px solid rgba(0, 180, 170, .25);
@@ -285,7 +285,8 @@
   <a href="index.html" class="logo-mark page-logo">
     <img src="Rinqr_logo.png" alt="Rinqr" class="logo-img">
   </a>
-  <p class="page-tagline">Reach this vehicle's owner — privately</p>
+  <!-- FIX: Changed <p> to <h1> — page had no H1 -->
+  <h1 class="page-tagline">Reach this vehicle's owner — privately</h1>
 
   <div id="demoBanner" class="demo-banner" style="display:none">
     ⚠️ Demo mode — no tag ID in URL. Real scans use <code>?tag=PP-XXXX-XXXX</code>
@@ -349,72 +350,42 @@
     </button>
   </div>
 
-  <!-- STEP 2: MESSAGE (new) -->
+  <!-- STEP 2: MESSAGE -->
   <div class="step" id="step2">
     <button class="back-link" onclick="goStep(1)">← Back</button>
-
     <div class="selected-reason-chip" id="selectedChip2" onclick="goStep(1)">
       <span id="chipEmoji2">🚗</span>
       <span id="chipText2">Blocking driveway</span>
       <span style="color:var(--muted)">· change</span>
     </div>
-
     <div class="message-wrap">
       <label class="message-label" for="messageInput">Add a message <span style="color:var(--muted2)">(optional)</span></label>
-      <textarea
-        id="messageInput"
-        placeholder="E.g. You're blocking spot 14, can you move ASAP?"
-        maxlength="160"
-        oninput="updateCharCount()"
-      ></textarea>
+      <textarea id="messageInput" placeholder="E.g. You're blocking spot 14, can you move ASAP?" maxlength="160" oninput="updateCharCount()"></textarea>
       <div class="char-count" id="charCount">160 characters remaining</div>
     </div>
-
     <div class="privacy-note mb-16">
       🔒 Your message is sent anonymously — the owner won't see your number
     </div>
-
-    <button class="btn btn-primary" onclick="goStep(3)">
-      Continue →
-    </button>
-    <button class="btn btn-secondary mt-8" onclick="skipMessage()">
-      Skip — send without a message
-    </button>
+    <button class="btn btn-primary" onclick="goStep(3)">Continue →</button>
+    <button class="btn btn-secondary mt-8" onclick="skipMessage()">Skip — send without a message</button>
   </div>
 
   <!-- STEP 3: PHONE -->
   <div class="step" id="step3">
     <button class="back-link" onclick="goStep(2)">← Back</button>
-
     <div class="selected-reason-chip" id="selectedChip" onclick="goStep(1)">
       <span id="chipEmoji">🚗</span>
       <span id="chipText">Blocking driveway</span>
       <span style="color:var(--muted)">· change</span>
     </div>
-
     <div class="phone-wrap">
       <label class="phone-label" for="phoneInput">Your phone number</label>
-      <input
-        type="tel"
-        id="phoneInput"
-        placeholder="(555) 000-0000"
-        maxlength="14"
-        autocomplete="tel"
-        oninput="formatPhone(this); checkPhoneReady()"
-      >
+      <input type="tel" id="phoneInput" placeholder="(555) 000-0000" maxlength="14" autocomplete="tel"
+        oninput="formatPhone(this); checkPhoneReady()">
     </div>
-
-    <div class="privacy-note mb-16">
-      🔒 Your number is never shared with the vehicle owner
-    </div>
-
-    <button class="btn btn-primary" id="phoneNextBtn" disabled onclick="sendSMS()">
-      Send message anonymously →
-    </button>
-
-    <p class="tcpa mt-8">
-      By continuing you consent to receive an anonymous SMS reply from the vehicle owner. Standard rates may apply.
-    </p>
+    <div class="privacy-note mb-16">🔒 Your number is never shared with the vehicle owner</div>
+    <button class="btn btn-primary" id="phoneNextBtn" disabled onclick="sendSMS()">Send message anonymously →</button>
+    <p class="tcpa mt-8">By continuing you consent to receive an anonymous SMS reply from the vehicle owner. Standard rates may apply.</p>
   </div>
 
   <!-- STEP 4: SENDING -->
@@ -424,9 +395,7 @@
       <div class="spinner" id="connectSpinner"></div>
       <div class="connecting-title" id="connectTitle">SENDING…</div>
       <div class="connecting-sub" id="connectSub">Routing through secure relay</div>
-      <div class="connecting-privacy">
-        🔒 Both numbers masked from each other
-      </div>
+      <div class="connecting-privacy">🔒 Both numbers masked from each other</div>
     </div>
   </div>
 
@@ -437,7 +406,6 @@
       <div class="success-title">MESSAGE SENT</div>
       <div class="success-sub">The vehicle owner has been notified by SMS and can reply anonymously</div>
     </div>
-
     <div class="privacy-breakdown">
       <div class="pb-title">What just happened</div>
       <div class="pb-row"><span class="pb-check">✓</span><span>Your real number — <strong>hidden from owner</strong></span></div>
@@ -446,10 +414,7 @@
       <div class="pb-row"><span class="pb-check">✓</span><span>If they reply, you'll get an anonymous SMS back</span></div>
       <div class="pb-row"><span class="pb-check">✓</span><span>Scan logged in owner's private dashboard</span></div>
     </div>
-
-    <button class="btn btn-secondary mt-16" onclick="resetFlow()">
-      ↺ Start over
-    </button>
+    <button class="btn btn-secondary mt-16" onclick="resetFlow()">↺ Start over</button>
   </div>
 
   <div class="page-footer">
@@ -457,43 +422,27 @@
   </div>
 
 <script>
-  // ── State ─────────────────────────────────────────────────
   let selectedEmoji  = '';
   let selectedReason = '';
-  let scannerMessage = '';   // typed message (optional)
+  let scannerMessage = '';
   let currentStep    = 1;
 
-  // Read tag ID from URL: index.html?tag=PP-7X4K-9M2R
   const tagId = new URLSearchParams(location.search).get('tag') || '';
 
-  // ── Init ──────────────────────────────────────────────────
   document.addEventListener('DOMContentLoaded', () => {
     if (!tagId) {
       document.getElementById('demoBanner').style.display = 'block';
     }
   });
 
-  // ── Step navigation ───────────────────────────────────────
-  // Steps: 0=error, 1=reason, 2=message, 3=phone, 4=sending, 5=success
   function goStep(n) {
-    // Sync chips on step 2 and 3
     if (n === 2 || n === 3) {
-      ['chipEmoji','chipEmoji2'].forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.textContent = selectedEmoji;
-      });
-      ['chipText','chipText2'].forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.textContent = selectedReason;
-      });
+      ['chipEmoji','chipEmoji2'].forEach(id => { const el = document.getElementById(id); if (el) el.textContent = selectedEmoji; });
+      ['chipText','chipText2'].forEach(id => { const el = document.getElementById(id); if (el) el.textContent = selectedReason; });
     }
-
-    // Show correct step div (steps are id="step0"…"step5")
     document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
     const target = document.getElementById('step' + n);
     if (target) target.classList.add('active');
-
-    // Update progress dots (5 dots for steps 1–5)
     ['dot0','dot1','dot2','dot3','dot4'].forEach((id, i) => {
       const dot = document.getElementById(id);
       if (!dot) return;
@@ -501,12 +450,10 @@
       if (i + 1 < n)  dot.classList.add('done');
       if (i + 1 === n) dot.classList.add('active');
     });
-
     currentStep = n;
     window.scrollTo(0, 0);
   }
 
-  // ── Reason selection ──────────────────────────────────────
   function selectReason(btn, emoji, reason) {
     document.querySelectorAll('.reason-btn').forEach(b => b.classList.remove('selected'));
     btn.classList.add('selected');
@@ -515,7 +462,6 @@
     document.getElementById('reasonNextBtn').disabled = false;
   }
 
-  // ── Message step ──────────────────────────────────────────
   function updateCharCount() {
     const input = document.getElementById('messageInput');
     const remaining = 160 - input.value.length;
@@ -530,7 +476,6 @@
     goStep(3);
   }
 
-  // ── Phone formatting ──────────────────────────────────────
   function formatPhone(input) {
     let v = input.value.replace(/\D/g, '');
     if (v.length > 10) v = v.slice(0, 10);
@@ -545,17 +490,11 @@
     document.getElementById('phoneNextBtn').disabled = digits.length < 10;
   }
 
-  // ── Core: send SMS via API ────────────────────────────────
   async function sendSMS() {
-    // Grab message text (may be empty if skipped)
     scannerMessage = document.getElementById('messageInput').value.trim();
     const scannerPhone = document.getElementById('phoneInput').value;
-
-    // Move to sending step immediately (show spinner)
     goStep(4);
     animateSendingText();
-
-    // Demo mode — no real API call
     if (!tagId) {
       setTimeout(() => {
         document.getElementById('successReason').textContent = selectedReason;
@@ -564,85 +503,48 @@
       }, 3000);
       return;
     }
-
     try {
       const res = await fetch('/api/send-message', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          tagId,
-          reason:       selectedReason,
-          message:      scannerMessage || null,
-          scannerPhone
-        })
+        body: JSON.stringify({ tagId, reason: selectedReason, message: scannerMessage || null, scannerPhone })
       });
-
       const data = await res.json();
-
       if (!res.ok || data.error) {
-        // Handle known error codes
-        if (data.error === 'TAG_INACTIVE') {
-          showErrorState();
-          return;
-        }
-        if (data.error === 'TAG_NOT_FOUND') {
-          showErrorState('TAG_NOT_FOUND');
-          return;
-        }
-        // Generic error
+        if (data.error === 'TAG_INACTIVE') { showErrorState(); return; }
+        if (data.error === 'TAG_NOT_FOUND') { showErrorState('TAG_NOT_FOUND'); return; }
         showSendError(data.message || 'Something went wrong. Please try again.');
         return;
       }
-
-      // Success
       document.getElementById('successReason').textContent = selectedReason;
       document.getElementById('cancelBtn').style.display = 'none';
       goStep(5);
-
     } catch (err) {
-      // Network error
-      console.error('sendSMS error:', err);
       showSendError('Network error. Check your connection and try again.');
     }
   }
 
-  // ── Sending animation ─────────────────────────────────────
   function animateSendingText() {
-    const steps = [
-      'Locating vehicle owner…',
-      'Encrypting your number…',
-      'Routing through Twilio relay…',
-      'Sending SMS to owner…',
-      'Logging scan securely…',
-    ];
+    const steps = ['Locating vehicle owner…','Encrypting your number…','Routing through Twilio relay…','Sending SMS to owner…','Logging scan securely…'];
     const subEl = document.getElementById('connectSub');
     let i = 0;
     const iv = setInterval(() => {
-      if (i < steps.length) {
-        subEl.textContent = steps[i++];
-      } else {
-        clearInterval(iv);
-      }
+      if (i < steps.length) { subEl.textContent = steps[i++]; } else { clearInterval(iv); }
     }, 600);
   }
 
-  // ── Error handling ────────────────────────────────────────
   function showErrorState(code) {
     document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
     document.getElementById('step0').classList.add('active');
     document.getElementById('stepIndicator').style.display = 'none';
     document.querySelector('.page-tagline').style.display = 'none';
-
-    // Customise message for not-found vs inactive
     if (code === 'TAG_NOT_FOUND') {
       document.querySelector('#step0 .success-title').textContent = 'TAG NOT FOUND';
-      document.querySelector('#step0 .success-sub').textContent =
-        'This tag ID is not registered with Rinqr. Check the sticker and try again.';
+      document.querySelector('#step0 .success-sub').textContent = 'This tag ID is not registered with Rinqr. Check the sticker and try again.';
     }
   }
 
   function showSendError(msg) {
-    // Go back to phone step and show inline error
     goStep(3);
     let errEl = document.getElementById('sendError');
     if (!errEl) {
@@ -662,7 +564,6 @@
     document.querySelector('.page-tagline').style.display = 'block';
   }
 
-  // ── Reset ─────────────────────────────────────────────────
   function resetFlow() {
     selectedEmoji  = '';
     selectedReason = '';
@@ -679,6 +580,5 @@
     goStep(1);
   }
 </script>
-
 </body>
 </html>

@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="robots" content="noindex, nofollow">
-  <title>Rinqr — Dashboard</title>
+  <title>My Dashboard — Rinqr Tag Manager</title>
   <script src="auth.js"></script>
   <script>var __session = RinqrAuth.requireDriver();</script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
@@ -82,6 +82,7 @@
     .modal{background:#fff;border:1px solid var(--border2);border-radius:12px;padding:28px;width:100%;max-width:400px;transform:translateY(20px);transition:transform .2s;box-shadow:0 8px 40px rgba(0,0,0,.14)}
     .modal-overlay.open .modal{transform:translateY(0)}
 
+    .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
     @media(max-width:720px){.stats-grid{grid-template-columns:repeat(2,1fr)}.two-col{grid-template-columns:1fr}}
   </style>
 </head>
@@ -108,6 +109,7 @@
   </div>
 </nav>
 
+<h1 class="sr-only">Rinqr Dashboard</h1>
 <div class="main">
   <div class="tabs">
     <div class="tab active" onclick="showTab('overview',this)">Overview</div>
